@@ -1,6 +1,4 @@
 SHELL := /bin/bash
-SESSION_NAME := km3mon
-DAQ_LIGIER := 192.168.0.110
 STANDARD_TAGS := "IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSSN, MSG, IO_MONIT"
 
 default: start
@@ -12,12 +10,12 @@ start:
 	@tmux rename-window -t ${SESSION_NAME}:1 ligier
 
 	@tmux send-keys -t ${SESSION_NAME}:ligier.1 \
-	    "JLigier -d2 -P 5553" Enter
+	    "JLigier -d2 -P ${MONITORING_LIGIER_PORT}" Enter
 	@sleep 1  # wait a second for JLigier
 
 	@tmux split-window -v -t ${SESSION_NAME}:ligier
 	@tmux send-keys -t ${SESSION_NAME}:ligier.2 \
-	    "ligiermirror -m \"${STANDARD_TAGS}\" ${DAQ_LIGIER}" Enter
+	    "ligiermirror -m \"${STANDARD_TAGS}\" -q ${MONITORING_LIGIER_PORT} -p ${DAQ_LIGIER_PORT} ${DAQ_LIGIER_IP}" Enter
 
 stop:
 	tmux kill-session -t ${SESSION_NAME}

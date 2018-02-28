@@ -1,0 +1,47 @@
+#!/bin/sh
+
+daq_ligier_ip="192.168.0.110"
+daq_ligier_port=5553
+monitoring_ligier_port=5553
+tmux_session_name="km3mon"
+
+for arg in "$@"; do
+    case "$arg" in
+    --daq-ligier-ip=*)
+        daq_ligier_ip=`echo $arg | sed 's/--daq-ligier-ip=//'`
+        ;;
+
+    --daq-ligier-port=*)
+        daq_ligier_port=`echo $arg | sed 's/--daq-ligier-port=//'`
+        ;;
+
+    --monitoring-ligier-port=*)
+        monitoring_ligier_port=`echo $arg | sed 's/--monitoring-ligier-port=//'`
+        ;;
+
+    --tmux-session-name=*)
+        tmux_session_name=`echo $arg | sed 's/--tmux-session-name=//'`
+        ;;
+
+    --help)
+        echo 'usage: ./configure [options]'
+        echo 'options:'
+        echo '  --daq-ligier-ip=<ip>: The IP of the DAQ Ligier [default: ${daq_ligier_ip}].'
+        echo '  --daq-ligier-port=<port>: The port of the DAQ Ligier [default: ${daq_ligier_port}].'
+        echo '  --tmux-session-name=<name>: The name of the tmux session [default: ${tmux_session_name}].'
+        echo 'all invalid options are silently ignored'
+        exit 0
+        ;;
+    esac
+done
+
+echo 'Generating makefile...'
+
+echo "DAQ_LIGIER_IP = ${daq_ligier_ip}" > Makefile
+echo "DAQ_LIGIER_PORT = ${daq_ligier_port}" >> Makefile
+echo "MONITORING_LIGIER_PORT = ${monitoring_ligier_port}" >> Makefile
+echo "SESSION_NAME = ${tmux_session_name}" >> Makefile
+
+cat Makefile.in >> Makefile
+
+echo 'Configuration complete, type "make start" to start the monitoring session.'
