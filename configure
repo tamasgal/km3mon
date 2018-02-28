@@ -4,6 +4,7 @@ daq_ligier_ip="192.168.0.110"
 daq_ligier_port=5553
 monitoring_ligier_ip="127.0.0.1"
 monitoring_ligier_port=5553
+webserver_port=8080
 tmux_session_name="km3mon"
 
 
@@ -27,10 +28,6 @@ for arg in "$@"; do
         daq_ligier_port=`echo $arg | sed 's/--daq-ligier-port=//'`
         ;;
 
-    --monitoring-ligier-ip=*)
-        monitoring_ligier_ip=`echo $arg | sed 's/--monitoring-ligier-ip=//'`
-        ;;
-
     --monitoring-ligier-port=*)
         monitoring_ligier_port=`echo $arg | sed 's/--monitoring-ligier-port=//'`
         ;;
@@ -39,16 +36,20 @@ for arg in "$@"; do
         tmux_session_name=`echo $arg | sed 's/--tmux-session-name=//'`
         ;;
 
+    --webserver-port=*)
+        webserver_port=`echo $arg | sed 's/--webserver-port=//'`
+        ;;
+
     --help)
         show_km3mon_banner
         echo 'Usage:  ./configure [options]'
         echo
-        echo '  OPTION                           DESCRIPTION                 DEFAULT'
-        echo "  --daq-ligier-ip=<ip>             The DAQ Ligier              ${daq_ligier_ip}"
-        echo "  --daq-ligier-port=<port>         The port of the DAQ Ligier  ${daq_ligier_port}"
-        echo "  --monitoring-ligier-ip=<ip>      The monitoring Ligier       ${monitoring_ligier_ip}"
-        echo "  --monitoring-ligier-port=<port>  The port of the DAQ Ligier  ${monitoring_ligier_port}"
-        echo "  --tmux-session-name=<name>       TMUX session name           ${tmux_session_name}"
+        echo '  OPTION                    DESCRIPTION                    DEFAULT'
+        echo "  --daq-ligier-ip           DAQ Ligier                     ${daq_ligier_ip}"
+        echo "  --daq-ligier-port         Port of the DAQ Ligier         ${daq_ligier_port}"
+        echo "  --monitoring-ligier-port  Port of the monitoring Ligier  ${monitoring_ligier_port}"
+        echo "  --tmux-session-name       TMUX session name              ${tmux_session_name}"
+        echo "  --webserver-port          Port of the web server         ${webserver_port}"
         echo
         echo 'All invalid options are silently ignored.'
         exit 0
@@ -58,8 +59,8 @@ done
 
 echo "DAQ_LIGIER_IP = ${daq_ligier_ip}" > Makefile
 echo "DAQ_LIGIER_PORT = ${daq_ligier_port}" >> Makefile
-echo "MONITORING_LIGIER_IP = ${monitoring_ligier_ip}" >> Makefile
 echo "MONITORING_LIGIER_PORT = ${monitoring_ligier_port}" >> Makefile
+echo "WEBSERVER_PORT = ${webserver_port}" >> Makefile
 echo "SESSION_NAME = ${tmux_session_name}" >> Makefile
 
 cat Makefile.in >> Makefile
@@ -67,5 +68,6 @@ cat Makefile.in >> Makefile
 show_km3mon_banner
 echo "DAQ Ligier:         ${daq_ligier_ip}:${daq_ligier_port}"
 echo "Monitoring Ligier:  ${monitoring_ligier_ip}:${monitoring_ligier_port}"
+echo "Webserver:          0.0.0.0:${webserver_port}"
 echo
 echo "Configuration complete, type \"make start\" to start the monitoring in a tmux session called \"${tmux_session_name}\"."

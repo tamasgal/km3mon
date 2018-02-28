@@ -5,19 +5,34 @@ default: start
 
 start: 
 	@echo Creating tmux session
-	@tmux new-session -d -s ${SESSION_NAME} \
-	    || (echo Please run \"make stop\" to close the current session.; exit 1)
-	@tmux rename-window -t ${SESSION_NAME}:1 ligier
 
-	@tmux send-keys -t ${SESSION_NAME}:ligier.1 \
+	@tmux new-session -d -s ${SESSION_NAME}  \
+	    || (echo Please run \"make stop\" to close the current session.; exit 1)
+
+	@tmux rename-window -t ${SESSION_NAME}:1 main
+
+	@tmux send-keys -t ${SESSION_NAME}:main.1  \
 	    "JLigier -d2 -P ${MONITORING_LIGIER_PORT}" Enter
+
 	@sleep 1  # wait a second for JLigier
 
-	@tmux split-window -v -t ${SESSION_NAME}:ligier
-	@tmux send-keys -t ${SESSION_NAME}:ligier.2 \
-	    "ligiermirror -m \"${STANDARD_TAGS}\" -q ${MONITORING_LIGIER_PORT} -p ${DAQ_LIGIER_PORT} ${DAQ_LIGIER_IP}" Enter
+	# The ligier mirror
+	@tmux split-window -v -t ${SESSION_NAME}:main
+	@tmux send-keys -t ${SESSION_NAME}:main.2  \
+	    "ligiermirror -m \"${STANDARD_TAGS}\""  \
+	                " -q ${MONITORING_LIGIER_PORT}"  \
+		        " -p ${DAQ_LIGIER_PORT} ${DAQ_LIGIER_IP}"  \
+		        Enter
+
+	# The web server
+	@tmux split-window -v -t ${SESSION_NAME}:main
+	@tmux send-keys -t ${SESSION_NAME}:main.3  \
+	    "cd www && python3 -m http.server ${WEBSERVER_PORT}" Enter
 
 stop:
 	tmux kill-session -t ${SESSION_NAME}
 
-.PHONY: start stop
+clean:
+	rm Makefile
+
+.PHONY: start stop clean
