@@ -46,6 +46,14 @@ start:
 	    "python scripts/dom_rates.py" Enter
 	@tmux select-layout even-vertical
 
+	@# Trigger rates
+	@#
+	@tmux new-window -n trigger -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:trigger
+	@tmux send-keys -t ${SESSION_NAME}:trigger.1  \
+	    "python scripts/trigger_rates.py" Enter
+	@tmux select-layout even-vertical
+
 
 stop:
 	tmux kill-session -t ${SESSION_NAME}
