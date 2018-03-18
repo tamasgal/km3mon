@@ -34,11 +34,10 @@ from km3modules.plot import plot_dom_parameters
 VERSION = "1.0"
 
 km3pipe.style.use('km3pipe')
-log = kp.logger.get("DOMActivity")
-log.warn("Starting DOM Activity monitor")
 
 
 class DOMActivityPlotter(kp.Module):
+    "Creates a plot with dots for each DOM, coloured based in their activity"
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
@@ -47,6 +46,8 @@ class DOMActivityPlotter(kp.Module):
         self.last_activity = defaultdict(partial(deque, maxlen=4000))
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
 
+        self.log.warning("Starting DOM Activity monitor")
+
     def process(self, blob):
         self.index += 1
         if self.index % 30:
@@ -54,7 +55,7 @@ class DOMActivityPlotter(kp.Module):
 
         tag = str(blob['CHPrefix'].tag)
 
-        if not tag == 'IO_SUM':
+        if tag != 'IO_SUM':
             return blob
 
         data = blob['CHData']
@@ -88,7 +89,7 @@ class DOMActivityPlotter(kp.Module):
             for key, delta_t in inactive_doms.items():
                 msg += "   DU{}-DOM{} for {:.1f}s\n"  \
                   .format(key[0], key[1], delta_t)
-            log.warn(msg)
+            self.log.warning(msg)
         plot_dom_parameters(delta_ts, self.detector, filename,
                             'last activity [s]',
                             "DOM Activity - via Summary Slices",
