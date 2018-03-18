@@ -7,7 +7,7 @@ start:
 	@echo Creating tmux session...
 
 	@tmux new-session -d -s ${SESSION_NAME}  \
-	    || (echo Please run \"make stop\" to close the current session.; exit 1)
+	    || (echo Run \"make stop\" to close the current session.; exit 1)
 
 	@tmux rename-window -t ${SESSION_NAME}:1 main
 	@tmux split-window -v -t ${SESSION_NAME}:main
