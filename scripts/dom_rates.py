@@ -47,7 +47,7 @@ class MonitorRates(kp.Module):
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
         self.n_slices = 0
 
-        self.log("Starting DOM rates monitor")
+        self.log.warning("Starting DOM rates monitor")
 
     def process(self, blob):
         """Store the rates from summary slices"""
