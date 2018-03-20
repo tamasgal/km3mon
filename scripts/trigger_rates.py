@@ -69,9 +69,9 @@ class TriggerRate(kp.Module):
         for trigger in ["Overall", "3DMuon", "MXShower", "3DShower"]:
             self.trigger_rates[trigger] = deque(maxlen=queue_len)
 
+        self.run = True
         self.thread = threading.Thread(target=self.plot).start()
         self.lock = threading.Lock()
-        self.run = True
 
     def process(self, blob):
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
