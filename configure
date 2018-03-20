@@ -69,6 +69,6 @@ show_km3mon_banner
 echo "DAQ Ligier:         ${daq_ligier_ip}:${daq_ligier_port}"
 echo "Monitoring Ligier:  ${monitoring_ligier_ip}:${monitoring_ligier_port}"
 echo "Webserver:          0.0.0.0:${webserver_port}"
-echo "tmux session:       ${tmux_session_name}"
+echo "TMUX session:       ${tmux_session_name}"
 echo
 echo "Configuration complete, type \"make start\" to start the monitoring in a tmux session called \"${tmux_session_name}\"."
