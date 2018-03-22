@@ -48,10 +48,10 @@ start:
 
 	@# PMT rates and HRV
 	@#
-	@tmux new-window -n doms -t ${SESSION_NAME}
+	@tmux new-window -n pmts -t ${SESSION_NAME}
 	@tmux split-window -v -t ${SESSION_NAME}:pmts
 	@tmux send-keys -t ${SESSION_NAME}:pmts.1  \
-	    "python scripts/pmt_rates.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT} -i 20 -d 1" Enter
+	    "python scripts/pmt_rates.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT} -i 20 -u 1" Enter
 	@tmux send-keys -t ${SESSION_NAME}:pmts.2  \
 	    "echo nothing to see here" Enter
 	@tmux select-layout even-vertical
