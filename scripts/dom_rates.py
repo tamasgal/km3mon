@@ -24,6 +24,8 @@ from io import BytesIO
 import os
 
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 
 import km3pipe as kp
 import km3pipe.style
