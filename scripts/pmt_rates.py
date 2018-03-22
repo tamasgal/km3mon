@@ -15,7 +15,7 @@ Options:
     -p LIGIER_PORT  The port of the ligier [default: 5553].
     -u DU           The DU to monitor [default: 1].
     -d DET_ID       Detector ID [default: 29].
-    -i INTERVAL     Time interval to monitor in minutes [default: 10].
+    -i INTERVAL     Time interval for one pixel [default: 10].
     -o PLOT_DIR     The directory to save the plot [default: www/plots].
     -h --help       Show this screen.
 
