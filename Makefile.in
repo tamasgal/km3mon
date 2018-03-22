@@ -7,7 +7,7 @@ start:
 	@echo Creating tmux session...
 
 	@tmux new-session -d -s ${SESSION_NAME}  \
-	    || (echo Please run \"make stop\" to close the current session.; exit 1)
+	    || (echo Run \"make stop\" to close the current session.; exit 1)
 
 	@tmux rename-window -t ${SESSION_NAME}:1 main
 	@tmux split-window -v -t ${SESSION_NAME}:main
@@ -44,6 +44,14 @@ start:
 	    "python scripts/dom_activity.py -d ${DETECTOR_ID}" Enter
 	@tmux send-keys -t ${SESSION_NAME}:doms.2  \
 	    "python scripts/dom_rates.py -d ${DETECTOR_ID}" Enter
+	@tmux select-layout even-vertical
+
+	@# Trigger rates
+	@#
+	@tmux new-window -n trigger -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:trigger
+	@tmux send-keys -t ${SESSION_NAME}:trigger.1  \
+	    "python scripts/trigger_rates.py" Enter
 	@tmux select-layout even-vertical
 
 
