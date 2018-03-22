@@ -22,6 +22,7 @@ Options:
 """
 from datetime import datetime
 import io
+import os
 from collections import defaultdict
 import threading
 import time
@@ -48,7 +49,7 @@ class PMTRates(kp.Module):
         self.detector = self.require("detector")
         self.du = self.require("du")
         self.interval = self.get("interval", default=10)
-        self.plot_path = self.get("plot_path", default= "www/plots")
+        self.plot_path = self.get("plot_path", default="www/plots")
         self.filename = self.get("filename", default="pmtrates.png")
         self.max_x = 800
         self.index = 0
@@ -108,13 +109,13 @@ class PMTRates(kp.Module):
         ax.imshow(m, origin='lower', interpolation='none')
         ax.set_title("Mean PMT Rates for DU-{} (colours from 5kHz to 15kHz)\n"
                      "(PMTs ordered from top to bottom) - {}"
-                    .format(self.du, datetime.utcnow()))
+                     .format(self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
         plt.yticks([i*31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
         xtics_int = range(0, max_x, int(max_x/10))
         plt.xticks([i for i in xtics_int],
-                   [xlabel_func(now - (max_x-i) * interval) for i in xtics_int])
+                   [xlabel_func(now-(max_x-i) * interval) for i in xtics_int])
         fig.tight_layout()
         plt.savefig(filename)
         plt.close('all')
