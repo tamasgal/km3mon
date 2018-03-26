@@ -45,78 +45,8 @@
     </nav>
 
     <div class="container-fluid" id="plots">
-
-      <div class="row">
-        <div class="col-md-6 plot-container">
-          <img id="dom_activity" class="plot img-responsive" src="plots/dom_activity.png" />
-        </div>
-        <div class="col-md-6 plot-container">
-          <img id="dom_rates" class="plot img-responsive" src="plots/dom_rates.png"  />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 plot-container">
-          <img id="pmtrates" class="plot img-responsive" src="plots/pmtrates.png" />
-        </div>
-        <div class="col-md-6 plot-container">
-          <img id="hrv" class="plot img-responsive" src="plots/hrv.png" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12 col-sm-12 plot-container">
-          <img id="trigger_rates" class="plot img-responsive" src="plots/trigger_rates.png"  />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12 col-sm-12 plot-container">
-          <img id="trigger_rates_test" class="plot img-responsive" src="plots/trigger_rates_test.png"  />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 plot-container">
-          <!-- <img id="dom_pings" class="plot img-responsive" src="plots/dom_pings.png"  /> //-->
-          <!-- <img id="k40" class="plot img-responsive" src="plots/k40.png"  /> //-->
-          <img id="single_rates" class="plot img-responsive" src="plots/single_rates.png"  />
-        </div>
-        <div class="col-md-6 plot-container">
-          <img id="ztplot" class="plot img-responsive" src="plots/ztplot.png"  />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 plot-container">
-          <img id="hits_on_doms" class="plot img-responsive" src="plots/hits_on_doms.png" style="alpha: 0.2"  />
-        </div>
-        <div class="col-md-6 plot-container">
-          <img id="triggered_hits_on_doms" class="plot img-responsive" src="plots/triggered_hits_on_doms.png" style="alpha: 0.2"  />
-        </div>
-
-      </div>
-
-      <div class="row">
-        <div class="col-md-12 plot-container">
-          <img id="yaw" class="plot img-responsive" src="plots/yaw_calib.png" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12 plot-container">
-          <img id="pitch" class="plot img-responsive" src="plots/pitch_calib.png" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12 plot-container">
-          <img id="roll" class="plot img-responsive" src="plots/roll_calib.png" />
-        </div>
-      </div>
-
-      <div id="horizontal" class="ruler"></div>
-      <div id="vertical" class="ruler"></div>
-    </div><!-- /.container -->
-
+      {% block plots %}{% endblock %}
+    </div>
 
     <script src="static/js/jquery-3.3.1.slim.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
@@ -145,14 +75,14 @@
         //    e.data[1].css('left', e.offsetX==undefined?e.originalEvent.layerX:e.offsetX);
         //    e.data[0].css('top', e.offsetY==undefined?e.originalEvent.layerY:e.offsetY);
         //});
-	$(function(){
-	  setInterval(function(){
-	    var divUtc = $('#divUTC');
-	    var d1 = new Date();
-	    var utc_string = d1.toUTCString().replace("GMT", "UTC");
-	    divUtc.text(utc_string);
-	  },1000);
-	});
+        $(function(){
+          setInterval(function(){
+            var divUtc = $('#divUTC');
+            var d1 = new Date();
+            var utc_string = d1.toUTCString().replace("GMT", "UTC");
+            divUtc.text(utc_string);
+          },1000);
+        });
       });
     </script>
 

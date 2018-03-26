@@ -6,7 +6,7 @@ app.config['PLOTS_PATH'] = "plots"
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('plots.html')
 
 @app.route('/plots/<path:filename>')
 def custom_static(filename):
