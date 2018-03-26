@@ -14,7 +14,7 @@ Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
     -d DET_ID       Detector ID [default: 29].
-    -o PLOT_DIR     The directory to save the plot [default: www/plots].
+    -o PLOT_DIR     The directory to save the plot [default: plots].
     -h --help       Show this screen.
 
 """
