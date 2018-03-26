@@ -57,16 +57,14 @@ class MonitorRates(kp.Module):
         if self.index % 30:
             return blob
 
-        data = blob['CHData']
-        data_io = BytesIO(data)
-        preamble = kp.io.daq.DAQPreamble(file_obj=data_io)  # noqa
-        summaryslice = kp.io.daq.DAQSummaryslice(file_obj=data_io)
-        self.rates = {}  # TODO: review this hack
-        for dom_id, rates in summaryslice.summary_frames.items():
-            du, dom, _ = self.detector.doms[dom_id]
-            self.rates[(du, dom)] = np.sum(rates) / 1000
+        if 'RawSummaryslice' in blob:
+            summaryslice = blob['RawSummaryslice']
+            self.rates = {}  # TODO: review this hack
+            for dom_id, rates in summaryslice.summary_frames.items():
+                du, dom, _ = self.detector.doms[dom_id]
+                self.rates[(du, dom)] = np.sum(rates) / 1000
 
-        self.cuckoo.msg()
+            self.cuckoo.msg()
 
         return blob
 
