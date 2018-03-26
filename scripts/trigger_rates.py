@@ -28,6 +28,8 @@ import shutil
 import time
 import threading
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 

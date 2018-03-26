@@ -1,5 +1,6 @@
 #!/bin/sh
 
+detector_id=29
 daq_ligier_ip="192.168.0.110"
 daq_ligier_port=5553
 monitoring_ligier_ip="127.0.0.1"
@@ -20,6 +21,10 @@ show_km3mon_banner()
 
 for arg in "$@"; do
     case "$arg" in
+    --detector-id=*)
+        detector_id=`echo $arg | sed 's/--detector-id=//'`
+        ;;
+
     --daq-ligier-ip=*)
         daq_ligier_ip=`echo $arg | sed 's/--daq-ligier-ip=//'`
         ;;
@@ -45,6 +50,7 @@ for arg in "$@"; do
         echo 'Usage:  ./configure [options]'
         echo
         echo '  OPTION                    DESCRIPTION                    DEFAULT'
+        echo "  --detector-id             Detector ID                    ${detector_id}"
         echo "  --daq-ligier-ip           DAQ Ligier                     ${daq_ligier_ip}"
         echo "  --daq-ligier-port         Port of the DAQ Ligier         ${daq_ligier_port}"
         echo "  --monitoring-ligier-port  Port of the monitoring Ligier  ${monitoring_ligier_port}"
@@ -57,7 +63,8 @@ for arg in "$@"; do
     esac
 done
 
-echo "DAQ_LIGIER_IP = ${daq_ligier_ip}" > Makefile
+echo "DETECTOR_ID = ${detector_id}" > Makefile
+echo "DAQ_LIGIER_IP = ${daq_ligier_ip}" >> Makefile
 echo "DAQ_LIGIER_PORT = ${daq_ligier_port}" >> Makefile
 echo "MONITORING_LIGIER_PORT = ${monitoring_ligier_port}" >> Makefile
 echo "WEBSERVER_PORT = ${webserver_port}" >> Makefile
@@ -66,6 +73,7 @@ echo "SESSION_NAME = ${tmux_session_name}" >> Makefile
 cat Makefile.in >> Makefile
 
 show_km3mon_banner
+echo "Detector ID:        ${detector_id}"
 echo "DAQ Ligier:         ${daq_ligier_ip}:${daq_ligier_port}"
 echo "Monitoring Ligier:  ${monitoring_ligier_ip}:${monitoring_ligier_port}"
 echo "Webserver:          0.0.0.0:${webserver_port}"

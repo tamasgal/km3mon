@@ -26,6 +26,9 @@ from io import BytesIO
 import os
 import time
 
+import matplotlib
+matplotlib.use("Agg")
+
 import km3pipe as kp
 import km3pipe.style
 from km3modules.plot import plot_dom_parameters
