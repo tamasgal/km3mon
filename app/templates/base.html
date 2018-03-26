@@ -10,6 +10,8 @@
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
     <link href="static/css/main.css" rel="stylesheet">
 
+    <script src="static/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -44,37 +46,10 @@
       </div>
     </nav>
 
-    <div class="container-fluid" id="plots">
-      {% block plots %}{% endblock %}
-    </div>
+    {% block plots %}{% endblock %}
 
-    <script src="static/js/jquery-3.3.1.slim.min.js"></script>
-    <script src="static/js/bootstrap.min.js"></script>
     <script type = "text/javascript">
       $(document).ready(function(){
-        setInterval(function(){
-          //$("#dom_pings").attr("src", "plots/dom_pings.png?"+new Date().getTime());
-          $("#dom_activity").attr("src", "plots/dom_activity.png?"+new Date().getTime());
-          $("#dom_rates").attr("src", "plots/dom_rates.png?"+new Date().getTime());
-          $("#pmtrates").attr("src", "plots/pmtrates.png?"+new Date().getTime());
-          $("#hrv").attr("src", "plots/hrv.png?"+new Date().getTime());
-          $("#yaw").attr("src", "plots/yaw_calib.png?"+new Date().getTime());
-          $("#pitch").attr("src", "plots/pitch_calib.png?"+new Date().getTime());
-          $("#roll").attr("src", "plots/roll_calib.png?"+new Date().getTime());
-          //$("#dom_pings").attr("src", "plots/dom_pings.png?"+new Date().getTime());
-          $("#k40").attr("src", "plots/k40.png?"+new Date().getTime());
-          $("#trigger_rates").attr("src", "plots/trigger_rates.png?"+new Date().getTime());
-          $("#trigger_rates_test").attr("src", "plots/trigger_rates_test.png?"+new Date().getTime());
-          $("#hits_on_doms").attr("src", "plots/hits_on_doms.png?"+new Date().getTime());
-          $("#triggered_hits_on_doms").attr("src", "plots/triggered_hits_on_doms.png?"+new Date().getTime());
-          $("#ztplot").attr("src", "plots/ztplot.png?"+new Date().getTime());
-          $("#single_rates").attr("src", "plots/single_rates.png?"+new Date().getTime());
-        }, 45000);
-
-        //$('#plots').on('mousemove', null, [$('#horizontal'), $('#vertical')],function(e){
-        //    e.data[1].css('left', e.offsetX==undefined?e.originalEvent.layerX:e.offsetX);
-        //    e.data[0].css('top', e.offsetY==undefined?e.originalEvent.layerY:e.offsetY);
-        //});
         $(function(){
           setInterval(function(){
             var divUtc = $('#divUTC');
