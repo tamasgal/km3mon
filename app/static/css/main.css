@@ -1,0 +1,27 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+img.plot {
+    width: 100%;
+}
+.plot-container {
+    text-align: center;
+}
+.ruler {
+    background-color: steelblue;
+    position: absolute;
+}
+#horizontal{
+    margin-top: 50px;
+    width:98%;
+    height:4px;
+    opacity: 0.5;
+    display: none;
+}
+#vertical{
+    width:1px;
+    height:100%;
+    display: none;
+}

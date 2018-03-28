@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block plots %}
+
+    <div class="container-fluid" id="plots">
+        {% for row in plots %}
+        <div class="row">
+            {% for plot in row %}
+            <div class="col-md-{{ (12/(row|length))|int }} plot-container">
+                <img id="{{ plot }}"
+                     class="plot img-responsive"
+                     src="plots/{{ plot }}.png"
+                     alt="{{ plot }}"/>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <script type = "text/javascript">
+        $(document).ready(function(){
+            setInterval(function(){
+            {% for row in plots %}
+                {% for plot in row %}
+                $("#{{ plot }}").attr("src", "plots/{{ plot }}.png?"+new Date().getTime());
+                {% endfor %}
+            {% endfor %}
+            }, 45000);
+        });
+    </script>
+
+{% endblock %}

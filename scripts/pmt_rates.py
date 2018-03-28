@@ -16,7 +16,7 @@ Options:
     -u DU           The DU to monitor [default: 1].
     -d DET_ID       Detector ID [default: 29].
     -i INTERVAL     Time interval for one pixel [default: 10].
-    -o PLOT_DIR     The directory to save the plot [default: www/plots].
+    -o PLOT_DIR     The directory to save the plot [default: plots].
     -h --help       Show this screen.
 
 """
@@ -49,8 +49,8 @@ class PMTRates(kp.Module):
         self.detector = self.require("detector")
         self.du = self.require("du")
         self.interval = self.get("interval", default=10)
-        self.plot_path = self.get("plot_path", default="www/plots")
-        self.filename = self.get("filename", default="pmtrates.png")
+        self.plot_path = self.get("plot_path", default="plots")
+        self.filename = self.get("filename", default="pmt_rates.png")
         self.max_x = 800
         self.index = 0
         self.rates = defaultdict(list)

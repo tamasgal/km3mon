@@ -14,7 +14,7 @@ Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
     -d DET_ID       Detector ID [default: 29].
-    -o PLOT_DIR     The directory to save the plot [default: www/plots].
+    -o PLOT_DIR     The directory to save the plot [default: plots].
     -h --help       Show this screen.
 
 """
@@ -56,22 +56,15 @@ class DOMActivityPlotter(kp.Module):
         if self.index % 30:
             return blob
 
-        tag = str(blob['CHPrefix'].tag)
+        if 'RawSummaryslice' in blob:
+            summaryslice = blob['RawSummaryslice']
+            timestamp = summaryslice.header.time_stamp
 
-        if tag != 'IO_SUM':
-            return blob
+            for dom_id, _ in summaryslice.summary_frames.items():
+                du, dom, _ = self.detector.doms[dom_id]
+                self.last_activity[(du, dom)] = timestamp
 
-        data = blob['CHData']
-        data_io = BytesIO(data)
-        preamble = kp.io.daq.DAQPreamble(file_obj=data_io)  # noqa
-        summaryslice = kp.io.daq.DAQSummaryslice(file_obj=data_io)
-        timestamp = summaryslice.header.time_stamp
-
-        for dom_id, _ in summaryslice.summary_frames.items():
-            du, dom, _ = self.detector.doms[dom_id]
-            self.last_activity[(du, dom)] = timestamp
-
-        self.cuckoo.msg()
+            self.cuckoo.msg()
 
         return blob
 
