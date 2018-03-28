@@ -121,7 +121,12 @@ class PMTRates(kp.Module):
         plt.close('all')
 
     def process(self, blob):
-        tmch_data = TMCHData(io.BytesIO(blob['CHData']))
+        try:
+            tmch_data = TMCHData(io.BytesIO(blob['CHData']))
+        except ValueError:
+            self.log.error("Could not parse binary data. Ignoring...")
+            return blob
+
         dom_id = tmch_data.dom_id
 
         if dom_id not in self.detector.doms:
