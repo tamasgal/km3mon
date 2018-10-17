@@ -105,7 +105,7 @@ class PMTRates(kp.Module):
         m = self.hrv_matrix
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(m, origin='lower', interpolation='none')
-        ax.set_title("HRV Rations (Monitoring Channel) for DU-{}\n"
+        ax.set_title("HRV Ratios (Monitoring Channel) for DU-{}\n"
                      "PMTs ordered from top to bottom - {}"
                      .format(self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
