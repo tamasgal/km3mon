@@ -105,9 +105,9 @@ class PMTRates(kp.Module):
         m = self.hrv_matrix
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(m, origin='lower', interpolation='none')
-        ax.set_title("HRV Ratios (Monitoring Channel) for DU-{}\n"
+        ax.set_title("HRV Ratios (Monitoring Channel) for DetID-{} DU-{}\n"
                      "PMTs ordered from top to bottom - {}"
-                     .format(self.du, datetime.utcnow()))
+                     .format(self.det_id, self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
         plt.yticks([i*31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
