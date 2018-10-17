@@ -44,7 +44,7 @@ VERSION = "1.0"
 log = kp.logger.logging.getLogger("PMTrates")
 
 
-class PMTRates(kp.Module):
+class PMTHRV(kp.Module):
     def configure(self):
         self.detector = self.require("detector")
         self.du = self.require("du")
@@ -107,7 +107,7 @@ class PMTRates(kp.Module):
         ax.imshow(m, origin='lower', interpolation='none')
         ax.set_title("HRV Ratios (Monitoring Channel) for DetID-{} DU-{}\n"
                      "PMTs ordered from top to bottom - {}"
-                     .format(self.det_id, self.du, datetime.utcnow()))
+                     .format(self.detector.det_id, self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
         plt.yticks([i*31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
@@ -169,7 +169,7 @@ def main():
                 tags='IO_MONIT',
                 timeout=60*60*24*7,
                 max_queue=2000)
-    pipe.attach(PMTRates,
+    pipe.attach(PMTHRV,
                 detector=detector,
                 du=du,
                 interval=interval,

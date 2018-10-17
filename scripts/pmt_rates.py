@@ -110,7 +110,7 @@ class PMTRates(kp.Module):
         ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
                      "- colours from 5kHz to 15kHz\n"
                      "PMTs ordered from top to bottom - {}"
-                     .format(self.det_id, self.du, datetime.utcnow()))
+                     .format(self.detector.det_id, self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
         plt.yticks([i*31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
