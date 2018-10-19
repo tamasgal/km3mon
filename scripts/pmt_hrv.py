@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding=utf-8
-# Filename: pmt_rates.py
+# Filename: pmt_hrv.py
 # Author: Tamas Gal <tgal@km3net.de>
 # vim: ts=4 sw=4 et
 """
-Monitors PMT rates.
+Monitors HRV flags of PMTs.
 
 Usage:
-    pmt_rates.py [options]
-    pmt_rates.py (-h | --help)
+    pmt_hrv.py [options]
+    pmt_hrv.py (-h | --help)
 
 Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
@@ -44,17 +44,17 @@ VERSION = "1.0"
 log = kp.logger.logging.getLogger("PMTrates")
 
 
-class PMTRates(kp.Module):
+class PMTHRV(kp.Module):
     def configure(self):
         self.detector = self.require("detector")
         self.du = self.require("du")
         self.interval = self.get("interval", default=10)
         self.plot_path = self.get("plot_path", default="plots")
-        self.filename = self.get("filename", default="pmt_rates.png")
+        self.filename = self.get("filename", default="pmt_hrv.png")
         self.max_x = 800
         self.index = 0
-        self.rates = defaultdict(list)
-        self.rates_matrix = np.full((18*31, self.max_x), np.nan)
+        self.hrv = defaultdict(list)
+        self.hrv_matrix = np.full((18*31, self.max_x), np.nan)
         self.lock = threading.Lock()
         self.thread = threading.Thread(target=self.run, args=())
         self.thread.daemon = True
@@ -81,16 +81,16 @@ class PMTRates(kp.Module):
                 interval = remaining_t
 
     def add_column(self):
-        m = np.roll(self.rates_matrix, -1, 1)
+        m = np.roll(self.hrv_matrix, -1, 1)
         y_range = 18*31
-        mean_rates = np.full(y_range, np.nan)
+        mean_hrv = np.full(y_range, np.nan)
         for i in range(y_range):
-            if i not in self.rates:
+            if i not in self.hrv:
                 continue
-            mean_rates[i] = np.mean(self.rates[i])
+            mean_hrv[i] = np.mean(self.hrv[i])
 
-        m[:, self.max_x - 1] = mean_rates
-        self.rates_matrix = m
+        m[:, self.max_x - 1] = mean_hrv
+        self.hrv_matrix = m
 
     def update_plot(self):
         filename = os.path.join(self.plot_path, self.filename)
@@ -102,13 +102,10 @@ class PMTRates(kp.Module):
         def xlabel_func(timestamp):
             return datetime.utcfromtimestamp(timestamp).strftime("%H:%M")
 
-        m = self.rates_matrix
-        m[m > 15000] = 15000
-        m[m < 5000] = 5000
+        m = self.hrv_matrix
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(m, origin='lower', interpolation='none')
-        ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
-                     "- colours from 5kHz to 15kHz\n"
+        ax.set_title("HRV Ratios (Monitoring Channel) for DetID-{} DU-{}\n"
                      "PMTs ordered from top to bottom - {}"
                      .format(self.detector.det_id, self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
@@ -138,12 +135,16 @@ class PMTRates(kp.Module):
         if du != self.du:
             return blob
 
+        hrv_flags = reversed("{0:b}".format(tmch_data.hrvbmp).zfill(32))
+
         y_base = (floor - 1) * 31
 
-        for channel_id, rate in enumerate(tmch_data.pmt_rates):
+        for channel_id, hrv_flag in enumerate(hrv_flags):
+            if channel_id > 30:
+                break
             idx = y_base + kp.hardware.ORDERED_PMT_IDS[channel_id]
             with self.lock:
-                self.rates[idx].append(rate)
+                self.hrv[idx].append(int(hrv_flag))
 
         return blob
 
@@ -168,7 +169,7 @@ def main():
                 tags='IO_MONIT',
                 timeout=60*60*24*7,
                 max_queue=2000)
-    pipe.attach(PMTRates,
+    pipe.attach(PMTHRV,
                 detector=detector,
                 du=du,
                 interval=interval,

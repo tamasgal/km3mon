@@ -53,7 +53,7 @@ start:
 	@tmux send-keys -t ${SESSION_NAME}:pmts.1  \
 	    "python scripts/pmt_rates.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT} -i 20 -u 1" Enter
 	@tmux send-keys -t ${SESSION_NAME}:pmts.2  \
-	    "echo nothing to see here" Enter
+	    "python scripts/pmt_hrv.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT} -i 20 -u 1" Enter
 	@tmux select-layout even-vertical
 
 	@# Trigger rates
