@@ -31,16 +31,18 @@ import km3pipe as kp
 import km3pipe.style
 from km3modules.plot import plot_dom_parameters
 
-
 VERSION = "1.0"
 km3pipe.style.use('km3pipe')
 
 
-class MonitorRates(kp.Module):
+class DOMRates(kp.Module):
     """Creates a coloured dot for each DOM, representing their rates."""
+
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
+        self.lowest_rate = self.get("lowest_rate", default=200)
+        self.highest_rate = self.get("highest_rate", default=400)
 
         self.detector = kp.hardware.Detector(det_id=det_id)
         self.index = 0
@@ -73,12 +75,18 @@ class MonitorRates(kp.Module):
         print(self.__class__.__name__ + ": updating plot.")
 
         filename = os.path.join(self.plots_path, 'dom_rates.png')
-        plot_dom_parameters(self.rates, self.detector, filename,
-                            'rate [kHz]',
-                            "DOM Rates",
-                            vmin=200, vmax=400,
-                            cmap='coolwarm', missing='black',
-                            under='darkorchid', over='deeppink')
+        plot_dom_parameters(
+            self.rates,
+            self.detector,
+            filename,
+            'rate [kHz]',
+            "DOM Rates",
+            vmin=self.lowest_rate,
+            vmax=self.highest_rate,
+            cmap='coolwarm',
+            missing='black',
+            under='darkorchid',
+            over='deeppink')
         print("done")
 
 
@@ -92,13 +100,15 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(kp.io.ch.CHPump, host=ligier_ip,
-                port=ligier_port,
-                tags='IO_SUM',
-                timeout=60*60*24*7,
-                max_queue=2000)
+    pipe.attach(
+        kp.io.ch.CHPump,
+        host=ligier_ip,
+        port=ligier_port,
+        tags='IO_SUM',
+        timeout=60 * 60 * 24 * 7,
+        max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(MonitorRates, det_id=det_id, plots_path=plots_path)
+    pipe.attach(DOMRates, det_id=det_id, plots_path=plots_path)
     pipe.drain()
 
 
