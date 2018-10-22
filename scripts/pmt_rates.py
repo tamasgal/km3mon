@@ -51,10 +51,12 @@ class PMTRates(kp.Module):
         self.interval = self.get("interval", default=10)
         self.plot_path = self.get("plot_path", default="plots")
         self.filename = self.get("filename", default="pmt_rates.png")
+        self.lowest_rate = self.get("lowest_rate", default=5000)
+        self.highest_rate = self.get("highest_rate", default=15000)
         self.max_x = 800
         self.index = 0
         self.rates = defaultdict(list)
-        self.rates_matrix = np.full((18*31, self.max_x), np.nan)
+        self.rates_matrix = np.full((18 * 31, self.max_x), np.nan)
         self.lock = threading.Lock()
         self.thread = threading.Thread(target=self.run, args=())
         self.thread.daemon = True
@@ -71,9 +73,9 @@ class PMTRates(kp.Module):
                 self.rates = defaultdict(list)
             delta_t = (datetime.now() - now).total_seconds()
             remaining_t = self.interval - delta_t
-            log.info("Delta t: {} -> waiting for {}s"
-                     .format(delta_t, self.interval - delta_t))
-            if(remaining_t < 0):
+            log.info("Delta t: {} -> waiting for {}s".format(
+                delta_t, self.interval - delta_t))
+            if (remaining_t < 0):
                 log.error("Can't keep up with plot production. "
                           "Increase the interval!")
                 interval = 1
@@ -82,7 +84,7 @@ class PMTRates(kp.Module):
 
     def add_column(self):
         m = np.roll(self.rates_matrix, -1, 1)
-        y_range = 18*31
+        y_range = 18 * 31
         mean_rates = np.full(y_range, np.nan)
         for i in range(y_range):
             if i not in self.rates:
@@ -103,20 +105,23 @@ class PMTRates(kp.Module):
             return datetime.utcfromtimestamp(timestamp).strftime("%H:%M")
 
         m = self.rates_matrix
-        m[m > 15000] = 15000
-        m[m < 5000] = 5000
+        m[m > self.highest_rate] = self.highest_rate
+        m[m < self.lowest_rate] = self.lowest_rate
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(m, origin='lower', interpolation='none')
         ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
-                     "- colours from 5kHz to 15kHz\n"
-                     "PMTs ordered from top to bottom - {}"
-                     .format(self.detector.det_id, self.du, datetime.utcnow()))
+                     "- colours from {:.1f}kHz to {:.1f}kHz\n"
+                     "PMTs ordered from top to bottom - {}".format(
+                         self.detector.det_id, self.du,
+                         self.lowest_rate / 1000, self.highest_rate / 1000,
+                         datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
-        plt.yticks([i*31 for i in range(18)],
+        plt.yticks([i * 31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
-        xtics_int = range(0, max_x, int(max_x/10))
-        plt.xticks([i for i in xtics_int],
-                   [xlabel_func(now-(max_x-i) * interval) for i in xtics_int])
+        xtics_int = range(0, max_x, int(max_x / 10))
+        plt.xticks(
+            [i for i in xtics_int],
+            [xlabel_func(now - (max_x - i) * interval) for i in xtics_int])
         fig.tight_layout()
         plt.savefig(filename)
         plt.close('all')
@@ -162,17 +167,19 @@ def main():
     detector = kp.hardware.Detector(det_id=det_id)
 
     pipe = kp.Pipeline(timeit=True)
-    pipe.attach(kp.io.ch.CHPump,
-                host=ligier_ip,
-                port=ligier_port,
-                tags='IO_MONIT',
-                timeout=60*60*24*7,
-                max_queue=2000)
-    pipe.attach(PMTRates,
-                detector=detector,
-                du=du,
-                interval=interval,
-                plot_path=plot_path)
+    pipe.attach(
+        kp.io.ch.CHPump,
+        host=ligier_ip,
+        port=ligier_port,
+        tags='IO_MONIT',
+        timeout=60 * 60 * 24 * 7,
+        max_queue=2000)
+    pipe.attach(
+        PMTRates,
+        detector=detector,
+        du=du,
+        interval=interval,
+        plot_path=plot_path)
     pipe.drain()
 
 
