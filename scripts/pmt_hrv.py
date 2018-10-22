@@ -54,7 +54,7 @@ class PMTHRV(kp.Module):
         self.max_x = 800
         self.index = 0
         self.hrv = defaultdict(list)
-        self.hrv_matrix = np.full((18*31, self.max_x), np.nan)
+        self.hrv_matrix = np.full((18 * 31, self.max_x), np.nan)
         self.lock = threading.Lock()
         self.thread = threading.Thread(target=self.run, args=())
         self.thread.daemon = True
@@ -71,9 +71,9 @@ class PMTHRV(kp.Module):
                 self.rates = defaultdict(list)
             delta_t = (datetime.now() - now).total_seconds()
             remaining_t = self.interval - delta_t
-            log.info("Delta t: {} -> waiting for {}s"
-                     .format(delta_t, self.interval - delta_t))
-            if(remaining_t < 0):
+            log.info("Delta t: {} -> waiting for {}s".format(
+                delta_t, self.interval - delta_t))
+            if (remaining_t < 0):
                 log.error("Can't keep up with plot production. "
                           "Increase the interval!")
                 interval = 1
@@ -82,7 +82,7 @@ class PMTHRV(kp.Module):
 
     def add_column(self):
         m = np.roll(self.hrv_matrix, -1, 1)
-        y_range = 18*31
+        y_range = 18 * 31
         mean_hrv = np.full(y_range, np.nan)
         for i in range(y_range):
             if i not in self.hrv:
@@ -106,14 +106,15 @@ class PMTHRV(kp.Module):
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(m, origin='lower', interpolation='none')
         ax.set_title("HRV Ratios (Monitoring Channel) for DetID-{} DU-{}\n"
-                     "PMTs ordered from top to bottom - {}"
-                     .format(self.detector.det_id, self.du, datetime.utcnow()))
+                     "PMTs ordered from top to bottom - {}".format(
+                         self.detector.det_id, self.du, datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
-        plt.yticks([i*31 for i in range(18)],
+        plt.yticks([i * 31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
-        xtics_int = range(0, max_x, int(max_x/10))
-        plt.xticks([i for i in xtics_int],
-                   [xlabel_func(now-(max_x-i) * interval) for i in xtics_int])
+        xtics_int = range(0, max_x, int(max_x / 10))
+        plt.xticks(
+            [i for i in xtics_int],
+            [xlabel_func(now - (max_x - i) * interval) for i in xtics_int])
         fig.tight_layout()
         plt.savefig(filename)
         plt.close('all')
@@ -163,17 +164,19 @@ def main():
     detector = kp.hardware.Detector(det_id=det_id)
 
     pipe = kp.Pipeline(timeit=True)
-    pipe.attach(kp.io.ch.CHPump,
-                host=ligier_ip,
-                port=ligier_port,
-                tags='IO_MONIT',
-                timeout=60*60*24*7,
-                max_queue=2000)
-    pipe.attach(PMTHRV,
-                detector=detector,
-                du=du,
-                interval=interval,
-                plot_path=plot_path)
+    pipe.attach(
+        kp.io.ch.CHPump,
+        host=ligier_ip,
+        port=ligier_port,
+        tags='IO_MONIT',
+        timeout=60 * 60 * 24 * 7,
+        max_queue=2000)
+    pipe.attach(
+        PMTHRV,
+        detector=detector,
+        du=du,
+        interval=interval,
+        plot_path=plot_path)
     pipe.drain()
 
 
