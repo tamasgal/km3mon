@@ -1,5 +1,10 @@
 SHELL := /bin/bash
 STANDARD_TAGS := "IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSSN, MSG, IO_MONIT"
+ifeq (, $(shell which SJ))
+LIGIER := "SJ JLigier"
+else
+LIGIER := "JLigier"
+endif
 
 default: start
 
@@ -16,7 +21,7 @@ start:
 	@echo Launching our own ligier
 	@#
 	@tmux send-keys -t ${SESSION_NAME}:main.1  \
-	    "JLigier -d2 -P ${MONITORING_LIGIER_PORT}" Enter
+	    "${LIGIER} -d2 -P ${MONITORING_LIGIER_PORT}" Enter
 
 	@sleep 1  # wait a second for JLigier
 
