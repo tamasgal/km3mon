@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 STANDARD_TAGS := "IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSSN, MSG, IO_MONIT"
 ifeq (, $(shell which SJ))
-LIGIER := "SJ JLigier"
+LIGIER := "SJ\ JLigier"
 else
 LIGIER := "JLigier"
 endif
