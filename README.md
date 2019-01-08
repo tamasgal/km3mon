@@ -4,19 +4,25 @@ Monitoring facility for the KM3NeT neutrino detector.
 
 ## Usage
 
-Check out the configure options with
+First, install the requirements by typing
+
+    make
+
+The `make` command can also be used to update the requirements.
+
+Next check out the `configure` options with
 
     ./configure --help
 
-then configure the ``Makefile`` with
+and configure the ``Makefile`` with
 
-    ./configure
+    ./configure --your --options
 
-and run
+Finally everything is set up. To start the monitoring facility, type
 
     make start
 
-to start the monitoring. If you want to stop it:
+If you want to stop it:
 
     make stop
 
