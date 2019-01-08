@@ -79,4 +79,4 @@ stop:
 clean:
 	rm Makefile
 
-.PHONY: start stop clean
+.PHONY: build start stop clean
