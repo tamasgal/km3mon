@@ -28,7 +28,6 @@ Next check out the `configure` options with
 which will print the following screen:
 
 ```
-> ./configure --help
  _  _  __  __  ___  __  __  _____  _  _
 ( )/ )(  \/  )(__ )(  \/  )(  _  )( \( )
  )  (  )    (  (_ \ )    (  )(_)(  )  (
