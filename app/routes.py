@@ -3,6 +3,7 @@ from flask import render_template, send_from_directory
 from app import app
 
 PLOTS_PATH = "../plots"
+app.config['FREEZER_DESTINATION'] = '../km3web'
 
 PLOTS = [
     ['dom_activity', 'dom_rates'],
@@ -24,6 +25,7 @@ def add_header(r):
 
 
 @app.route('/')
+@app.route('/index.html')
 def index():
     return render_template('plots.html', plots=PLOTS)
 
