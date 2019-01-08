@@ -6,7 +6,7 @@ else
 LIGIER := "JLigier"
 endif
 
-default: start
+default: build
 
 build:
 	pip install -Ur requirements.txt
