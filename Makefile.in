@@ -70,7 +70,7 @@ start:
 	@tmux send-keys -t ${SESSION_NAME}:trigger.1  \
 	    "python scripts/trigger_rates.py -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux send-keys -t ${SESSION_NAME}:trigger.2  \
-	    "python scripts/live_triggermap.py -p ${MONITORING_LIGIER_PORT}" Enter
+	    "python scripts/live_triggermap.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux select-layout even-vertical
 
 
