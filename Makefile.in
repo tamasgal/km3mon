@@ -1,9 +1,8 @@
 SHELL := /bin/bash
 STANDARD_TAGS := "IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSSN, MSG, IO_MONIT"
-ifeq (, $(shell which SJ))
-LIGIER := "SJ\ JLigier"
-else
-LIGIER := "JLigier"
+LIGIER := $(shell command -v JLigier 2> /dev/null)
+ifndef LIGIER
+    LIGIER := "SJ\ JLigier"
 endif
 
 default: build
