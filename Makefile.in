@@ -73,6 +73,16 @@ start:
 	    "python scripts/live_triggermap.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux select-layout even-vertical
 
+	@# ZT-Plots
+	@#
+	@tmux new-window -n trigger -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:ztplots
+	@tmux send-keys -t ${SESSION_NAME}:ztplots.1  \
+	    "python scripts/ztplot.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
+	@tmux send-keys -t ${SESSION_NAME}:ztplots.2  \
+	    "echo narf"
+	@tmux select-layout even-vertical
+
 
 stop:
 	killall gunicorn
