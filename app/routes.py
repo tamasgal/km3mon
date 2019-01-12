@@ -9,6 +9,7 @@ PLOTS = [
     ['dom_activity', 'dom_rates'],
     ['pmt_rates', 'pmt_hrv'],
     ['trigger_rates'],
+    ['hitmap', 'triggermap']
 ]
 
 
