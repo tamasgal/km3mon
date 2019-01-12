@@ -115,6 +115,9 @@ class TriggerRate(kp.Module):
         fig, ax = plt.subplots(figsize=(16, 4))
 
         for trigger, rates in self.trigger_rates.items():
+            if not rates:
+                self.log.warning("Empty rates, skipping...")
+                continue
             timestamps, trigger_rates = zip(*rates)
             ax.plot(timestamps, trigger_rates,
                     **self.styles[trigger],
