@@ -72,7 +72,7 @@ class ZTPlot(Module):
         if 'Hits' not in blob:
             return blob
 
-        hits = blob['Hits'].serialise(to='pandas')
+        hits = blob['Hits']
         hits = self.calib.apply(hits)
         event_info = blob['EventInfo']
 
