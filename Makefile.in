@@ -75,6 +75,7 @@ start:
 
 
 stop:
+	killall gunicorn
 	tmux kill-session -t ${SESSION_NAME}
 
 clean:
