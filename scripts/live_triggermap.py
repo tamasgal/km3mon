@@ -50,9 +50,6 @@ from km3pipe.logger import logging
 #         print("Setting log level to debug for '{0}'".format(logger_name))
 #         logger.setLevel("DEBUG")
 
-N_DOMS = 18
-N_DUS = 2
-
 # xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
 lock = threading.Lock()
 
@@ -61,7 +58,7 @@ class DOMHits(Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
-        self.detector = kp.hardware.Detector(det_id=det_id)
+        self.det = kp.hardware.Detector(det_id=det_id)
 
         self.run = True
         self.max_events = 1000
@@ -77,15 +74,16 @@ class DOMHits(Module):
 
         event_hits = blob['Hits']
         with lock:
-            hits = np.zeros(N_DOMS * N_DUS)
+            hits = np.zeros(self.det.n_doms * self.det.n_dus)
             for dom_id in event_hits.dom_id:
-                du, floor, _ = self.detector.doms[dom_id]
-                hits[(du - 1) * N_DOMS + floor - 1] += 1
+                du, floor, _ = self.det.doms[dom_id]
+                hits[(du - 1) * self.detecotor.n_doms + floor - 1] += 1
             self.hits.append(hits)
-            triggered_hits = np.zeros(N_DOMS * N_DUS)
-            for dom_id in event_hits.dom_id[event_hits.triggered.astype('bool')]:
-                du, floor, _ = self.detector.doms[dom_id]
-                triggered_hits[(du - 1) * N_DOMS + floor - 1] += 1
+            triggered_hits = np.zeros(self.det.n_doms * self.det.n_dus)
+            for dom_id in event_hits.dom_id[event_hits.triggered.astype(
+                    'bool')]:
+                du, floor, _ = self.det.doms[dom_id]
+                triggered_hits[(du - 1) * self.det.n_doms + floor - 1] += 1
             self.triggered_hits.append(triggered_hits)
 
         return blob
@@ -116,9 +114,10 @@ class DOMHits(Module):
             origin='lower',
             zorder=3,
             norm=LogNorm(vmin=1, vmax=np.amax(hit_matrix)))
-        yticks = np.arange(N_DOMS * N_DUS)
+        yticks = np.arange(self.det.n_doms * self.det.n_dus)
         ytick_labels = ["DU{0:0.0f}-DOM{1:02d}"
-                        .format(np.ceil((y+1)/N_DOMS), y % (N_DOMS) + 1) \
+                        .format(np.ceil((y+1)/self.det.n_doms),
+                                y % (self.det.n_doms) + 1) \
                         for y in yticks]
         ax.set_yticks(yticks)
         ax.set_yticklabels(ytick_labels)
@@ -166,6 +165,6 @@ def main():
     pipe.attach(DOMHits, det_id=det_id, plots_path=plots_path)
     pipe.drain()
 
+
 if __name__ == '__main__':
     main()
-
