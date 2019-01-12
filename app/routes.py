@@ -5,12 +5,8 @@ from app import app
 PLOTS_PATH = "../plots"
 app.config['FREEZER_DESTINATION'] = '../km3web'
 
-PLOTS = [
-    ['dom_activity', 'dom_rates'],
-    ['pmt_rates', 'pmt_hrv'],
-    ['trigger_rates'],
-    ['hitmap', 'triggermap']
-]
+PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates', 'pmt_hrv'],
+         ['trigger_rates'], ['ztplot', 'triggermap']]
 
 
 @app.after_request
