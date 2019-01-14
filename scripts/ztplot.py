@@ -76,7 +76,8 @@ class ZTPlot(Module):
         hits = self.calib.apply(hits)
         event_info = blob['EventInfo']
 
-        if len(np.unique(hits[hits.triggered == True].du)) < 2:
+        n_triggered_dus = np.unique(hits[hits.triggered == True].du)
+        if n_triggered_dus < 1:
             print("Skipping...")
             return blob
 
@@ -110,7 +111,10 @@ class ZTPlot(Module):
             sharey=True,
             figsize=(16, 8))
 
-        for ax, (du, du_hits) in zip(axes.flat, hits.groupby("du")):
+        axes = [axes] if n_plots == 1 else axes.flatten()
+
+        for ax, du in zip(axes, dus):
+            du_hits = hits[hits.du == du]
             trig_hits = du_hits[du_hits.triggered == True]
 
             ax.scatter(du_hits.time, du_hits.pos_z, c='#09A9DE', label='hit')
@@ -121,7 +125,7 @@ class ZTPlot(Module):
                 label='triggered hit')
             ax.set_title('DU{0}'.format(du), fontsize=16, fontweight='bold')
 
-        for ax in axes.flat:
+        for ax in axes:
             ax.tick_params(labelsize=16)
             ax.yaxis.set_major_locator(ticker.MultipleLocator(200))
             xlabels = ax.get_xticklabels()
@@ -133,9 +137,11 @@ class ZTPlot(Module):
                 event_info.frame_index, event_info.trigger_counter,
                 datetime.utcfromtimestamp(event_info.utc_seconds)),
             fontsize=16)
-        fig.text(0.5, 0.01, 'time [ns]', ha='center')
-        fig.text(0.08, 0.5, 'z [m]', va='center', rotation='vertical')
-        #        plt.tight_layout()
+        # fig.text(0.5, 0.01, 'time [ns]', ha='center')
+        # fig.text(0.08, 0.5, 'z [m]', va='center', rotation='vertical')
+        plt.xlabel = "time [ns]"
+        plt.ylabel = "z [ns]"
+        plt.tight_layout()
 
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')
