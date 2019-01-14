@@ -100,6 +100,7 @@ class ZTPlot(Module):
     def create_plot(self, event_info, hits):
         print(self.__class__.__name__ + ": updating plot.")
         dus = set(hits.du)
+        fontsize = 16
 
         n_plots = len(dus)
         n_cols = int(np.ceil(np.sqrt(n_plots)))
@@ -123,25 +124,27 @@ class ZTPlot(Module):
                 trig_hits.pos_z,
                 c='#FF6363',
                 label='triggered hit')
-            ax.set_title('DU{0}'.format(du), fontsize=16, fontweight='bold')
+            ax.set_title(
+                'DU{0}'.format(du), fontsize=fontsize, fontweight='bold')
 
-        for ax in axes:
-            ax.tick_params(labelsize=16)
+        for idx, ax in enumerate(axes):
+            ax.tick_params(labelsize=fontsize)
             ax.yaxis.set_major_locator(ticker.MultipleLocator(200))
             xlabels = ax.get_xticklabels()
             for label in xlabels:
                 label.set_rotation(45)
 
+            if idx % n_cols == 0:
+                ax.set_ylabel('time [ns]', fontsize=fontsize)
+            if idx >= len(axes) - n_cols:
+                ax.set_xlabel('z [m]', fontsize=fontsize)
+
         plt.suptitle(
             "FrameIndex {0}, TriggerCounter {1}\n{2} UTC".format(
                 event_info.frame_index, event_info.trigger_counter,
                 datetime.utcfromtimestamp(event_info.utc_seconds)),
-            fontsize=16)
-        # fig.text(0.5, 0.01, 'time [ns]', ha='center')
-        # fig.text(0.08, 0.5, 'z [m]', va='center', rotation='vertical')
-        plt.xlabel = "time [ns]"
-        plt.ylabel = "z [ns]"
-        plt.tight_layout()
+            fontsize=fontsize,
+            y=1.05)
 
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')
