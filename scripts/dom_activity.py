@@ -72,7 +72,6 @@ class DOMActivityPlotter(kp.Module):
         print(self.__class__.__name__ + ": updating plot.")
         filename = os.path.join(self.plots_path, 'dom_activity.png')
         now = kp.time.tai_timestamp()
-        now = time.time()
         delta_ts = {}
         inactive_doms = {}
         for key, timestamp in self.last_activity.items():
