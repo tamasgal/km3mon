@@ -114,7 +114,7 @@ class DOMHits(Module):
             origin='lower',
             zorder=3,
             norm=LogNorm(vmin=1, vmax=np.amax(hit_matrix)))
-        yticks = np.arange(self.det.n_doms * self.det.n_dus)
+        yticks = np.arange(self.det.n_doms)
         ytick_labels = ["DU{0:0.0f}-DOM{1:02d}"
                         .format(np.ceil((y+1)/self.det.n_doms),
                                 y % (self.det.n_doms) + 1) \
