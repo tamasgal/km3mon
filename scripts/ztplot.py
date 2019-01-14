@@ -65,7 +65,7 @@ class ZTPlot(Module):
         self.run = True
         self.max_queue = 3
         self.queue = queue.Queue()
-        self.thread = threading.Thread(target=self.plot)
+        self.thread = threading.Thread(target=self.plot, deamon=True)
         self.thread.start()
 
     def process(self, blob):
@@ -152,8 +152,6 @@ class ZTPlot(Module):
 
     def finish(self):
         self.run = False
-        if self.thread is not None:
-            self.thread.stop()
 
 
 def main():
