@@ -33,7 +33,6 @@ import km3pipe as kp
 import km3pipe.style
 from km3modules.plot import plot_dom_parameters
 
-
 VERSION = "1.0"
 
 km3pipe.style.use('km3pipe')
@@ -41,6 +40,7 @@ km3pipe.style.use('km3pipe')
 
 class DOMActivityPlotter(kp.Module):
     "Creates a plot with dots for each DOM, coloured based in their activity"
+
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
@@ -71,7 +71,8 @@ class DOMActivityPlotter(kp.Module):
     def create_plot(self):
         print(self.__class__.__name__ + ": updating plot.")
         filename = os.path.join(self.plots_path, 'dom_activity.png')
-        now = kp.time.tai_timestamp()
+        # now = kp.time.tai_timestamp()
+        now = time.time()
         delta_ts = {}
         inactive_doms = {}
         for key, timestamp in self.last_activity.items():
@@ -85,10 +86,14 @@ class DOMActivityPlotter(kp.Module):
                 msg += "   DU{}-DOM{} for {:.1f}s\n"  \
                   .format(key[0], key[1], delta_t)
             self.log.warning(msg)
-        plot_dom_parameters(delta_ts, self.detector, filename,
-                            'last activity [s]',
-                            "DOM Activity - via Summary Slices",
-                            vmin=0.0, vmax=15*60)
+        plot_dom_parameters(
+            delta_ts,
+            self.detector,
+            filename,
+            'last activity [s]',
+            "DOM Activity - via Summary Slices",
+            vmin=0.0,
+            vmax=15 * 60)
 
 
 def main():
@@ -101,11 +106,13 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(kp.io.ch.CHPump, host=ligier_ip,
-                port=ligier_port,
-                tags='IO_SUM',
-                timeout=60*60*24*7,
-                max_queue=2000)
+    pipe.attach(
+        kp.io.ch.CHPump,
+        host=ligier_ip,
+        port=ligier_port,
+        tags='IO_SUM',
+        timeout=60 * 60 * 24 * 7,
+        max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(DOMActivityPlotter, det_id=det_id, plots_path=plots_path)
     pipe.drain()
