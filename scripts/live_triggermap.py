@@ -79,7 +79,7 @@ class DOMHits(Module):
                 du, floor, _ = self.det.doms[dom_id]
                 hits[(du - 1) * self.det.n_doms + floor - 1] += 1
             self.hits.append(hits)
-            triggered_hits = np.zeros(self.det.n_doms * self.det.n_dus)
+            triggered_hits = np.zeros(self.det.n_doms)
             for dom_id in event_hits.dom_id[event_hits.triggered.astype(
                     'bool')]:
                 du, floor, _ = self.det.doms[dom_id]
