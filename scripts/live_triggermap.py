@@ -116,7 +116,8 @@ class DOMHits(Module):
             norm=LogNorm(vmin=1, vmax=np.amax(hit_matrix)))
         yticks = np.arange(self.det.n_doms)
         ytick_labels = [
-            "DU{}-DOM{}".format(dom[0], dom[1]) for dom in det.doms.values()
+            "DU{}-DOM{}".format(dom[0], dom[1])
+            for dom in self.det.doms.values()
         ]
         ax.set_yticks(yticks)
         ax.set_yticklabels(ytick_labels)
