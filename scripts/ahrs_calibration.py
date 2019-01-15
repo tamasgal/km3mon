@@ -116,7 +116,7 @@ class CalibrateAHRS(kp.Module):
                 bbox_to_anchor=(1.005, 1), loc=2, borderaxespad=0.)
             fig.tight_layout()
             plt.savefig(
-                self.plots_path + ahrs_param + '_calib.png',
+                os.path.join(self.plots_path, ahrs_param + '_calib.png',
                 bbox_extra_artists=(lgd, ),
                 bbox_inches='tight')
             plt.close('all')
