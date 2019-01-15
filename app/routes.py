@@ -28,10 +28,11 @@ def add_header(r):
 def index():
     return render_template('plots.html', plots=PLOTS)
 
-@app.route('')
+
 @app.route('/ahrs.html')
-def index():
+def ahrs():
     return render_template('plots.html', plots=AHRS_PLOTS)
+
 
 @app.route('/plots/<path:filename>')
 def custom_static(filename):
