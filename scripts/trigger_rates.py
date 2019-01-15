@@ -35,10 +35,9 @@ import matplotlib.dates as md
 
 import km3pipe as kp
 from km3pipe.config import Config
-from km3pipe.io.daq import (DAQPreamble, DAQEvent,
-                            is_3dshower, is_3dmuon, is_mxshower)
+from km3pipe.io.daq import (DAQPreamble, DAQEvent, is_3dshower, is_3dmuon,
+                            is_mxshower)
 import km3pipe.style
-
 
 VERSION = "1.0"
 km3pipe.style.use('km3pipe')
@@ -47,8 +46,8 @@ km3pipe.style.use('km3pipe')
 class TriggerRate(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
-        self.interval = self.get("interval",
-                                 default=self.trigger_rate_sampling_period())
+        self.interval = self.get(
+            "interval", default=self.trigger_rate_sampling_period())
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
         print("Update interval: {}s".format(self.interval))
@@ -56,24 +55,34 @@ class TriggerRate(kp.Module):
         self.trigger_rates = OrderedDict()
 
         self.styles = {
-            "xfmt": md.DateFormatter('%Y-%m-%d %H:%M'),
-            "general": dict(markersize=6,  linestyle='None'),
-            "Overall": dict(marker='D',
-                            markerfacecolor='None',
-                            markeredgecolor='tomato',
-                            markeredgewidth=1),
-            "3DMuon": dict(marker='X', markerfacecolor='dodgerblue'),
-            "MXShower": dict(marker='v', markerfacecolor='orange'),
-            "3DShower": dict(marker='^', markerfacecolor='olivedrab'),
+            "xfmt":
+            md.DateFormatter('%Y-%m-%d %H:%M'),
+            "general":
+            dict(markersize=6, linestyle='None'),
+            "Overall":
+            dict(
+                marker='D',
+                markerfacecolor='None',
+                markeredgecolor='tomato',
+                markeredgewidth=1),
+            "3DMuon":
+            dict(marker='X', markerfacecolor='dodgerblue'),
+            "MXShower":
+            dict(marker='v', markerfacecolor='orange'),
+            "3DShower":
+            dict(marker='^', markerfacecolor='olivedrab'),
         }
 
-        queue_len = int(60*24/(self.interval/60))
+        queue_len = int(60 * 24 / (self.interval / 60))
         for trigger in ["Overall", "3DMuon", "MXShower", "3DShower"]:
             self.trigger_rates[trigger] = deque(maxlen=queue_len)
 
         self.run = True
         self.thread = threading.Thread(target=self.plot).start()
         self.lock = threading.Lock()
+
+        self.run_changes = []
+        self.current_run_id = 0
 
     def process(self, blob):
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
@@ -85,6 +94,9 @@ class TriggerRate(kp.Module):
         data_io = BytesIO(data)
         preamble = DAQPreamble(file_obj=data_io)  # noqa
         event = DAQEvent(file_obj=data_io)
+        if event.header.run > self.current_run_id:
+            self.current_run_id = event.header.run
+            self._log_run_change()
         tm = event.trigger_mask
         with self.lock:
             self.trigger_counts["Overall"] += 1
@@ -96,9 +108,22 @@ class TriggerRate(kp.Module):
 
         return blob
 
+    def _log_run_change(self):
+        now = datetime.utcnow()
+        self.run_changes.append((now, self.current_run_id))
+
+    def _remove_run_changes_out_of_range(self):
+        new_run_changes = []
+        min_timestamp = min(self.trigger_rates['Overall'])[0]
+        for timestamp, run in self.run_changes:
+            if timestamp > min_timestamp:
+                new_run_changes.append((timestamp, run))
+        self.run_changes = new_run_changes
+
     def plot(self):
         while self.run:
             time.sleep(self.interval)
+            self_remove_run_changes_out_of_range()
             self.create_plot()
 
     def create_plot(self):
@@ -119,12 +144,27 @@ class TriggerRate(kp.Module):
                 self.log.warning("Empty rates, skipping...")
                 continue
             timestamps, trigger_rates = zip(*rates)
-            ax.plot(timestamps, trigger_rates,
-                    **self.styles[trigger],
-                    **self.styles['general'],
-                    label=trigger)
-        ax.set_title("Trigger Rates\n{0} UTC"
-                     .format(datetime.utcnow().strftime("%c")))
+            ax.plot(
+                timestamps,
+                trigger_rates,
+                **self.styles[trigger],
+                **self.styles['general'],
+                label=trigger)
+
+        for run_start, run in self.run_changes:
+            plt.text(
+                run_start,
+                0.1,
+                "\nRUN %s" % run,
+                rotation=90,
+                verticalalignment='bottom',
+                fontsize=8,
+                color='gray')
+            ax.axvline(
+                run_start, color='#ff0f5b', linestyle='--', alpha=0.8)  # added
+
+        ax.set_title("Trigger Rates\n{0} UTC".format(
+            datetime.utcnow().strftime("%c")))
         ax.set_xlabel("time")
         ax.set_ylabel("trigger rate [Hz]")
         ax.xaxis.set_major_formatter(self.styles["xfmt"])
@@ -175,11 +215,13 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(kp.io.ch.CHPump, host=ligier_ip,
-                port=ligier_port,
-                tags='IO_EVT',
-                timeout=60*60*24*7,
-                max_queue=200000)
+    pipe.attach(
+        kp.io.ch.CHPump,
+        host=ligier_ip,
+        port=ligier_port,
+        tags='IO_EVT',
+        timeout=60 * 60 * 24 * 7,
+        max_queue=200000)
     pipe.attach(TriggerRate, interval=300, plots_path=plots_path)
     pipe.drain()
 
