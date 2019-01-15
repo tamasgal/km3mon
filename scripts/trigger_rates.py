@@ -109,21 +109,25 @@ class TriggerRate(kp.Module):
         return blob
 
     def _log_run_change(self):
+        self.print("New run: %s" % self.current_run_id)
         now = datetime.utcnow()
         self.run_changes.append((now, self.current_run_id))
 
     def _remove_run_changes_out_of_range(self):
+        self.print("Removing run changes out of range")
+        self.print("  Before: {}".format(self.run_changes))
         new_run_changes = []
         min_timestamp = min(self.trigger_rates['Overall'])[0]
         for timestamp, run in self.run_changes:
             if timestamp > min_timestamp:
                 new_run_changes.append((timestamp, run))
         self.run_changes = new_run_changes
+        self.print("  After: {}".format(self.run_changes))
 
     def plot(self):
         while self.run:
             time.sleep(self.interval)
-            self_remove_run_changes_out_of_range()
+            self._remove_run_changes_out_of_range()
             self.create_plot()
 
     def create_plot(self):
@@ -151,6 +155,7 @@ class TriggerRate(kp.Module):
                 **self.styles['general'],
                 label=trigger)
 
+        self.print("Recorded run changes: {}".format(self.run_changes))
         for run_start, run in self.run_changes:
             plt.text(
                 run_start,
