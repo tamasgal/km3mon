@@ -135,9 +135,9 @@ class ZTPlot(Module):
                 label.set_rotation(45)
 
             if idx % n_cols == 0:
-                ax.set_ylabel('time [ns]', fontsize=fontsize)
+                ax.set_ylabel('z [m]', fontsize=fontsize)
             if idx >= len(axes) - n_cols:
-                ax.set_xlabel('z [m]', fontsize=fontsize)
+                ax.set_xlabel('time [ns]', fontsize=fontsize)
 
         plt.suptitle(
             "FrameIndex {0}, TriggerCounter {1}\n{2} UTC".format(
