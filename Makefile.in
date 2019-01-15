@@ -83,6 +83,14 @@ start:
 	    "echo narf"
 	@tmux select-layout even-vertical
 
+	@# AHRS
+	@#
+	@tmux new-window -n ahrs -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:ahrs
+	@tmux send-keys -t ${SESSION_NAME}:ahrs.1  \
+	    "python scripts/ahrs_calibration.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
+	@tmux select-layout even-vertical
+
 
 stop:
 	killall gunicorn
