@@ -46,7 +46,7 @@ class CalibrateAHRS(kp.Module):
         self.detector = kp.hardware.Detector(det_id=det_id)
         self.du = self.get('du', default=1)
 
-        self.db = kp.db.DBManager()
+        self.clbmap = kp.db.CLBMap(det_oid=det_id)
 
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
         self.cuckoo_log = kp.time.Cuckoo(10, print)
@@ -66,29 +66,28 @@ class CalibrateAHRS(kp.Module):
         now = datetime.utcnow()
         tmch_data = TMCHData(io.BytesIO(blob['CHData']))
         dom_id = tmch_data.dom_id
-        try:
-            du, floor, _ = self.detector.doms[dom_id]
-        except KeyError:  # base CLB
+        clb = self.clbmap.dom_id[dom_id]
+        if clb.floor == 0:
+            self.log.info("Skipping base CLB")
             return blob
 
-        if du != self.du:
+        if clb.du != self.du:
             return blob
 
-        clb_upi = self.db.doms.via_dom_id(dom_id, self.detector.det_id).clb_upi
         yaw = tmch_data.yaw
-        calib = get_latest_ahrs_calibration(clb_upi, max_version=4)
+        calib = get_latest_ahrs_calibration(clb.upi, max_version=4)
 
         if calib is None:
             return blob
 
         cyaw, cpitch, croll = fit_ahrs(tmch_data.A, tmch_data.H, *calib)
         self.cuckoo_log("DU{}-DOM{} (random pick): calibrated yaw={}".format(
-            du, floor, cyaw))
+            clb.du, clb.floor, cyaw))
         with self.lock:
-            self.data['yaw'][floor].append(cyaw)
-            self.data['pitch'][floor].append(cpitch)
-            self.data['roll'][floor].append(croll)
-            self.times[floor].append(now)
+            self.data['yaw'][clb.floor].append(cyaw)
+            self.data['pitch'][clb.floor].append(cpitch)
+            self.data['roll'][clb.floor].append(croll)
+            self.times[clb.floor].append(now)
 
         self.cuckoo.msg()
         return blob
