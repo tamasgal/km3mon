@@ -74,7 +74,7 @@ class CalibrateAHRS(kp.Module):
         if du != self.du:
             return blob
 
-        clb_upi = self.db.doms.via_dom_id(dom_id).clb_upi
+        clb_upi = self.db.doms.via_dom_id(self.detector.det_id, dom_id).clb_upi
         yaw = tmch_data.yaw
         calib = get_latest_ahrs_calibration(clb_upi, max_version=4)
 
