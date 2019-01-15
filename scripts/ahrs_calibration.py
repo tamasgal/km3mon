@@ -137,7 +137,7 @@ def main():
         kp.io.ch.CHPump,
         host=ligier_ip,
         port=ligier_port,
-        tags='IO_EVT, IO_SUM',
+        tags='IO_MONIT',
         timeout=60 * 60 * 24 * 7,
         max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
