@@ -93,8 +93,8 @@ start:
 
 
 stop:
-	killall gunicorn
 	tmux kill-session -t ${SESSION_NAME}
+	killall gunicorn
 
 clean:
 	rm Makefile
