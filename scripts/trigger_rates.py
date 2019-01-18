@@ -113,20 +113,21 @@ class TriggerRate(kp.Module):
         now = datetime.utcnow()
         self.run_changes.append((now, self.current_run_id))
 
-    def _remove_run_changes_out_of_range(self):
-        self.print("Removing run changes out of range")
+    def _get_run_changes_to_plot(self):
+        self.print("Checking run changes out of range")
         overall_rates = self.trigger_rates['Overall']
         if not overall_rates:
             self.print("No trigger rates logged  yet, nothing to remove.")
             return
-        self.print("  Before: {}".format(self.run_changes))
-        new_run_changes = []
+        self.print("  all:     {}".format(self.run_changes))
+        run_changes_to_plot = []
         min_timestamp = min(overall_rates)[0]
+        self.print("  earliest timestamp to plot: {}".format(min_timestamp))
         for timestamp, run in self.run_changes:
             if timestamp > min_timestamp:
-                new_run_changes.append((timestamp, run))
-        self.run_changes = new_run_changes
-        self.print("  After: {}".format(self.run_changes))
+                run_changes_to_plot.append((timestamp, run))
+        self.print("  to plot: {}".format(run_changes_to_plot))
+        return run_changes_to_plot
 
     def plot(self):
         while self.run:
@@ -144,8 +145,6 @@ class TriggerRate(kp.Module):
                 self.trigger_rates[trigger].append((timestamp, trigger_rate))
             self.trigger_counts = defaultdict(int)
 
-        self._remove_run_changes_out_of_range()
-
         fig, ax = plt.subplots(figsize=(16, 4))
 
         for trigger, rates in self.trigger_rates.items():
@@ -160,8 +159,9 @@ class TriggerRate(kp.Module):
                 **self.styles['general'],
                 label=trigger)
 
-        self.print("Recorded run changes: {}".format(self.run_changes))
-        for run_start, run in self.run_changes:
+        run_changes_to_plot = self._get_run_changes_to_plot()
+        self.print("Recorded run changes: {}".format(run_changes_to_plot))
+        for run_start, run in run_changes_to_plot:
             plt.text(
                 run_start,
                 0.1,
