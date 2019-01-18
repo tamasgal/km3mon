@@ -161,13 +161,14 @@ class TriggerRate(kp.Module):
 
         run_changes_to_plot = self._get_run_changes_to_plot()
         self.print("Recorded run changes: {}".format(run_changes_to_plot))
+        min_trigger_rate  = min([r[1] for r in trigger_rates['Overall']])
         for run_start, run in run_changes_to_plot:
             plt.text(
                 run_start,
-                0.1,
-                "\nRUN %s" % run,
+                min_trigger_rate,
+                "\nRUN %s  " % run,
                 rotation=90,
-                verticalalignment='bottom',
+                verticalalignment='top',
                 fontsize=8,
                 color='gray')
             ax.axvline(
