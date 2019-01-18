@@ -161,7 +161,8 @@ class TriggerRate(kp.Module):
 
         run_changes_to_plot = self._get_run_changes_to_plot()
         self.print("Recorded run changes: {}".format(run_changes_to_plot))
-        min_trigger_rate  = min([r[1] for r in trigger_rates['Overall']])
+        min_trigger_rate = min(
+            [r[1] for r in trigger_rates['Overall'].values()])
         for run_start, run in run_changes_to_plot:
             plt.text(
                 run_start,
