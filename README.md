@@ -60,3 +60,21 @@ If you want to stop it:
     make stop
 
 easy.
+
+## Configuration file
+
+A file called `pipeline.toml` can be placed into the root folder of the
+monitoring software (usually `~/monitoring`) which can be used to set
+different kind of parameters, like plot attributes or ranges.
+Here is an example `pipeline.toml`:
+
+    [DOMRates]
+    lowest_rate = 200
+    highest_rate = 400
+
+    [PMTRates]
+    lowest_rate = 1000
+    highest_rate = 10000
+
+After a `make stop` and `make start`, the file is parsed and the default
+values are overwritten by those defined in the configuration file.
