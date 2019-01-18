@@ -115,9 +115,13 @@ class TriggerRate(kp.Module):
 
     def _remove_run_changes_out_of_range(self):
         self.print("Removing run changes out of range")
+        overall_rates = self.trigger_rates['Overall']
+        if not overall_rates:
+            self.print("No trigger rates logged  yet, nothing to remove.")
+            return
         self.print("  Before: {}".format(self.run_changes))
         new_run_changes = []
-        min_timestamp = min(self.trigger_rates['Overall'])[0]
+        min_timestamp = min(overall_rates)[0]
         for timestamp, run in self.run_changes:
             if timestamp > min_timestamp:
                 new_run_changes.append((timestamp, run))
@@ -127,7 +131,6 @@ class TriggerRate(kp.Module):
     def plot(self):
         while self.run:
             time.sleep(self.interval)
-            self._remove_run_changes_out_of_range()
             self.create_plot()
 
     def create_plot(self):
@@ -140,6 +143,8 @@ class TriggerRate(kp.Module):
                 trigger_rate = n_events / self.interval
                 self.trigger_rates[trigger].append((timestamp, trigger_rate))
             self.trigger_counts = defaultdict(int)
+
+        self._remove_run_changes_out_of_range()
 
         fig, ax = plt.subplots(figsize=(16, 4))
 
