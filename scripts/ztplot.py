@@ -141,9 +141,8 @@ class ZTPlot(Module):
 
         print
         plt.suptitle(
-            "Det ID {0}, Run {1}, FrameIndex {2}, TriggerCounter {3}, "
-            "Overlays {4}\n"
-            "{5} UTC".format(
+            "z-t-Plot for DetID-{0}, Run {1}, FrameIndex {2}, "
+            "TriggerCounter {3}, Overlays {4}\n{5} UTC".format(
                 event_info.det_id[0], event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
                 event_info.overlays[0],

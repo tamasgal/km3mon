@@ -80,7 +80,7 @@ class DOMRates(kp.Module):
             self.detector,
             filename,
             'rate [kHz]',
-            "DOM Rates",
+            "DOM Rates for DetID-{}".format(self.detector.det_id),
             vmin=self.lowest_rate,
             vmax=self.highest_rate,
             cmap='coolwarm',

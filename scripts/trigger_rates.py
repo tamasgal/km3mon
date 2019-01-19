@@ -84,6 +84,7 @@ class TriggerRate(kp.Module):
 
         self.run_changes = []
         self.current_run_id = 0
+        self.det_id = 0
 
     def process(self, blob):
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
@@ -95,6 +96,7 @@ class TriggerRate(kp.Module):
         data_io = BytesIO(data)
         preamble = DAQPreamble(file_obj=data_io)  # noqa
         event = DAQEvent(file_obj=data_io)
+        self.det_id = event.header.det_id
         if event.header.run > self.current_run_id:
             self.current_run_id = event.header.run
             self._log_run_change()
@@ -176,7 +178,8 @@ class TriggerRate(kp.Module):
             ax.axvline(
                 run_start, color='#ff0f5b', linestyle='--', alpha=0.8)  # added
 
-        ax.set_title("Trigger Rates\n{0} UTC".format(
+        ax.set_title("Trigger Rates for DetID-{0}\n{1} UTC".format(
+            self.det_id,
             datetime.utcnow().strftime("%c")))
         ax.set_xlabel("time")
         ax.set_ylabel("trigger rate [Hz]")
