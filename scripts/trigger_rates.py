@@ -21,6 +21,7 @@ from __future__ import division, print_function
 
 from datetime import datetime
 from collections import defaultdict, deque, OrderedDict
+from itertools import chain
 import sys
 from io import BytesIO
 from os.path import join
@@ -161,14 +162,14 @@ class TriggerRate(kp.Module):
 
         run_changes_to_plot = self._get_run_changes_to_plot()
         self.print("Recorded run changes: {}".format(run_changes_to_plot))
-        min_trigger_rate = min(
-            [r[1] for r in self.trigger_rates['Overall']])
+        all_rates = [r for d, r in chain(*self.trigger_rates.values())]
+        min_trigger_rate = min(all_rates)
+        max_trigger_rate = max(all_rates)
         for run_start, run in run_changes_to_plot:
             plt.text(
-                run_start,
-                min_trigger_rate,
+                run_start, (min_trigger_rate + max_trigger_rate) / 2,
                 "\nRUN %s  " % run,
-                rotation=90,
+                rotation=60,
                 verticalalignment='top',
                 fontsize=8,
                 color='gray')
