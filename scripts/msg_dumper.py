@@ -30,7 +30,7 @@ class MSGDumper(Module):
         self.fobj = open(os.path.abspath(self.filename), 'a')
 
     def process(self, blob):
-        data = blob['CHData']
+        data = blob['CHData'].decode()
         log_level = 'info'
         if "ERROR" in data:
             log_level = 'error'
