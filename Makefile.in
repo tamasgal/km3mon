@@ -91,6 +91,13 @@ start:
 	    "python scripts/ahrs_calibration.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux select-layout even-vertical
 
+	@# Log.io
+	@#
+	@tmux new-window -n logio -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:logio
+	@tmux send-keys -t ${SESSION_NAME}:logio.1  \
+	    "python scripts/logio.py -p ${MONITORING_LIGIER_PORT} -x ${LOGIO_IP} -q ${LOGIO_PORT}" Enter
+	@tmux select-layout even-vertical
 
 stop:
 	tmux kill-session -t ${SESSION_NAME}
