@@ -27,7 +27,7 @@ from km3pipe.io import CHPump
 class MSGDumper(Module):
     def configure(self):
         self.filename = self.get('filename', default='MSG.log')
-        self.fobj = open(os.path.abspath(self.filename))
+        self.fobj = open(os.path.abspath(self.filename), 'a')
 
     def process(self, blob):
         data = blob['CHData']
