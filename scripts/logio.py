@@ -62,7 +62,7 @@ def main():
     ligier_ip = args['-l']
     ligier_port = int(args['-p'])
     logio_ip = args['-x']
-    logio_port = args['-q']
+    logio_port = int(args['-q'])
 
     pipe = Pipeline()
     pipe.attach(
