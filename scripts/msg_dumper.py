@@ -24,7 +24,7 @@ from km3pipe import Pipeline, Module
 from km3pipe.io import CHPump
 
 
-class LogIO(Module):
+class MSGDumper(Module):
     def configure(self):
         self.filename = self.get('filename', default='MSG.log')
         self.fobj = open(os.path.abspath(self.filename))
@@ -58,8 +58,7 @@ def main():
 
     ligier_ip = args['-l']
     ligier_port = int(args['-p'])
-    logio_ip = args['-x']
-    logio_port = int(args['-q'])
+    filename = args['-f']
 
     pipe = Pipeline()
     pipe.attach(
@@ -69,7 +68,7 @@ def main():
         tags='MSG',
         timeout=7 * 60 * 60 * 24,
         max_queue=500)
-    pipe.attach(LogIO, logio_ip=logio_ip, logio_port=logio_port)
+    pipe.attach(MSGDumper, filename=filename)
     pipe.drain()
 
 
