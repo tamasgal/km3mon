@@ -7,8 +7,8 @@
 Sends MSG data from Ligier to a log.io server to be displayed in real-time.
 
 Usage:
-    event_hits.py [options]
-    event_hits.py (-h | --help)
+    logio.py [options]
+    logio.py (-h | --help)
 
 Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
