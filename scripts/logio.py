@@ -74,3 +74,7 @@ def main():
         max_queue=500)
     pipe.attach(LogIO, logio_ip=logio_ip, logio_port=logio_port)
     pipe.drain()
+
+
+if __name__ == '__main__':
+    main()
