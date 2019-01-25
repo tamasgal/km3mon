@@ -44,8 +44,8 @@ class MSGDumper(Module):
         if " W0" in data:
             source = "DataWriter"
 
-        entry = "{} [{}] - {}: {}\n".format(self.filename, source,
-                                                    log_level, data))
+        entry = "{} [{}] - {}: {}\n".format(self.filename, source, log_level,
+                                            data)
         self.fobj.write(entry)
         return blob
 
