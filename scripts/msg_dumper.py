@@ -31,11 +31,6 @@ class MSGDumper(Module):
 
     def process(self, blob):
         data = blob['CHData'].decode()
-        log_level = 'info'
-        if "ERROR" in data:
-            log_level = 'error'
-        if "WARNING" in data:
-            log_level = 'warning'
         source = "Other"
         if " F0" in data:
             source = "DataFilter"
@@ -44,8 +39,8 @@ class MSGDumper(Module):
         if " W0" in data:
             source = "DataWriter"
 
-        entry = "{} [{}] - {}: {}\n".format(self.filename, source, log_level,
-                                            data)
+        entry = "{} [{}]: {}\n".format(
+            os.path.basename(self.filename), source, data)
         self.fobj.write(entry)
         return blob
 
