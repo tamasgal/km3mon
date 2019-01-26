@@ -4,7 +4,7 @@
         "STATUS": "color: #2F76CC;",
         "DataFilter": "background-color: #138799; color: #ffffff",
         "DataWriter": "background-color: #FFBE05; color: #000000",
-        "DataQueue": "background-color: #CC578F; color=: #ffffff"
+        "DataQueue": "background-color: #674591; color=: #ffffff"
     },
     "lines": {
         "ERROR": "font-weight: bold;"
