@@ -166,7 +166,7 @@ class TriggerRate(kp.Module):
         self.print("Recorded run changes: {}".format(run_changes_to_plot))
         all_rates = [r for d, r in chain(*self.trigger_rates.values())]
         if not all_rates:
-            self.warning("Empty rates, skipping...")
+            self.log.warning("Empty rates, skipping...")
             return
         min_trigger_rate = min(all_rates)
         max_trigger_rate = max(all_rates)
