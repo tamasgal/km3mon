@@ -136,6 +136,8 @@ class DOMHits(Module):
         for run, n_events_since_runchange in self.runchanges.items():
             if n_events_since_runchange >= self.max_events:
                 continue
+            self.print("Annotating run {} ({} events passed)".format(
+                run, n_events_since_runchange))
             x_pos = self.max_events - n_events_since_runchange
             plt.text(
                 x_pos,
