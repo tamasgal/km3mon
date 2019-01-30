@@ -8,6 +8,9 @@ app.config['FREEZER_DESTINATION'] = '../km3web'
 PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates', 'pmt_hrv'],
          ['trigger_rates'], ['ztplot', 'triggermap']]
 
+AHRS_PLOTS = [['yaw_calib'], ['pitch_calib'], ['roll_calib']]
+TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
+
 
 @app.after_request
 def add_header(r):
@@ -25,6 +28,16 @@ def add_header(r):
 @app.route('/index.html')
 def index():
     return render_template('plots.html', plots=PLOTS)
+
+
+@app.route('/ahrs.html')
+def ahrs():
+    return render_template('plots.html', plots=AHRS_PLOTS)
+
+
+@app.route('/trigger.html')
+def trigger():
+    return render_template('plots.html', plots=TRIGGER_PLOTS)
 
 
 @app.route('/plots/<path:filename>')

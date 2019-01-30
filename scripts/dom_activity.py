@@ -91,7 +91,8 @@ class DOMActivityPlotter(kp.Module):
             self.detector,
             filename,
             'last activity [s]',
-            "DOM Activity - via Summary Slices",
+            "DOM Activity for DetID-{} - via Summary Slices".format(
+                self.detector.det_id),
             vmin=0.0,
             vmax=15 * 60)
 

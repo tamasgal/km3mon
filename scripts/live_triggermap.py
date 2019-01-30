@@ -125,9 +125,10 @@ class DOMHits(Module):
         ax.tick_params(labelbottom=False)
         ax.tick_params(labeltop=False)
         ax.set_xlabel("event (latest on the right)")
-        ax.set_title("{0} - via the last {1} Events\n{2} UTC".format(
-            title, self.max_events,
-            datetime.utcnow().strftime("%c")))
+        ax.set_title(
+            "{0} for DetID-{1} - via the last {2} Events\n{3} UTC".format(
+                title, self.det.det_id, self.max_events,
+                datetime.utcnow().strftime("%c")))
         cb = fig.colorbar(im, pad=0.05)
         cb.set_label("number of hits")
 
@@ -180,7 +181,7 @@ def main():
         kp.io.ch.CHPump,
         host=ligier_ip,
         port=ligier_port,
-        tags='IO_EVT, IO_SUM',
+        tags='IO_EVT',
         timeout=60 * 60 * 24 * 7,
         max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)

@@ -135,13 +135,17 @@ class ZTPlot(Module):
                 label.set_rotation(45)
 
             if idx % n_cols == 0:
-                ax.set_ylabel('time [ns]', fontsize=fontsize)
+                ax.set_ylabel('z [m]', fontsize=fontsize)
             if idx >= len(axes) - n_cols:
-                ax.set_xlabel('z [m]', fontsize=fontsize)
+                ax.set_xlabel('time [ns]', fontsize=fontsize)
 
+        print
         plt.suptitle(
-            "FrameIndex {0}, TriggerCounter {1}\n{2} UTC".format(
-                event_info.frame_index, event_info.trigger_counter,
+            "z-t-Plot for DetID-{0}, Run {1}, FrameIndex {2}, "
+            "TriggerCounter {3}, Overlays {4}\n{5} UTC".format(
+                event_info.det_id[0], event_info.run_id[0],
+                event_info.frame_index[0], event_info.trigger_counter[0],
+                event_info.overlays[0],
                 datetime.utcfromtimestamp(event_info.utc_seconds)),
             fontsize=fontsize,
             y=1.05)

@@ -5,6 +5,8 @@ daq_ligier_ip="192.168.0.110"
 daq_ligier_port=5553
 monitoring_ligier_ip="127.0.0.1"
 monitoring_ligier_port=5553
+logio_ip="127.0.0.1"
+logio_port=28777
 webserver_port=8080
 tmux_session_name="km3mon"
 
@@ -37,6 +39,14 @@ for arg in "$@"; do
         monitoring_ligier_port=`echo $arg | sed 's/--monitoring-ligier-port=//'`
         ;;
 
+    --logio-ip=*)
+        logio_ip=`echo $arg | sed 's/--logio-ip=//'`
+        ;;
+
+    --logio-port=*)
+        logio_port=`echo $arg | sed 's/--logio-port=//'`
+        ;;
+
     --tmux-session-name=*)
         tmux_session_name=`echo $arg | sed 's/--tmux-session-name=//'`
         ;;
@@ -54,6 +64,8 @@ for arg in "$@"; do
         echo "  --daq-ligier-ip           DAQ Ligier                     ${daq_ligier_ip}"
         echo "  --daq-ligier-port         Port of the DAQ Ligier         ${daq_ligier_port}"
         echo "  --monitoring-ligier-port  Port of the monitoring Ligier  ${monitoring_ligier_port}"
+        echo "  --logio-ip                Log.io IP                      ${logio_ip}"
+        echo "  --logio-port              Port of the Log.io server      ${logio_port}"
         echo "  --tmux-session-name       TMUX session name              ${tmux_session_name}"
         echo "  --webserver-port          Port of the web server         ${webserver_port}"
         echo
@@ -67,6 +79,8 @@ echo "DETECTOR_ID = ${detector_id}" > Makefile
 echo "DAQ_LIGIER_IP = ${daq_ligier_ip}" >> Makefile
 echo "DAQ_LIGIER_PORT = ${daq_ligier_port}" >> Makefile
 echo "MONITORING_LIGIER_PORT = ${monitoring_ligier_port}" >> Makefile
+echo "LOGIO_IP = ${logio_ip}" >> Makefile
+echo "LOGIO_PORT = ${logio_port}" >> Makefile
 echo "WEBSERVER_PORT = ${webserver_port}" >> Makefile
 echo "SESSION_NAME = ${tmux_session_name}" >> Makefile
 
@@ -76,6 +90,7 @@ show_km3mon_banner
 echo "Detector ID:        ${detector_id}"
 echo "DAQ Ligier:         ${daq_ligier_ip}:${daq_ligier_port}"
 echo "Monitoring Ligier:  ${monitoring_ligier_ip}:${monitoring_ligier_port}"
+echo "Log.io Server:      ${logio_ip}:${logio_port}"
 echo "Webserver:          0.0.0.0:${webserver_port}"
 echo "TMUX session:       ${tmux_session_name}"
 echo
