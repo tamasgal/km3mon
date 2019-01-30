@@ -64,6 +64,7 @@ class DOMHits(Module):
         self.max_events = 1000
         self.hits = deque(maxlen=1000)
         self.triggered_hits = deque(maxlen=1000)
+        self.run_changes = defaultdict(int)
         self.thread = threading.Thread(target=self.plot).start()
 
     def process(self, blob):
@@ -129,6 +130,27 @@ class DOMHits(Module):
             datetime.utcnow().strftime("%c")))
         cb = fig.colorbar(im, pad=0.05)
         cb.set_label("number of hits")
+
+        for run, n_events_since_runchange in self.run_changes.items():
+            if n_events_since_runchange >= self.max_events:
+                continue
+            x_pos = self.max_events - n_events_since_runchange
+            plt.text(
+                x_pos,
+                self.det.n_doms,
+                "\nRUN %s  " % run,
+                rotation=60,
+                verticalalignment='top',
+                fontsize=12,
+                color='black',
+                zorder=10)
+            ax.axvline(
+                x_pos,
+                linewidth=3,
+                color='#ff0f5b',
+                linestyle='--',
+                alpha=0.8,
+                zorder=10)
 
         fig.tight_layout()
 
