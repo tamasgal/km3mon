@@ -19,7 +19,7 @@ Options:
 from __future__ import division
 
 from datetime import datetime
-from collections import deque
+from collections import deque, defaultdict
 import os
 import shutil
 import time
@@ -64,7 +64,7 @@ class DOMHits(Module):
         self.max_events = 1000
         self.hits = deque(maxlen=1000)
         self.triggered_hits = deque(maxlen=1000)
-        self.run_changes = defaultdict(int)
+        self.runchanges = defaultdict(int)
         self.thread = threading.Thread(target=self.plot).start()
 
     def process(self, blob):
@@ -73,6 +73,7 @@ class DOMHits(Module):
         if not tag == 'IO_EVT':
             return blob
 
+        self.runchanges[blob['EventInfo'].run_id[0]] += 1
         event_hits = blob['Hits']
         with lock:
             hits = np.zeros(self.det.n_doms)
@@ -132,7 +133,7 @@ class DOMHits(Module):
         cb = fig.colorbar(im, pad=0.05)
         cb.set_label("number of hits")
 
-        for run, n_events_since_runchange in self.run_changes.items():
+        for run, n_events_since_runchange in self.runchanges.items():
             if n_events_since_runchange >= self.max_events:
                 continue
             x_pos = self.max_events - n_events_since_runchange
