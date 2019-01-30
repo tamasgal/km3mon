@@ -65,6 +65,8 @@ class DOMHits(Module):
         self.hits = deque(maxlen=1000)
         self.triggered_hits = deque(maxlen=1000)
         self.runchanges = defaultdict(int)
+        self.n_events = 0
+
         self.thread = threading.Thread(target=self.plot).start()
 
     def process(self, blob):
@@ -74,6 +76,7 @@ class DOMHits(Module):
             return blob
 
         self.runchanges[blob['EventInfo'].run_id[0]] += 1
+        self.n_events += 1
         event_hits = blob['Hits']
         with lock:
             hits = np.zeros(self.det.n_doms)
@@ -138,7 +141,8 @@ class DOMHits(Module):
                 continue
             self.print("Annotating run {} ({} events passed)".format(
                 run, n_events_since_runchange))
-            x_pos = self.max_events - n_events_since_runchange
+            x_pos = min(self.n_events,
+                        self.max_events) - n_events_since_runchange
             plt.text(
                 x_pos,
                 self.det.n_doms,
