@@ -75,10 +75,18 @@ class DOMHits(Module):
         if not tag == 'IO_EVT':
             return blob
 
-        self.runchanges[blob['EventInfo'].run_id[0]] += 1
-        self.n_events += 1
         event_hits = blob['Hits']
         with lock:
+            run_id = blob['EventInfo'].run_id[0]
+            for _run_id in set(list(self.runchanges.keys()) + [run_id]):
+                self.runchanges[_run_id] += 1
+                if self.runchanges[_run_id] > self.max_events:
+                    self.print("Removing run {} from the annotation list".
+                               format(_run_id))
+                    del self.runchanges[_run_id]
+
+            self.n_events += 1
+
             hits = np.zeros(self.det.n_doms)
             for dom_id in event_hits.dom_id:
                 du, floor, _ = self.det.doms[dom_id]
