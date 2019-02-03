@@ -65,6 +65,7 @@ class DOMHits(Module):
         self.hits = deque(maxlen=1000)
         self.triggered_hits = deque(maxlen=1000)
         self.runchanges = defaultdict(int)
+        self.current_run_id = 0
         self.n_events = 0
 
         self.thread = threading.Thread(target=self.plot).start()
@@ -78,9 +79,12 @@ class DOMHits(Module):
         event_hits = blob['Hits']
         with lock:
             run_id = blob['EventInfo'].run_id[0]
+            if run_id > self.current_run_id:
+                self.current_run_id = run_id
             for _run_id in set(list(self.runchanges.keys()) + [run_id]):
                 self.runchanges[_run_id] += 1
-                if self.runchanges[_run_id] > self.max_events:
+                if _run_id != self.current_run_id and \
+                        self.runchanges[_run_id] > self.max_events:
                     self.print("Removing run {} from the annotation list".
                                format(_run_id))
                     del self.runchanges[_run_id]
