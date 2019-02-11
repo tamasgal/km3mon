@@ -58,12 +58,12 @@ class DOMHits(Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
+        self.max_events = self.get("max_events", default=1000)
         self.det = kp.hardware.Detector(det_id=det_id)
 
         self.run = True
-        self.max_events = 1000
-        self.hits = deque(maxlen=1000)
-        self.triggered_hits = deque(maxlen=1000)
+        self.hits = deque(maxlen=self.max_events)
+        self.triggered_hits = deque(maxlen=self.max_events)
         self.runchanges = defaultdict(int)
         self.current_run_id = 0
         self.n_events = 0
