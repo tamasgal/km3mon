@@ -54,7 +54,7 @@ from km3pipe.logger import logging
 lock = threading.Lock()
 
 
-class DOMHits(Module):
+class TriggerMap(Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
@@ -204,7 +204,7 @@ def main():
         timeout=60 * 60 * 24 * 7,
         max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(DOMHits, det_id=det_id, plots_path=plots_path)
+    pipe.attach(TriggerMap, det_id=det_id, plots_path=plots_path)
     pipe.drain()
 
 
