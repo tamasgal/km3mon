@@ -96,7 +96,7 @@ class PMTRates(kp.Module):
 
     def update_plot(self):
         filename = os.path.join(self.plot_path, self.filename)
-        self.debug("Updating plot at {}".format(filename))
+        self.log.debug("Updating plot at {}".format(filename))
         now = time.time()
         max_x = self.max_x
         interval = self.interval
