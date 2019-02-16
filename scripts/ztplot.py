@@ -59,6 +59,7 @@ lock = threading.Lock()
 class ZTPlot(Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
+        self.min_dus = self.get('min_dus', default=1)
         det_id = self.require('det_id')
         self.calib = kp.calib.Calibration(det_id=det_id)
 
@@ -77,7 +78,7 @@ class ZTPlot(Module):
         event_info = blob['EventInfo']
 
         n_triggered_dus = np.unique(hits[hits.triggered == True].du)
-        if n_triggered_dus < 1:
+        if n_triggered_dus < self.min_dus:
             print("Skipping...")
             return blob
 
