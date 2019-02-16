@@ -42,6 +42,7 @@ class MSGDumper(Module):
         entry = "{} [{}]: {}\n".format(
             os.path.basename(self.filename), source, data)
         self.fobj.write(entry)
+        self.fobj.flush()
         return blob
 
     def finish(self):
