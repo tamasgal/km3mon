@@ -37,7 +37,7 @@ start:
 	@echo Starting the web server on 0.0.0.0:${WEBSERVER_PORT}
 	@#
 	@tmux send-keys -t ${SESSION_NAME}:main.3  \
-	    "gunicorn -w 4 -b 0.0.0.0:${WEBSERVER_PORT} km3mon:app" Enter
+	    "gunicorn --pid gunicorn.pid -w 4 -b 0.0.0.0:${WEBSERVER_PORT} km3mon:app" Enter
 	@tmux select-layout even-vertical
 
 	@echo Starting the monitoring scripts
@@ -100,8 +100,10 @@ start:
 	@tmux select-layout even-vertical
 
 stop:
+	@echo Stopping monitoring session...
 	tmux kill-session -t ${SESSION_NAME}
-	killall gunicorn
+	kill -9 $(shell cat gunicorn.pid)
+	@sleep 5
 
 clean:
 	rm Makefile
