@@ -37,7 +37,7 @@ start:
 	@echo Starting the web server on 0.0.0.0:${WEBSERVER_PORT}
 	@#
 	@tmux send-keys -t ${SESSION_NAME}:main.3  \
-	    "gunicorn -w 4 -b 0.0.0.0:${WEBSERVER_PORT} km3mon:app" Enter
+	    "gunicorn --pid gunicorn.pid -w 4 -b 0.0.0.0:${WEBSERVER_PORT} km3mon:app" Enter
 	@tmux select-layout even-vertical
 
 	@echo Starting the monitoring scripts
@@ -91,17 +91,21 @@ start:
 	    "python scripts/ahrs_calibration.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux select-layout even-vertical
 
-	@# Log.io
+	@# Logs
 	@#
-	@tmux new-window -n logio -t ${SESSION_NAME}
-	@tmux split-window -v -t ${SESSION_NAME}:logio
-	@tmux send-keys -t ${SESSION_NAME}:logio.1  \
-	    "python scripts/logio.py -p ${MONITORING_LIGIER_PORT} -x ${LOGIO_IP} -q ${LOGIO_PORT}" Enter
+	@tmux new-window -n log -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:log
+	@tmux send-keys -t ${SESSION_NAME}:log.1  \
+	    "python scripts/msg_dumper.py -l 127.0.0.1 -p ${MONITORING_LIGIER_PORT} -f logs/MSG.log" Enter
+	@tmux send-keys -t ${SESSION_NAME}:log.2  \
+	    "touch logs/MSG.log && frontail logs/*.log --ui-highlight --ui-highlight-preset frontail.json --theme dark -l 10000 -n 200 -p 8082" Enter
 	@tmux select-layout even-vertical
 
 stop:
+	@echo Stopping monitoring session...
 	tmux kill-session -t ${SESSION_NAME}
-	killall gunicorn
+	kill -9 $(shell cat gunicorn.pid)
+	@sleep 5
 
 clean:
 	rm Makefile
