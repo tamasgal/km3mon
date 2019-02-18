@@ -19,7 +19,7 @@ Options:
 from __future__ import division
 
 from datetime import datetime
-from collections import deque
+from collections import deque, defaultdict
 import os
 import shutil
 import time
@@ -54,16 +54,20 @@ from km3pipe.logger import logging
 lock = threading.Lock()
 
 
-class DOMHits(Module):
+class TriggerMap(Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
+        self.max_events = self.get("max_events", default=1000)
         self.det = kp.hardware.Detector(det_id=det_id)
 
         self.run = True
-        self.max_events = 1000
-        self.hits = deque(maxlen=1000)
-        self.triggered_hits = deque(maxlen=1000)
+        self.hits = deque(maxlen=self.max_events)
+        self.triggered_hits = deque(maxlen=self.max_events)
+        self.runchanges = defaultdict(int)
+        self.current_run_id = 0
+        self.n_events = 0
+
         self.thread = threading.Thread(target=self.plot).start()
 
     def process(self, blob):
@@ -74,6 +78,19 @@ class DOMHits(Module):
 
         event_hits = blob['Hits']
         with lock:
+            run_id = blob['EventInfo'].run_id[0]
+            if run_id > self.current_run_id:
+                self.current_run_id = run_id
+            for _run_id in set(list(self.runchanges.keys()) + [run_id]):
+                self.runchanges[_run_id] += 1
+                if _run_id != self.current_run_id and \
+                        self.runchanges[_run_id] > self.max_events:
+                    self.print("Removing run {} from the annotation list".
+                               format(_run_id))
+                    del self.runchanges[_run_id]
+
+            self.n_events += 1
+
             hits = np.zeros(self.det.n_doms)
             for dom_id in event_hits.dom_id:
                 du, floor, _ = self.det.doms[dom_id]
@@ -131,6 +148,30 @@ class DOMHits(Module):
         cb = fig.colorbar(im, pad=0.05)
         cb.set_label("number of hits")
 
+        for run, n_events_since_runchange in self.runchanges.items():
+            if n_events_since_runchange >= self.max_events:
+                continue
+            self.print("Annotating run {} ({} events passed)".format(
+                run, n_events_since_runchange))
+            x_pos = min(self.n_events,
+                        self.max_events) - n_events_since_runchange
+            plt.text(
+                x_pos,
+                self.det.n_doms,
+                "\nRUN %s  " % run,
+                rotation=60,
+                verticalalignment='top',
+                fontsize=12,
+                color='black',
+                zorder=10)
+            ax.axvline(
+                x_pos,
+                linewidth=3,
+                color='#ff0f5b',
+                linestyle='--',
+                alpha=0.8,
+                zorder=10)
+
         fig.tight_layout()
 
         f = os.path.join(self.plots_path, filename + '.png')
@@ -163,7 +204,7 @@ def main():
         timeout=60 * 60 * 24 * 7,
         max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(DOMHits, det_id=det_id, plots_path=plots_path)
+    pipe.attach(TriggerMap, det_id=det_id, plots_path=plots_path)
     pipe.drain()
 
 
