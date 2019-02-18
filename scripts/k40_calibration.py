@@ -6,7 +6,16 @@
 K40 Intra-DOM Calibration
 =========================
 
-The following script calculates the PMT time offsets using K40 coincidences
+Usage:
+    k40_calibration.py [options]
+    k40_calibration.py (-h | --help)
+
+Options:
+    -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
+    -p LIGIER_PORT  The port of the ligier [default: 5553].
+    -d DET_ID       Detector ID.
+    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -h --help       Show this screen.
 
 """
 # Author: Jonas Reubelt <jreubelt@km3net.de> and Tamas Gal <tgal@km3net.de>
