@@ -127,7 +127,7 @@ class ZTPlot(Module):
                 c='#FF6363',
                 label='triggered hit')
             ax.set_title(
-                'DU{0}'.format(du), fontsize=fontsize, fontweight='bold')
+                'DU{0}'.format(int(du)), fontsize=fontsize, fontweight='bold')
 
         for idx, ax in enumerate(axes):
             ax.tick_params(labelsize=fontsize)
