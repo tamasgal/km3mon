@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block infoheader %}
-<div class="alert alert-success alert-dismissible" role="alert">{{ info }}</div>
+    {% if info is defined %}
+        <div class="alert alert-success alert-dismissible" role="alert">{{ info }}</div>
+    {% endif %}
 {% endblock %}
 
 {% block plots %}
