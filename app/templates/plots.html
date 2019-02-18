@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block infoheader %}
+<div class="alert alert-success alert-dismissible" role="alert">{{ info }}</div>
+{% endblock %}
+
 {% block plots %}
 
     <div class="container-fluid" id="plots">

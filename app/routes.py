@@ -38,7 +38,7 @@ def ahrs():
 
 @app.route('/k40.html')
 def k40():
-    return render_template('k40.html', plots=K40_PLOTS)
+    return render_template('plots.html', plots=K40_PLOTS)
 
 
 @app.route('/trigger.html')
