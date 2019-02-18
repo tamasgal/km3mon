@@ -59,6 +59,7 @@ lock = threading.Lock()
 class ZTPlot(Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
+        self.ytick_distance = self.get('ytick_distance', default=200)
         det_id = self.require('det_id')
         self.calib = kp.calib.Calibration(det_id=det_id)
 
@@ -129,7 +130,8 @@ class ZTPlot(Module):
 
         for idx, ax in enumerate(axes):
             ax.tick_params(labelsize=fontsize)
-            ax.yaxis.set_major_locator(ticker.MultipleLocator(200))
+            ax.yaxis.set_major_locator(
+                ticker.MultipleLocator(self.ytick_distance))
             xlabels = ax.get_xticklabels()
             for label in xlabels:
                 label.set_rotation(45)
