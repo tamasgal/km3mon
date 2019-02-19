@@ -68,13 +68,27 @@ monitoring software (usually `~/monitoring`) which can be used to set
 different kind of parameters, like plot attributes or ranges.
 Here is an example `pipeline.toml`:
 
-    [DOMRates]
-    lowest_rate = 200
-    highest_rate = 400
+```
+[DOMRates]
+lowest_rate = 150  # [kHz]
+highest_rate = 350  # [kHz]
 
-    [PMTRates]
-    lowest_rate = 1000
-    highest_rate = 10000
+[PMTRates]
+lowest_rate = 1000  # [Hz]
+highest_rate = 20000  # [Hz]
+
+[TriggerRate]
+interval = 300  # time inverval to integrate [s]
+with_minor_ticks = true  # minor tickmarks on the plot
+
+[TriggerMap]
+max_events = 5000  # the number of events to log
+
+[ZTPlot]
+min_dus = 1
+ytick_distance = 25  # [m]
+```
+
 
 After a `make stop` and `make start`, the file is parsed and the default
 values are overwritten by those defined in the configuration file.
