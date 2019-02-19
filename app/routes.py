@@ -38,7 +38,14 @@ def ahrs():
 
 @app.route('/k40.html')
 def k40():
-    return render_template('plots.html', plots=K40_PLOTS)
+    return render_template(
+        'plots.html',
+        plots=K40_PLOTS,
+        info="The first plot shows the intra-DOM calibration. "
+        "y-axis: delta_t [ns], x-axis: cosine of angles. "
+        "The second plot the angular distribution of K40 rates. "
+        "y-axis: rate [Hz], x-axis: cosine of angles. "
+        "blue=before, red=after")
 
 
 @app.route('/trigger.html')
