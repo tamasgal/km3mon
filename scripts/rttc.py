@@ -72,6 +72,7 @@ def main():
 
         n_dus = detector.n_dus
         fig, axes = plt.subplots(n_dus, figsize=(16, 4 * n_dus))
+        axes = [axes] if n_dus == 1 else axes.flatten()
         for ax, du in zip(axes, detector.dus):
             times = []
             rttc = []
