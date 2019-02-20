@@ -44,7 +44,7 @@ def rttc():
         plots=RTTC_PLOTS,
         info=
         "Cable Round Trip Time calculated from realtime data provided by the "
-        "Detector Manager.</ br>"
+        "Detector Manager.\n"
         "RTTC = Cable_RTT - (TX_Slave + RX_Slave + TX_Master + RX_Master)")
 
 
