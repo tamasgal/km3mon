@@ -122,8 +122,13 @@ def main():
                     wr_delta0 + wr_delta1 + wr_delta2 + wr_delta3)
                 rttc.append(rttc_value)
 
-
-            ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
+            ax.plot(
+                times,
+                rttc,
+                marker="X",
+                markersize=6,
+                linestyle='None',
+                zorder=100)
 
             rttc_median = baselines[du][0]
             rttc_std = baselines[du][1]
