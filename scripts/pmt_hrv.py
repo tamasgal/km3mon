@@ -89,6 +89,8 @@ class PMTHRV(kp.Module):
                 continue
             mean_hrv[i] = np.mean(self.hrv[i])
 
+        self.hrv = defaultdict(list)
+
         m[:, self.max_x - 1] = mean_hrv
         self.hrv_matrix = m
 
