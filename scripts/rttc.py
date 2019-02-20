@@ -40,8 +40,10 @@ km3pipe.style.use('km3pipe')
 from km3pipe.logger import logging
 
 
+@kp.tools.timed_cache(hours=1)
 def get_baseline_rttc(det_id, hours=24):
     """Retrieve the median and std RTTC values for a given time interval [h]"""
+    print("Retrieving baseline RTTC")
     now = time.time()
     dm = kp.db.DBManager()
     det_oid = dm.get_det_oid(det_id)
@@ -54,7 +56,7 @@ def get_baseline_rttc(det_id, hours=24):
         runs[runs.UNIXSTARTTIME < (now - 60 * 60 * hours) * 1000].tail(1).RUN)
 
     baselines = {}
-    for du in self.det.dus:
+    for du in det.dus:
         data = OrderedDict()
         for param in ['wr_mu'] + ['wr_delta[%d]' % i for i in range(4)]:
             _data = sds.datalognumbers(
@@ -62,7 +64,10 @@ def get_baseline_rttc(det_id, hours=24):
                 detid=det_oid,
                 minrun=run_24h_ago,
                 maxrun=latest_run,
-                source_name=clbmap.base(1).upi)
+                source_name=clbmap.base(du).upi)
+            if _data is None:
+                data[param] = (0, 0)
+                continue
             data[param] = (_data.DATA_VALUE.median(), _data.DATA_VALUE.std())
         rttc_median = data['wr_mu'][0] - sum(
             [data[p][0] for p in list(data.keys())[1:]])
@@ -96,6 +101,7 @@ def main():
     session = dmm.start_session('rttc_monitoring', params)
 
     for values in session:
+        baselines = get_baseline_rttc(det_id, hours=24)
         for du in detector.dus:
             i = detector.dus.index(du)
             idx_start = i * 5
@@ -115,6 +121,12 @@ def main():
                 rttc_value = wr_mu - (
                     wr_delta0 + wr_delta1 + wr_delta2 + wr_delta3)
                 rttc.append(rttc_value)
+
+            rttc_median = baselines[du][0]
+            rttc_std = baselines[du][1]
+            ax.axhline(y=rttc_median + rttc_std, color='r', lw=1, ls='--')
+            ax.axhline(y=rttc_median - rttc_std, color='r', lw=1, ls='--')
+            ax.axhline(y=rttc_median, color='r', lw=2, ls='-')
 
             ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
 
