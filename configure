@@ -3,6 +3,7 @@
 detector_id=29
 daq_ligier_ip="192.168.0.110"
 daq_ligier_port=5553
+detector_manager_ip="192.168.0.120"
 monitoring_ligier_ip="127.0.0.1"
 monitoring_ligier_port=5553
 logio_ip="127.0.0.1"
@@ -35,6 +36,10 @@ for arg in "$@"; do
         daq_ligier_port=`echo $arg | sed 's/--daq-ligier-port=//'`
         ;;
 
+    --detector-manager-ip=*)
+        detector_manager_ip=`echo $arg | sed 's/--detector-manager-ip=//'`
+        ;;
+
     --monitoring-ligier-port=*)
         monitoring_ligier_port=`echo $arg | sed 's/--monitoring-ligier-port=//'`
         ;;
@@ -63,6 +68,7 @@ for arg in "$@"; do
         echo "  --detector-id             Detector ID                    ${detector_id}"
         echo "  --daq-ligier-ip           DAQ Ligier                     ${daq_ligier_ip}"
         echo "  --daq-ligier-port         Port of the DAQ Ligier         ${daq_ligier_port}"
+        echo "  --detector-manager-ip     Detector Manager for RTTC      ${detector_manager_ip}"
         echo "  --monitoring-ligier-port  Port of the monitoring Ligier  ${monitoring_ligier_port}"
         echo "  --logio-ip                Log.io IP                      ${logio_ip}"
         echo "  --logio-port              Port of the Log.io server      ${logio_port}"
@@ -78,6 +84,7 @@ done
 echo "DETECTOR_ID = ${detector_id}" > Makefile
 echo "DAQ_LIGIER_IP = ${daq_ligier_ip}" >> Makefile
 echo "DAQ_LIGIER_PORT = ${daq_ligier_port}" >> Makefile
+echo "DETECTOR_MANAGER_IP = ${detector_manager_ip}" >> Makefile
 echo "MONITORING_LIGIER_PORT = ${monitoring_ligier_port}" >> Makefile
 echo "LOGIO_IP = ${logio_ip}" >> Makefile
 echo "LOGIO_PORT = ${logio_port}" >> Makefile
@@ -89,6 +96,7 @@ cat Makefile.in >> Makefile
 show_km3mon_banner
 echo "Detector ID:        ${detector_id}"
 echo "DAQ Ligier:         ${daq_ligier_ip}:${daq_ligier_port}"
+echo "Detector Manager:   ${detector_manager_ip}"
 echo "Monitoring Ligier:  ${monitoring_ligier_ip}:${monitoring_ligier_port}"
 echo "Log.io Server:      ${logio_ip}:${logio_port}"
 echo "Webserver:          0.0.0.0:${webserver_port}"

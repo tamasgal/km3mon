@@ -83,12 +83,14 @@ start:
 	    "echo narf"
 	@tmux select-layout even-vertical
 
-	@# AHRS
+	@# AHRS/RTTC
 	@#
-	@tmux new-window -n ahrs -t ${SESSION_NAME}
-	@tmux split-window -v -t ${SESSION_NAME}:ahrs
-	@tmux send-keys -t ${SESSION_NAME}:ahrs.1  \
+	@tmux new-window -n ahrs-rttc -t ${SESSION_NAME}
+	@tmux split-window -v -t ${SESSION_NAME}:ahrs-rttc
+	@tmux send-keys -t ${SESSION_NAME}:ahrs-rttc.1  \
 	    "python scripts/ahrs_calibration.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
+	@tmux send-keys -t ${SESSION_NAME}:ahrs-rttc.2  \
+	    "python scripts/rttc.py -d ${DETECTOR_ID} -l ${DETECTOR_MANAGER_IP}" Enter
 	@tmux select-layout even-vertical
 
 	@# K40
