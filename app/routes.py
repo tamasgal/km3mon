@@ -11,6 +11,7 @@ PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates', 'pmt_hrv'],
 AHRS_PLOTS = [['yaw_calib'], ['pitch_calib'], ['roll_calib']]
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
+RTTC_PLOTS = [['rttc']]
 
 
 @app.after_request
@@ -34,6 +35,17 @@ def index():
 @app.route('/ahrs.html')
 def ahrs():
     return render_template('plots.html', plots=AHRS_PLOTS)
+
+
+@app.route('/rttc.html')
+def rttc():
+    return render_template(
+        'plots.html',
+        plots=RTTC_PLOTS,
+        info=
+        "Cable Round Trip Time calculated from realtime data provided by the "
+        "Detector Manager.</ br>"
+        "RTTC = Cable_RTT - (TX_Slave + RX_Slave + TX_Master + RX_Master)")
 
 
 @app.route('/k40.html')
