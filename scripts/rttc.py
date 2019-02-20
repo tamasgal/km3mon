@@ -55,7 +55,8 @@ def main():
 
     params = []
     for du in detector.dus:
-        params += ['wr_mu/%d/0' % du] + ['wr_delta/%d/0/%i' % (du, i) for i in range(4)]
+        params += ['wr_mu/%d/0' % du
+                   ] + ['wr_delta/%d/0/%i' % (du, i) for i in range(4)]
 
     xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
 
@@ -69,24 +70,25 @@ def main():
             data[du].append((datetime.utcnow(),
                              [v['value'] for v in values[idx_start:idx_stop]]))
 
-
-        for du in detector.dus:
+        fig, axes = plt.subplots(figsize=(16, 4 * len(detector.dus)))
+        for ax, du in zip(axes, detector.dus):
             times = []
             rttc = []
             for d in data[du]:
                 times.append(d[0])
                 wr_mu, wr_delta0, wr_delta1, wr_delta2, wr_delta3 = d[1]
-                rttc_value = wr_mu - (wr_delta0 + wr_delta1 + wr_delta2 + wr_delta3)
+                rttc_value = wr_mu - (
+                    wr_delta0 + wr_delta1 + wr_delta2 + wr_delta3)
                 rttc.append(rttc_value)
 
-            fig, ax = plt.subplots(figsize=(16, 4))
             ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
             ax.set_xlabel('time [UTC]')
             ax.set_ylabel('RTTC [ps]')
             ax.xaxis.set_major_formatter(xfmt)
-            plt.savefig(os.path.join(plots_path, 'rttc_du-%d.png' % du),
-                        dpi=120, bbox_inches="tight")
-            plt.close('all')
+        plt.savefig(
+            os.path.join(plots_path, 'rttc.png'), dpi=120, bbox_inches="tight")
+        plt.close('all')
+
 
 if __name__ == '__main__':
     main()
