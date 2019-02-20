@@ -50,7 +50,7 @@ def main():
     plots_path = args['-o']
 
     detector = kp.hardware.Detector(det_id=det_id)
-
+    clbmap = kp.db.CLBMap(det_id)
     dmm = kp.io.daq.DMMonitor(dm_ip, base='clb/outparams')
 
     params = []
@@ -70,7 +70,8 @@ def main():
             data[du].append((datetime.utcnow(),
                              [v['value'] for v in values[idx_start:idx_stop]]))
 
-        fig, axes = plt.subplots(figsize=(16, 4 * len(detector.dus)))
+        n_dus = detector.n_dus
+        fig, axes = plt.subplots(n_dus, figsize=(16, 4 * n_dus))
         for ax, du in zip(axes, detector.dus):
             times = []
             rttc = []
@@ -82,6 +83,9 @@ def main():
                 rttc.append(rttc_value)
 
             ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
+
+            clb = clbmap.base(du)
+            ax.set_title("RTTC for CLB %s in Det ID %d" % (clb.upi, det_id))
             ax.set_xlabel('time [UTC]')
             ax.set_ylabel('RTTC [ps]')
             ax.xaxis.set_major_formatter(xfmt)
