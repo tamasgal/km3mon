@@ -61,8 +61,15 @@ class ZTPlot(Module):
         self.plots_path = self.require('plots_path')
         self.ytick_distance = self.get('ytick_distance', default=200)
         self.min_dus = self.get('min_dus', default=1)
-        det_id = self.require('det_id')
-        self.calib = kp.calib.Calibration(det_id=det_id)
+        self.det_id = self.require('det_id')
+        self.t0set = None
+        self.calib = None
+
+        self.sds = kp.db.StreamDS()
+
+        self.index = 0
+
+        self._update_calibration()
 
         self.run = True
         self.max_queue = 3
@@ -70,9 +77,18 @@ class ZTPlot(Module):
         self.thread = threading.Thread(target=self.plot, daemon=True)
         self.thread.start()
 
+    def _update_calibration(self):
+        self.print("Updating calibration")
+        self.t0set = self.sds.t0sets(detid=self.det_id).iloc[-1]['CALIBSETID']
+        self.calib = kp.calib.Calibration(det_id=self.det_id, t0set=self.t0set)
+
     def process(self, blob):
         if 'Hits' not in blob:
             return blob
+
+        self.index += 1
+        if self.index % 1000 == 0:
+            self._update_calibration()
 
         hits = blob['Hits']
         hits = self.calib.apply(hits)
@@ -144,9 +160,9 @@ class ZTPlot(Module):
 
         print
         plt.suptitle(
-            "z-t-Plot for DetID-{0}, Run {1}, FrameIndex {2}, "
-            "TriggerCounter {3}, Overlays {4}\n{5} UTC".format(
-                event_info.det_id[0], event_info.run_id[0],
+            "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
+            "TriggerCounter {4}, Overlays {5}\n{6} UTC".format(
+                event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
                 event_info.overlays[0],
                 datetime.utcfromtimestamp(event_info.utc_seconds)),
