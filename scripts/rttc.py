@@ -122,13 +122,14 @@ def main():
                     wr_delta0 + wr_delta1 + wr_delta2 + wr_delta3)
                 rttc.append(rttc_value)
 
+
+            ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
+
             rttc_median = baselines[du][0]
             rttc_std = baselines[du][1]
             ax.axhline(y=rttc_median + rttc_std, color='r', lw=1, ls='--')
             ax.axhline(y=rttc_median - rttc_std, color='r', lw=1, ls='--')
             ax.axhline(y=rttc_median, color='r', lw=2, ls='-')
-
-            ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
 
             clb = clbmap.base(du)
             ax.set_title("RTTC for base CLB %s of DU-%d in Det ID %d" %
