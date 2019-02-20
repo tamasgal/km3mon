@@ -85,7 +85,8 @@ def main():
             ax.plot(times, rttc, marker="X", markersize=6, linestyle='None')
 
             clb = clbmap.base(du)
-            ax.set_title("RTTC for CLB %s in Det ID %d" % (clb.upi, det_id))
+            ax.set_title("RTTC for base CLB %s of DU-%d in Det ID %d" %
+                         (clb.upi, du, det_id))
             ax.set_xlabel('time [UTC]')
             ax.set_ylabel('RTTC [ps]')
             ax.xaxis.set_major_formatter(xfmt)
