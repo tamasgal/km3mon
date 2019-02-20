@@ -19,6 +19,7 @@ from __future__ import division
 
 import os
 from datetime import datetime
+import time
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
@@ -28,7 +29,7 @@ import matplotlib.ticker as ticker
 from matplotlib.colors import LogNorm
 import numpy as np
 
-from collections import deque, defaultdict
+from collections import deque, defaultdict, OrderedDict
 from functools import partial
 
 import km3pipe as kp
@@ -37,6 +38,38 @@ import km3pipe.style
 km3pipe.style.use('km3pipe')
 
 from km3pipe.logger import logging
+
+
+def get_baseline_rttc(det_id, hours=24):
+    """Retrieve the median and std RTTC values for a given time interval [h]"""
+    now = time.time()
+    dm = kp.db.DBManager()
+    det_oid = dm.get_det_oid(det_id)
+    sds = kp.db.StreamDS()
+    det = kp.hardware.Detector(det_id=det_id)
+    clbmap = kp.db.CLBMap(det_oid=det_oid)
+    runs = sds.runs(detid=det_id)
+    latest_run = int(runs.tail(1).RUN)
+    run_24h_ago = int(
+        runs[runs.UNIXSTARTTIME < (now - 60 * 60 * hours) * 1000].tail(1).RUN)
+
+    baselines = {}
+    for du in self.det.dus:
+        data = OrderedDict()
+        for param in ['wr_mu'] + ['wr_delta[%d]' % i for i in range(4)]:
+            _data = sds.datalognumbers(
+                parameter_name=param,
+                detid=det_oid,
+                minrun=run_24h_ago,
+                maxrun=latest_run,
+                source_name=clbmap.base(1).upi)
+            data[param] = (_data.DATA_VALUE.median(), _data.DATA_VALUE.std())
+        rttc_median = data['wr_mu'][0] - sum(
+            [data[p][0] for p in list(data.keys())[1:]])
+        rttc_std = data['wr_mu'][1] - sum(
+            [data[p][1] for p in list(data.keys())[1:]])
+        baselines[du] = (rttc_median, rttc_std)
+    return baselines
 
 
 def main():
