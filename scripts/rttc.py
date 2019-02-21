@@ -69,12 +69,12 @@ def get_baseline_rttc(det_id, hours=24):
         for param, df in data.items():
             values = df[df.SOURCE_NAME == source_name].DATA_VALUE.values
             if len(values) == 0:
-                du_data[param] = (0, 0)
+                du_data[param] = (np.nan, np.nan)
                 continue
             du_data[param] = (np.median(values), np.std(values))
-        rttc_median = du_data['wr_mu'][0] - sum(
+        rttc_median = du_data['wr_mu'][0] - np.sum(
             [du_data[p][0] for p in list(du_data.keys())[1:]])
-        rttc_std = du_data['wr_mu'][1] - sum(
+        rttc_std = du_data['wr_mu'][1] - np.sum(
             [du_data[p][1] for p in list(du_data.keys())[1:]])
         baselines[du] = (rttc_median, rttc_std)
     return baselines
