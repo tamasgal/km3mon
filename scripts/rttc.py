@@ -39,6 +39,8 @@ km3pipe.style.use('km3pipe')
 
 from km3pipe.logger import logging
 
+plt.rcParams['axes.formatter.useoffset'] = False
+
 
 @kp.tools.timed_cache(hours=1)
 def get_baseline_rttc(det_id, hours=24):
