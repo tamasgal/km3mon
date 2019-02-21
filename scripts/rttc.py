@@ -55,24 +55,27 @@ def get_baseline_rttc(det_id, hours=24):
     run_24h_ago = int(
         runs[runs.UNIXSTARTTIME < (now - 60 * 60 * hours) * 1000].tail(1).RUN)
 
+    data = OrderedDict()
+    for param in ['wr_mu'] + ['wr_delta[%d]' % i for i in range(4)]:
+        data[param] = sds.datalognumbers(
+            parameter_name=param,
+            detid=det_oid,
+            minrun=run_24h_ago,
+            maxrun=latest_run)
     baselines = {}
     for du in det.dus:
-        data = OrderedDict()
-        for param in ['wr_mu'] + ['wr_delta[%d]' % i for i in range(4)]:
-            _data = sds.datalognumbers(
-                parameter_name=param,
-                detid=det_oid,
-                minrun=run_24h_ago,
-                maxrun=latest_run,
-                source_name=clbmap.base(du).upi)
-            if _data is None:
-                data[param] = (0, 0)
+        source_name = clbmap.base(du).upi
+        du_data = OrderedDict()
+        for param, df in data.items():
+            values = df[df.SOURCE_NAME == source_name].DATA_VALUE.values
+            if len(values) == 0:
+                du_data[param] = (0, 0)
                 continue
-            data[param] = (_data.DATA_VALUE.median(), _data.DATA_VALUE.std())
-        rttc_median = data['wr_mu'][0] - sum(
-            [data[p][0] for p in list(data.keys())[1:]])
-        rttc_std = data['wr_mu'][1] - sum(
-            [data[p][1] for p in list(data.keys())[1:]])
+            du_data[param] = (np.median(values), np.std(values))
+        rttc_median = du_data['wr_mu'][0] - sum(
+            [du_data[p][0] for p in list(du_data.keys())[1:]])
+        rttc_std = du_data['wr_mu'][1] - sum(
+            [du_data[p][1] for p in list(du_data.keys())[1:]])
         baselines[du] = (rttc_median, rttc_std)
     return baselines
 
