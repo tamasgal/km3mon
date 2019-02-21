@@ -39,8 +39,6 @@ km3pipe.style.use('km3pipe')
 
 from km3pipe.logger import logging
 
-plt.rcParams['axes.formatter.useoffset'] = False
-
 
 @kp.tools.timed_cache(hours=1)
 def get_baseline_rttc(det_id, hours=24):
@@ -147,6 +145,9 @@ def main():
             ax.set_xlabel('time [UTC]')
             ax.set_ylabel('RTTC [ps]')
             ax.xaxis.set_major_formatter(xfmt)
+            ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+            ax.yaxis.get_major_formatter().set_useOffset(False)
         plt.savefig(
             os.path.join(plots_path, 'rttc.png'), dpi=120, bbox_inches="tight")
         plt.close('all')
