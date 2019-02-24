@@ -64,6 +64,7 @@ class ZTPlot(Module):
         self.det_id = self.require('det_id')
         self.t0set = None
         self.calib = None
+        self.max_z = None
 
         self.sds = kp.db.StreamDS()
 
@@ -81,6 +82,7 @@ class ZTPlot(Module):
         self.print("Updating calibration")
         self.t0set = self.sds.t0sets(detid=self.det_id).iloc[-1]['CALIBSETID']
         self.calib = kp.calib.Calibration(det_id=self.det_id, t0set=self.t0set)
+        self.max_z = round(np.max(self.calib.detector.pmts.pos_z) + 10, -1)
 
     def process(self, blob):
         if 'Hits' not in blob:
@@ -146,6 +148,7 @@ class ZTPlot(Module):
                 'DU{0}'.format(int(du)), fontsize=fontsize, fontweight='bold')
 
         for idx, ax in enumerate(axes):
+            ax.set_ylim(0, self.max_z)
             ax.tick_params(labelsize=fontsize)
             ax.yaxis.set_major_locator(
                 ticker.MultipleLocator(self.ytick_distance))
