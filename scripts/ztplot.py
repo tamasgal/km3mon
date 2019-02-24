@@ -122,6 +122,9 @@ class ZTPlot(Module):
         dus = set(hits.du)
         fontsize = 16
 
+        time_offset = np.min(hits[hits.triggered == True].time)
+        hits.time -= time_offset
+
         n_plots = len(dus)
         n_cols = int(np.ceil(np.sqrt(n_plots)))
         n_rows = int(n_plots / n_cols) + (n_plots % n_cols > 0)
@@ -164,10 +167,11 @@ class ZTPlot(Module):
         print
         plt.suptitle(
             "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
-            "TriggerCounter {4}, Overlays {5}\n{6} UTC".format(
+            "TriggerCounter {4}, Overlays {5}, time offset {6} ns"
+            "\n{7} UTC".format(
                 event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
-                event_info.overlays[0],
+                event_info.overlays[0], time_offset,
                 datetime.utcfromtimestamp(event_info.utc_seconds)),
             fontsize=fontsize,
             y=1.05)
