@@ -143,7 +143,7 @@ class ZTPlot(Module):
 
         for ax, du in zip(axes, dus):
             for z in dom_zs:
-                ax.axhline(z, lw=1, color='b', alpha=0.2)
+                ax.axhline(z, lw=1, color='b', ls='--', alpha=0.15)
             du_hits = hits[hits.du == du]
             trig_hits = du_hits[du_hits.triggered == True]
 
