@@ -120,6 +120,7 @@ class ZTPlot(Module):
     def create_plot(self, event_info, hits):
         print(self.__class__.__name__ + ": updating plot.")
         dus = set(hits.du)
+        doms = set(hits.dom_id)
         fontsize = 16
 
         time_offset = np.min(hits[hits.triggered == True].time)
@@ -186,6 +187,8 @@ class ZTPlot(Module):
         f = os.path.join(self.plots_path, filename + '.png')
         f_tmp = os.path.join(self.plots_path, filename + '_tmp.png')
         plt.savefig(f_tmp, dpi=120, bbox_inches="tight")
+        if len(doms) > 4:
+            plt.savefig(os.path.join(self.plots_path, filename + '_5doms.png'))
         plt.close('all')
         shutil.move(f_tmp, f)
 
