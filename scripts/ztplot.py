@@ -137,7 +137,13 @@ class ZTPlot(Module):
 
         axes = [axes] if n_plots == 1 else axes.flatten()
 
+        dom_zs = self.calib.detector.pmts.pos_z[
+            (self.calib.detector.pmts.du == min(dus))
+            & (self.calib.detector.pmts.channel_id == 0)]
+
         for ax, du in zip(axes, dus):
+            for z in dom_zs:
+                ax.axhline(z, lw=1, color='b', alpha=0.2)
             du_hits = hits[hits.du == du]
             trig_hits = du_hits[du_hits.triggered == True]
 
