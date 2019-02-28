@@ -19,6 +19,7 @@ Options:
 """
 from collections import deque
 import time
+import os
 import threading
 import numpy as np
 import matplotlib
@@ -52,8 +53,12 @@ class ZenithDistribution(kp.Module):
 
     def create_plot(self):
         fig, ax = plt.subplots(figsize=(16, 4))
-        plt.histogram(self.thetas, bins=180)
-        filename = join(self.plots_path, 'track_reco.png')
+        ax.hist(self.thetas, bins=180)
+        ax.set_title(
+            r"$\theta$ distribution of JGandalf track reconstructions")
+        ax.set_xlabel(r"$\theta$ [deg]")
+        ax.set_ylabel = "count"
+        filename = os.path.join(self.plots_path, 'track_reco.png')
         plt.savefig(filename, dpi=120, bbox_inches="tight")
         plt.close('all')
 
