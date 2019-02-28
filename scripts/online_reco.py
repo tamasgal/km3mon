@@ -52,7 +52,7 @@ class ZenithDistribution(kp.Module):
             self.create_plot()
 
     def create_plot(self):
-        fig, ax = plt.subplots(figsize=(16, 8))
+        fig, ax = plt.subplots(figsize=(4, 3))
         ax.hist(self.thetas, bins=180)
         ax.set_title(
             r"$\theta$ distribution of JGandalf track reconstructions\n"
