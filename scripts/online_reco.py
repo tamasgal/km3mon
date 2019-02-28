@@ -52,11 +52,14 @@ class ZenithDistribution(kp.Module):
             self.create_plot()
 
     def create_plot(self):
-        fig, ax = plt.subplots(figsize=(4, 3))
+        n = len(self.thetas)
+        n_ok = n - np.count_nonzero(np.isnan(self.thetas))
+
+        fig, ax = plt.subplots(figsize=(16, 10))
         ax.hist(self.thetas, bins=180)
         ax.set_title(
             r"$\theta$ distribution of JGandalf track reconstructions\n"
-            r"(from the last %s events)" % self.max_events)
+            r"based on %d of %d reconstructed events" % (n_ok, n))
         ax.set_xlabel(r"$\theta$ [deg]")
         ax.set_ylabel = "count"
         filename = os.path.join(self.plots_path, 'track_reco.png')
