@@ -35,15 +35,15 @@ class ZenithDistribution(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         self.max_events = self.get('max_events', default=5000)
-        self.thetas = deque(maxlen=self.max_events)
+        self.zeniths = deque(maxlen=self.max_events)
         self.interval = 60
         threading.Thread(target=self.plot).start()
 
     def process(self, blob):
         track = blob['RecoTrack']
-        theta = np.rad2deg(
+        zenith = np.rad2deg(
             kp.math.angle_between([0, 0, -1], [track.dx, track.dy, track.dz]))
-        self.thetas.append(theta)
+        self.zeniths.append(zenith)
         return blob
 
     def plot(self):
@@ -52,16 +52,16 @@ class ZenithDistribution(kp.Module):
             self.create_plot()
 
     def create_plot(self):
-        n = len(self.thetas)
-        n_ok = n - np.count_nonzero(np.isnan(self.thetas))
+        n = len(self.zeniths)
+        n_ok = n - np.count_nonzero(np.isnan(self.zeniths))
         fontsize = 16
 
         fig, ax = plt.subplots(figsize=(16, 8))
-        ax.hist(self.thetas, bins=180)
+        ax.hist(self.zeniths, bins=180)
         ax.set_title(
-            r"$\theta$ distribution of JGandalf track reconstructions"
+            r"Zenith distribution of JGandalf track reconstructions"
             "\nbased on %d reconstructed tracks out of %d events" % (n_ok, n))
-        ax.set_xlabel(r"$\theta$ [deg]", fontsize=fontsize)
+        ax.set_xlabel(r"zenith angle [deg]", fontsize=fontsize)
         ax.set_ylabel("count", fontsize=fontsize)
         ax.tick_params(labelsize=fontsize)
         filename = os.path.join(self.plots_path, 'track_reco.png')
