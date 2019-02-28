@@ -34,8 +34,8 @@ km3pipe.style.use('km3pipe')
 class ZenithDistribution(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
-        self.max_events = 1000
-        self.thetas = deque(maxlen=1000)
+        self.max_events = self.get('max_events', default=5000)
+        self.thetas = deque(maxlen=self.max_events)
         self.interval = 60
         threading.Thread(target=self.plot).start()
 
@@ -52,10 +52,11 @@ class ZenithDistribution(kp.Module):
             self.create_plot()
 
     def create_plot(self):
-        fig, ax = plt.subplots(figsize=(16, 4))
+        fig, ax = plt.subplots(figsize=(16, 8))
         ax.hist(self.thetas, bins=180)
         ax.set_title(
-            r"$\theta$ distribution of JGandalf track reconstructions")
+            r"$\theta$ distribution of JGandalf track reconstructions\n"
+            r"(from the last %s events)" % self.max_events)
         ax.set_xlabel(r"$\theta$ [deg]")
         ax.set_ylabel = "count"
         filename = os.path.join(self.plots_path, 'track_reco.png')
