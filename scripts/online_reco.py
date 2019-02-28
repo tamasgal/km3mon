@@ -57,9 +57,8 @@ class ZenithDistribution(kp.Module):
 
         fig, ax = plt.subplots(figsize=(16, 10))
         ax.hist(self.thetas, bins=180)
-        ax.set_title(
-            r"$\theta$ distribution of JGandalf track reconstructions\n"
-            r"based on %d of %d reconstructed events" % (n_ok, n))
+        ax.set_title(r"$\theta$ distribution of JGandalf track reconstructions"
+                     "\nbased on %d of %d reconstructed events" % (n_ok, n))
         ax.set_xlabel(r"$\theta$ [deg]")
         ax.set_ylabel = "count"
         filename = os.path.join(self.plots_path, 'track_reco.png')
