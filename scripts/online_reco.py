@@ -41,7 +41,7 @@ class ZenithDistribution(kp.Module):
 
     def process(self, blob):
         track = blob['RecoTrack']
-        zenith = np.rad2deg(
+        zenith = np.cos(
             kp.math.angle_between([0, 0, -1], [track.dx, track.dy, track.dz]))
         self.zeniths.append(zenith)
         return blob
@@ -61,7 +61,7 @@ class ZenithDistribution(kp.Module):
         ax.set_title(
             r"Zenith distribution of JGandalf track reconstructions"
             "\nbased on %d reconstructed tracks out of %d events" % (n_ok, n))
-        ax.set_xlabel(r"zenith angle [deg]", fontsize=fontsize)
+        ax.set_xlabel(r"cos(zenith)", fontsize=fontsize)
         ax.set_ylabel("count", fontsize=fontsize)
         ax.tick_params(labelsize=fontsize)
         filename = os.path.join(self.plots_path, 'track_reco.png')
