@@ -64,6 +64,7 @@ class ZTPlot(Module):
         self.det_id = self.require('det_id')
         self.t0set = None
         self.calib = None
+        self.max_z = None
 
         self.sds = kp.db.StreamDS()
 
@@ -81,6 +82,7 @@ class ZTPlot(Module):
         self.print("Updating calibration")
         self.t0set = self.sds.t0sets(detid=self.det_id).iloc[-1]['CALIBSETID']
         self.calib = kp.calib.Calibration(det_id=self.det_id, t0set=self.t0set)
+        self.max_z = round(np.max(self.calib.detector.pmts.pos_z) + 10, -1)
 
     def process(self, blob):
         if 'Hits' not in blob:
@@ -118,7 +120,11 @@ class ZTPlot(Module):
     def create_plot(self, event_info, hits):
         print(self.__class__.__name__ + ": updating plot.")
         dus = set(hits.du)
+        doms = set(hits.dom_id)
         fontsize = 16
+
+        time_offset = np.min(hits[hits.triggered == True].time)
+        hits.time -= time_offset
 
         n_plots = len(dus)
         n_cols = int(np.ceil(np.sqrt(n_plots)))
@@ -132,7 +138,13 @@ class ZTPlot(Module):
 
         axes = [axes] if n_plots == 1 else axes.flatten()
 
+        dom_zs = self.calib.detector.pmts.pos_z[
+            (self.calib.detector.pmts.du == min(dus))
+            & (self.calib.detector.pmts.channel_id == 0)]
+
         for ax, du in zip(axes, dus):
+            for z in dom_zs:
+                ax.axhline(z, lw=1, color='b', ls='--', alpha=0.15)
             du_hits = hits[hits.du == du]
             trig_hits = du_hits[du_hits.triggered == True]
 
@@ -146,6 +158,7 @@ class ZTPlot(Module):
                 'DU{0}'.format(int(du)), fontsize=fontsize, fontweight='bold')
 
         for idx, ax in enumerate(axes):
+            ax.set_ylim(0, self.max_z)
             ax.tick_params(labelsize=fontsize)
             ax.yaxis.set_major_locator(
                 ticker.MultipleLocator(self.ytick_distance))
@@ -161,10 +174,11 @@ class ZTPlot(Module):
         print
         plt.suptitle(
             "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
-            "TriggerCounter {4}, Overlays {5}\n{6} UTC".format(
+            "TriggerCounter {4}, Overlays {5}, time offset {6} ns"
+            "\n{7} UTC".format(
                 event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
-                event_info.overlays[0],
+                event_info.overlays[0], time_offset,
                 datetime.utcfromtimestamp(event_info.utc_seconds)),
             fontsize=fontsize,
             y=1.05)
@@ -173,6 +187,8 @@ class ZTPlot(Module):
         f = os.path.join(self.plots_path, filename + '.png')
         f_tmp = os.path.join(self.plots_path, filename + '_tmp.png')
         plt.savefig(f_tmp, dpi=120, bbox_inches="tight")
+        if len(doms) > 4:
+            plt.savefig(os.path.join(self.plots_path, filename + '_5doms.png'))
         plt.close('all')
         shutil.move(f_tmp, f)
 

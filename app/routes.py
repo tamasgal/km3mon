@@ -17,6 +17,7 @@ AHRS_PLOTS = [['yaw_calib'], ['pitch_calib'], ['roll_calib']]
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
+RECO_PLOTS = [['track_reco']]
 COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
                  ['trigger_rates', 'trigger_rates_lin'],
                  ['ztplot', 'triggermap']]
@@ -81,6 +82,12 @@ def index():
 @requires_auth
 def ahrs():
     return render_template('plots.html', plots=AHRS_PLOTS)
+
+
+@app.route('/reco.html')
+@requires_auth
+def reco():
+    return render_template('plots.html', plots=RECO_PLOTS)
 
 
 @app.route('/compact.html')
