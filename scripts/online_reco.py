@@ -18,6 +18,7 @@ Options:
 
 """
 from collections import deque
+from datetime import datetime
 import time
 import os
 import threading
@@ -73,7 +74,8 @@ class ZenithDistribution(kp.Module):
             label="ROy (last %d events)" % n_roy,
             histtype="step",
             lw=3)
-        ax.set_title("Zenith distribution of online track reconstructions")
+        ax.set_title("Zenith distribution of online track reconstructions\n%s"
+                     % datetime.utcnow().strftime("%c"))
         ax.set_xlabel(r"cos(zenith)", fontsize=fontsize)
         ax.set_ylabel("count", fontsize=fontsize)
         ax.tick_params(labelsize=fontsize)
