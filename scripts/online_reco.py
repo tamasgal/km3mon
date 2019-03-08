@@ -61,8 +61,18 @@ class ZenithDistribution(kp.Module):
         n_roy = len(roy_zeniths)
 
         fig, ax = plt.subplots(figsize=(16, 8))
-        ax.hist(self.zeniths, bins=180, label="JGandalf (last %d events)" % n)
-        ax.hist(roy_zeniths, bins=180, label="ROy (last %d events)" % n_roy)
+        ax.hist(
+            self.zeniths,
+            bins=180,
+            label="JGandalf (last %d events)" % n,
+            histtype="step",
+            lw=3)
+        ax.hist(
+            roy_zeniths,
+            bins=180,
+            label="ROy (last %d events)" % n_roy,
+            histtype="step",
+            lw=3)
         ax.set_title("Zenith distribution of online track reconstructions")
         ax.set_xlabel(r"cos(zenith)", fontsize=fontsize)
         ax.set_ylabel("count", fontsize=fontsize)
