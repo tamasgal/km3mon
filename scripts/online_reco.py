@@ -80,6 +80,7 @@ class ZenithDistribution(kp.Module):
         ax.set_ylabel("count", fontsize=fontsize)
         ax.tick_params(labelsize=fontsize)
         ax.set_yscale("log")
+        plt.legend(fontsize=fontsize)
         filename = os.path.join(self.plots_path, 'track_reco.png')
         plt.savefig(filename, dpi=120, bbox_inches="tight")
         plt.close('all')
