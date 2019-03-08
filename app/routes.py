@@ -17,6 +17,9 @@ AHRS_PLOTS = [['yaw_calib'], ['pitch_calib'], ['roll_calib']]
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
+COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
+                 ['trigger_rates', 'trigger_rates_lin'],
+                 ['ztplot', 'triggermap']]
 
 if exists(CONFIG_PATH):
     config = toml.load(CONFIG_PATH)
@@ -78,6 +81,12 @@ def index():
 @requires_auth
 def ahrs():
     return render_template('plots.html', plots=AHRS_PLOTS)
+
+
+@app.route('/compact.html')
+@requires_auth
+def compact():
+    return render_template('plots.html', plots=COMPACT_PLOTS)
 
 
 @app.route('/rttc.html')
