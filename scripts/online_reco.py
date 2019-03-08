@@ -56,7 +56,7 @@ class ZenithDistribution(kp.Module):
         n_ok = n - np.count_nonzero(np.isnan(self.zeniths))
         fontsize = 16
 
-        roy_zeniths = -np.loadtxt("reco.txt", "r")[-self.max_events:]
+        roy_zeniths = -np.loadtxt("reco.txt")[-self.max_events:]
         roy_zeniths[np.abs(roy_zeniths) > .99] = np.nan
         n_roy = len(roy_zeniths)
 
