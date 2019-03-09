@@ -57,8 +57,9 @@ class ZenithDistribution(kp.Module):
         n_ok = n - np.count_nonzero(np.isnan(self.zeniths))
         fontsize = 16
 
-        roy_zeniths = -np.loadtxt("reco.txt")[-self.max_events:]
-        roy_zeniths[np.abs(roy_zeniths) > .99] = np.nan
+        reco = np.loadtxt("reco2.txt", delimiter=',')[-self.max_events:]
+        roy_zeniths, roy_Q = -reco[:, 0], reco[:, 1]
+        roy_zeniths = roy_zeniths[roy_Q < 40]
         n_roy = len(roy_zeniths)
 
         fig, ax = plt.subplots(figsize=(16, 8))
@@ -66,18 +67,22 @@ class ZenithDistribution(kp.Module):
             self.zeniths,
             bins=180,
             label="JGandalf (last %d events)" % n,
+            # label="JGandalf",
             histtype="step",
+            normed=True,
             lw=3)
         ax.hist(
             roy_zeniths,
             bins=180,
             label="ROy (last %d events)" % n_roy,
+            # label="ROy",
             histtype="step",
+            normed=True,
             lw=3)
         ax.set_title("Zenith distribution of online track reconstructions\n%s"
                      % datetime.utcnow().strftime("%c"))
         ax.set_xlabel(r"cos(zenith)", fontsize=fontsize)
-        ax.set_ylabel("count", fontsize=fontsize)
+        ax.set_ylabel("normed count", fontsize=fontsize)
         ax.tick_params(labelsize=fontsize)
         ax.set_yscale("log")
         plt.legend(fontsize=fontsize, loc=2)
