@@ -171,7 +171,6 @@ class ZTPlot(Module):
             if idx >= len(axes) - n_cols:
                 ax.set_xlabel('time [ns]', fontsize=fontsize)
 
-        print
         plt.suptitle(
             "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
             "TriggerCounter {4}, Overlays {5}, time offset {6} ns"
