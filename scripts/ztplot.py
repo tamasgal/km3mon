@@ -96,8 +96,8 @@ class ZTPlot(Module):
         hits = self.calib.apply(hits)
         event_info = blob['EventInfo']
 
-        n_triggered_dus = np.unique(hits[hits.triggered == True].du)
-        if n_triggered_dus < self.min_dus:
+        triggered_dus = np.unique(hits[hits.triggered == True].du)
+        if len(triggered_dus) < self.min_dus:
             print("Skipping...")
             return blob
 
