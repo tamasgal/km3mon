@@ -19,44 +19,29 @@ Options:
 from __future__ import division
 
 from datetime import datetime
-from collections import deque
 import os
 import queue
 import shutil
-import time
 import threading
 
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.dates as md
 import matplotlib.ticker as ticker
-from matplotlib.colors import LogNorm
 import numpy as np
 
 import km3pipe as kp
-from km3pipe import Pipeline, Module
-from km3pipe.calib import Calibration
-from km3pipe.hardware import Detector
-from km3pipe.io import CHPump
-from km3pipe.io.daq import (DAQProcessor, DAQPreamble, DAQSummaryslice,
-                            DAQEvent)
+from km3modules.hits import count_multiplicities
 import km3pipe.style
 km3pipe.style.use('km3pipe')
 
 from km3pipe.logger import logging
 
-# for logger_name, logger in logging.Logger.manager.loggerDict.iteritems():
-#     if logger_name.startswith('km3pipe.'):
-#         print("Setting log level to debug for '{0}'".format(logger_name))
-#         logger.setLevel("DEBUG")
-
-# xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
 lock = threading.Lock()
 
 
-class ZTPlot(Module):
+class ZTPlot(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         self.ytick_distance = self.get('ytick_distance', default=200)
@@ -123,12 +108,20 @@ class ZTPlot(Module):
         doms = set(hits.dom_id)
         fontsize = 16
 
+        hits = hits.append_columns('multiplicity', np.ones(len(hits)))
+
+        for dom in doms:
+            dom_hits = hits[hits.dom_id == dom]
+            mltps, m_ids = count_multiplicities(dom_hits.time)
+            hits['multiplicity'][hits.dom_id == dom] = mltps
+
         time_offset = np.min(hits[hits.triggered == True].time)
         hits.time -= time_offset
 
         n_plots = len(dus)
         n_cols = int(np.ceil(np.sqrt(n_plots)))
         n_rows = int(n_plots / n_cols) + (n_plots % n_cols > 0)
+        marker_fig, marker_axes = plt.subplots()  # for the marker size hack...
         fig, axes = plt.subplots(
             ncols=n_cols,
             nrows=n_rows,
@@ -148,10 +141,19 @@ class ZTPlot(Module):
             du_hits = hits[hits.du == du]
             trig_hits = du_hits[du_hits.triggered == True]
 
-            ax.scatter(du_hits.time, du_hits.pos_z, c='#09A9DE', label='hit')
+            ax.scatter(
+                du_hits.time,
+                du_hits.pos_z,
+                s=du_hits.multiplicity * 30,
+                c='#09A9DE',
+                label='hit',
+                alpha=0.5)
             ax.scatter(
                 trig_hits.time,
                 trig_hits.pos_z,
+                s=trig_hits.multiplicity * 30,
+                alpha=0.8,
+                marker="+",
                 c='#FF6363',
                 label='triggered hit')
             ax.set_title(
@@ -170,6 +172,22 @@ class ZTPlot(Module):
                 ax.set_ylabel('z [m]', fontsize=fontsize)
             if idx >= len(axes) - n_cols:
                 ax.set_xlabel('time [ns]', fontsize=fontsize)
+
+        # The only way I could create a legend with matching marker sizes
+        max_multiplicity = int(np.max(du_hits.multiplicity))
+        custom_markers = [
+            marker_axes.scatter(
+                [], [], s=mult * 30, color='#09A9DE', lw=0, alpha=0.5)
+            for mult in range(0, max_multiplicity)
+        ] + [marker_axes.scatter([], [], s=30, marker="+", c='#FF6363')]
+        axes[0].legend(
+            custom_markers, ['multiplicity'] +
+            ["       %d" % m
+             for m in range(1, max_multiplicity)] + ['triggered'],
+            scatterpoints=1,
+            markerscale=1,
+            loc='upper left',
+            bbox_to_anchor=(1.005, 1))
 
         plt.suptitle(
             "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
