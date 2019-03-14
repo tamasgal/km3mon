@@ -79,8 +79,9 @@ class ZenithDistribution(kp.Module):
             histtype="step",
             normed=True,
             lw=3)
-        ax.set_title("Zenith distribution of online track reconstructions\n%s"
-                     % datetime.utcnow().strftime("%c"))
+        ax.set_title(
+            "Zenith distribution of online track reconstructions\n%s UTC" %
+            datetime.utcnow().strftime("%c"))
         ax.set_xlabel(r"cos(zenith)", fontsize=fontsize)
         ax.set_ylabel("normed count", fontsize=fontsize)
         ax.tick_params(labelsize=fontsize)
