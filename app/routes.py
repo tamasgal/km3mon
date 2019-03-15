@@ -17,10 +17,10 @@ AHRS_PLOTS = [['yaw_calib'], ['pitch_calib'], ['roll_calib']]
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
-RECO_PLOTS = [['track_reco']]
+RECO_PLOTS = [['track_reco', 'ztplot_roy']]
 COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
                  ['trigger_rates', 'trigger_rates_lin'],
-                 ['ztplot', 'triggermap']]
+                 ['ztplot', 'ztplot_roy', 'triggermap']]
 
 if exists(CONFIG_PATH):
     config = toml.load(CONFIG_PATH)
