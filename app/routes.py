@@ -92,7 +92,7 @@ def reco():
 
 @app.route('/sn.html')
 @requires_auth
-def reco():
+def sn():
     return render_template('sn.html', plots=SN_PLOTS)
 
 @app.route('/compact.html')
