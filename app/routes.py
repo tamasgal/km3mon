@@ -21,6 +21,7 @@ RECO_PLOTS = [['track_reco', 'ztplot_roy']]
 COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
                  ['trigger_rates', 'trigger_rates_lin'],
                  ['ztplot', 'ztplot_roy', 'triggermap']]
+SN_PLOTS = [['sn_bg_distribution']]
 
 if exists(CONFIG_PATH):
     config = toml.load(CONFIG_PATH)
@@ -89,6 +90,10 @@ def ahrs():
 def reco():
     return render_template('plots.html', plots=RECO_PLOTS)
 
+@app.route('/sn.html')
+@requires_auth
+def reco():
+    return render_template('sn.html', plots=SN_PLOTS)
 
 @app.route('/compact.html')
 @requires_auth
