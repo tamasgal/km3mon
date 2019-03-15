@@ -93,7 +93,7 @@ def reco():
 @app.route('/sn.html')
 @requires_auth
 def supernova():
-    return render_template('sn.html', plots=SN_PLOTS)
+    return render_template('plots.html', plots=SN_PLOTS)
 
 @app.route('/compact.html')
 @requires_auth
