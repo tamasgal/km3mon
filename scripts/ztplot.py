@@ -128,7 +128,7 @@ class ZTPlot(kp.Module):
             sharex=True,
             sharey=True,
             figsize=(16, 8),
-            constrained=True)
+            constrained_layout=True)
 
         axes = [axes] if n_plots == 1 else axes.flatten()
 
