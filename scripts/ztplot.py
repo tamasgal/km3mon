@@ -200,7 +200,7 @@ class ZTPlot(kp.Module):
 
         plt.suptitle(
             "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
-            "TriggerCounter {4}, Overlays {5}, Trigger: {7}"
+            "TriggerCounter {4}, Overlays {5}, Trigger: {8}"
             "\n{7} UTC (time offset: {6} ns)".format(
                 event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
