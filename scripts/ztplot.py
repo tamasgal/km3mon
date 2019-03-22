@@ -32,6 +32,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 import km3pipe as kp
+from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
 from km3modules.hits import count_multiplicities
 import km3pipe.style
 km3pipe.style.use('km3pipe')
