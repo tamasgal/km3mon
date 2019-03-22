@@ -190,14 +190,22 @@ class ZTPlot(kp.Module):
             loc='upper left',
             bbox_to_anchor=(1.005, 1))
 
+        trigger_params = ' '.join([
+            trig
+            for trig, trig_check in (("MX", is_mxshower), ("3DM", is_3dmuon),
+                                     ("3DS", is_3dshower))
+            if trig_check(event_info.trigger_mask[0])
+        ])
+
         plt.suptitle(
             "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
-            "TriggerCounter {4}, Overlays {5}, time offset {6} ns"
-            "\n{7} UTC".format(
+            "TriggerCounter {4}, Overlays {5}, Trigger: {7}"
+            "\n{7} UTC (time offset: {6} ns)".format(
                 event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
                 event_info.overlays[0], time_offset,
-                datetime.utcfromtimestamp(event_info.utc_seconds)),
+                datetime.utcfromtimestamp(
+                    event_info.utc_seconds), trigger_params),
             fontsize=fontsize,
             y=1.05)
 
