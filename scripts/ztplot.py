@@ -195,7 +195,7 @@ class ZTPlot(kp.Module):
             trig
             for trig, trig_check in (("MX", is_mxshower), ("3DM", is_3dmuon),
                                      ("3DS", is_3dshower))
-            if trig_check(event_info.trigger_mask[0])
+            if trig_check(int(event_info.trigger_mask[0]))
         ])
 
         plt.suptitle(
