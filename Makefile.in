@@ -101,7 +101,7 @@ start:
 	@tmux new-window -n k40 -t ${SESSION_NAME}
 	@tmux split-window -v -t ${SESSION_NAME}:k40
 	@tmux send-keys -t ${SESSION_NAME}:k40.1  \
-	    "python scripts/k40_calibration.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
+	    "# python scripts/k40_calibration.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux select-layout even-vertical
 
 	@# Logs
