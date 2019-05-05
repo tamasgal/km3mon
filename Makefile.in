@@ -67,9 +67,12 @@ start:
 	@#
 	@tmux new-window -n trigger -t ${SESSION_NAME}
 	@tmux split-window -v -t ${SESSION_NAME}:trigger
+	@tmux split-window -v -t ${SESSION_NAME}:trigger
 	@tmux send-keys -t ${SESSION_NAME}:trigger.1  \
 	    "python scripts/trigger_rates.py -p ${MONITORING_LIGIER_PORT}" Enter
-	@tmux send-keys -t ${SESSION_NAME}:trigger.2  \
+	@tmux send-keys -t ${SESSION_NAME}:trigger.2 \
+	    "python scripts/timeslice_rates.py -p ${MONITORING_LIGIER_PORT}" Enter
+	@tmux send-keys -t ${SESSION_NAME}:trigger.3  \
 	    "python scripts/live_triggermap.py -d ${DETECTOR_ID} -p ${MONITORING_LIGIER_PORT}" Enter
 	@tmux select-layout even-vertical
 
