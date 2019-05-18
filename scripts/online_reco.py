@@ -32,62 +32,81 @@ import km3pipe.style
 km3pipe.style.use('km3pipe')
 
 
-class ZenithDistribution(kp.Module):
+class IO_OLINEDistributions(kp.Module):
     def configure(self):
+        self.fontsize = 16
+
         self.plots_path = self.require('plots_path')
         self.max_events = self.get('max_events', default=5000)
-        self.zeniths = deque(maxlen=self.max_events)
-        self.interval = 60
+        self.zeniths    = deque(maxlen=self.max_events)
+        self.qualities  = deque(maxlen=self.max_events)
+        self.interval   = 60
         threading.Thread(target=self.plot).start()
 
     def process(self, blob):
         track = blob['RecoTrack']
-        zenith = np.cos(
-            kp.math.angle_between([0, 0, -1], [track.dx, track.dy, track.dz]))
-        self.zeniths.append(zenith)
+
+        if track.status==1:
+            zenith = np.cos(
+                kp.math.angle_between([0, 0, -1], [track.dx, track.dy, track.dz]))
+            self.zeniths.append(zenith)
+
+            self.qualities.append(track.Q)
+
         return blob
 
     def plot(self):
         while True:
             time.sleep(self.interval)
-            self.create_plot()
+            self.create_zenith_plot()
+            self.create_quality_plot()
 
-    def create_plot(self):
+
+    def create_quality_plot(self):
+        n = len(self.qualities)
+      
+        plt.clf()
+        fig, ax = plt.subplots(figsize=(16, 8))
+        ax.hist(
+            self.qualities,
+            bins=100,
+            label="JGandalf (last %d events)" % n,
+            histtype="step",
+            normed=True,
+            lw=3)
+        ax.set_title(
+            "Quality distribution of online track reconstructions\n%s UTC" %
+            datetime.utcnow().strftime("%c"))
+        ax.set_xlabel(r"Quality", fontsize=self.fontsize)
+        ax.set_ylabel("normed count", fontsize=self.fontsize)
+        ax.tick_params(labelsize=self.fontsize)
+        ax.set_yscale("log")
+        plt.legend(fontsize=self.fontsize, loc=2)
+        filename = os.path.join(self.plots_path, 'gandalf_quality.png')
+        plt.savefig(filename, dpi=120, bbox_inches="tight")
+        plt.close('all')
+
+    def create_zenith_plot(self):
         n = len(self.zeniths)
-        n_ok = n - np.count_nonzero(np.isnan(self.zeniths))
-        fontsize = 16
 
-        reco = np.loadtxt("reco2.txt", delimiter=',')[-self.max_events:]
-        roy_zeniths, roy_Q = -reco[:, 0], reco[:, 1]
-        roy_zeniths = roy_zeniths[roy_Q < 40]
-        n_roy = len(roy_zeniths)
-
+        plt.clf()
         fig, ax = plt.subplots(figsize=(16, 8))
         ax.hist(
             self.zeniths,
             bins=180,
             label="JGandalf (last %d events)" % n,
-            # label="JGandalf",
-            histtype="step",
-            normed=True,
-            lw=3)
-        ax.hist(
-            roy_zeniths,
-            bins=180,
-            label="ROy (last %d events)" % n_roy,
-            # label="ROy",
             histtype="step",
             normed=True,
             lw=3)
         ax.set_title(
             "Zenith distribution of online track reconstructions\n%s UTC" %
             datetime.utcnow().strftime("%c"))
-        ax.set_xlabel(r"cos(zenith)", fontsize=fontsize)
-        ax.set_ylabel("normed count", fontsize=fontsize)
-        ax.tick_params(labelsize=fontsize)
+        ax.set_xlabel(r"cos(zenith)", fontsize=self.fontsize)
+        ax.set_ylabel("normed count", fontsize=self.fontsize)
+        ax.tick_params(labelsize=self.fontsize)
         ax.set_yscale("log")
-        plt.legend(fontsize=fontsize, loc=2)
-        filename = os.path.join(self.plots_path, 'track_reco.png')
+        plt.legend(fontsize=self.fontsize, loc=2)
+        filename = os.path.join(self.plots_path, 'gandalf_zenith.png')
         plt.savefig(filename, dpi=120, bbox_inches="tight")
         plt.close('all')
 
@@ -109,7 +128,7 @@ def main():
         timeout=60 * 60 * 24 * 7,
         max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(ZenithDistribution, plots_path=plots_path)
+    pipe.attach(IO_OLINEDistributions, plots_path=plots_path)
     pipe.drain()
 
 
