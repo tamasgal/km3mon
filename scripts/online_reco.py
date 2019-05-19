@@ -38,8 +38,48 @@ class IO_OLINEDistributions(kp.Module):
 
         self.plots_path = self.require('plots_path')
         self.max_events = self.get('max_events', default=5000)
-        self.zeniths = deque(maxlen=self.max_events)
-        self.qualities = deque(maxlen=self.max_events)
+        self.plots = {
+            'reco_zenith': {
+                'title': 'Zenith distribution of online track reconstructions',
+                'xlabel': 'cos(zenith)',
+                'ylabel': 'normed count',
+                'function': 'hist',
+                'options': {
+                    'bins': 180,
+                    'histtype': "step",
+                    'normed': True,
+                    'lw': 3
+                },
+                'subplots': {
+                    'gandalf': {
+                        'data': deque(maxlen=self.max_events),
+                        'subplot_options': {
+                            'label': "JGandalf",
+                        }
+                    }
+                }
+            },
+            'reco_quality': {
+                'title': 'Quality of online track reconstructions',
+                'xlabel': 'Quality',
+                'ylabel': 'normed count',
+                'function': 'hist',
+                'options': {
+                    'bins': 100,
+                    'histtype': "step",
+                    'normed': True,
+                    'lw': 3
+                },
+                'subplots': {
+                    'gandalf': {
+                        'data': deque(maxlen=self.max_events),
+                        'subplot_options': {
+                            'label': "JGandalf",
+                        }
+                    }
+                }
+            },
+        }
         self.plot_interval = 60  # [s]
         threading.Thread(target=self.plot).start()
 
@@ -50,63 +90,42 @@ class IO_OLINEDistributions(kp.Module):
             zenith = np.cos(
                 kp.math.angle_between([0, 0, -1],
                                       [track.dx, track.dy, track.dz]))
-            self.zeniths.append(zenith)
+            reco_name = track.reco
 
-            self.qualities.append(track.Q)
+            self._add_reco_parameter('reco_zenith', reco_name, zenith)
+            self._add_reco_parameter('reco_quality', reco_name, track.Q)
 
         return blob
+
+    def _add_reco_parameter(self, parameter, reco_name, value):
+        """Add the value to the parameter cache"""
+        for reco, subplot in self.plots[parameter]['subplots']:
+            if reco == reco_name:
+                subplot['data'].append(value)
 
     def plot(self):
         while True:
             time.sleep(self.plot_interval)
-            self.create_zenith_plot()
-            self.create_quality_plot()
+            self.create_plots()
 
-    def create_quality_plot(self):
-        n = len(self.qualities)
-
-        plt.clf()
-        fig, ax = plt.subplots(figsize=(16, 8))
-        ax.hist(self.qualities,
-                bins=100,
-                label="JGandalf (last %d events)" % n,
-                histtype="step",
-                normed=True,
-                lw=3)
-        ax.set_title(
-            "Quality distribution of online track reconstructions\n%s UTC" %
-            datetime.utcnow().strftime("%c"))
-        ax.set_xlabel(r"Quality", fontsize=self.fontsize)
-        ax.set_ylabel("normed count", fontsize=self.fontsize)
-        ax.tick_params(labelsize=self.fontsize)
-        ax.set_yscale("log")
-        plt.legend(fontsize=self.fontsize, loc=2)
-        filename = os.path.join(self.plots_path, 'gandalf_quality.png')
-        plt.savefig(filename, dpi=120, bbox_inches="tight")
-        plt.close('all')
-
-    def create_zenith_plot(self):
-        n = len(self.zeniths)
-
-        plt.clf()
-        fig, ax = plt.subplots(figsize=(16, 8))
-        ax.hist(self.zeniths,
-                bins=180,
-                label="JGandalf (last %d events)" % n,
-                histtype="step",
-                normed=True,
-                lw=3)
-        ax.set_title(
-            "Zenith distribution of online track reconstructions\n%s UTC" %
-            datetime.utcnow().strftime("%c"))
-        ax.set_xlabel(r"cos(zenith)", fontsize=self.fontsize)
-        ax.set_ylabel("normed count", fontsize=self.fontsize)
-        ax.tick_params(labelsize=self.fontsize)
-        ax.set_yscale("log")
-        plt.legend(fontsize=self.fontsize, loc=2)
-        filename = os.path.join(self.plots_path, 'gandalf_zenith.png')
-        plt.savefig(filename, dpi=120, bbox_inches="tight")
-        plt.close('all')
+    def create_plots(self):
+        for name, plot in self.plots.items():
+            plt.clf()
+            fig, ax = plt.subplots(figsize=(16, 8))
+            for subplot in self.plots['subplots'].values():
+                getattr(ax, plot['function'])(subplot['data'],
+                                              **self.plots['options'],
+                                              **subplot['options'])
+            ax.set_title(plot['title'] +
+                         "\n%s UTC" % datetime.utcnow().strftime("%c"))
+            ax.set_xlabel(plot['xlabel'], fontsize=self.fontsize)
+            ax.set_ylabel(plot['ylabel'], fontsize=self.fontsize)
+            ax.tick_params(labelsize=self.fontsize)
+            ax.set_yscale("log")
+            plt.legend(fontsize=self.fontsize, loc=2)
+            filename = os.path.join(self.plots_path, '%s.png' % name)
+            plt.savefig(filename, dpi=120, bbox_inches="tight")
+            plt.close('all')
 
 
 def main():
