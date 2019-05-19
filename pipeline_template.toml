@@ -1,0 +1,67 @@
+[VARIABLES]
+DETECTOR_ID = 43
+DAQ_LIGIER_IP = 192.168.0.110
+DAQ_LIGIER_PORT = 5553
+DETECTOR_MANAGER_IP = 192.168.0.120
+MONITORING_LIGIER_PORT = 55530
+LOGIO_IP = 127.0.0.1
+LOGIO_PORT = 28777
+WEBSERVER_PORT = 8081
+
+[WebServer]
+username = "km3net"
+password = "pyrosoma"
+
+#########################################
+# ahrs_calibration.py
+[CalibrateAHRS]
+det_id = "DETECTOR_ID"
+
+[CalibrateAHRS_CHPump]
+host = "DAQ_LIGIER_IP"
+port = "DAQ_LIGIER_PORT"
+
+#########################################
+# dom_activity.py
+[DOMActivityPlotter]
+det_id = "DETECTOR_ID"
+[DOMActivityPlotter_CHPump]
+host = "DAQ_LIGIER_IP"
+port = "DAQ_LIGIER_PORT"
+
+#########################################
+# dom_rates.py
+[DOMRates]
+lowest_rate = 150  # [kHz]
+highest_rate = 350  # [kHz]
+[DOMRates_CHPump]
+host = "DAQ_LIGIER_IP"
+port = "DAQ_LIGIER_PORT"
+
+
+#########################################
+# k40_calibration.py
+[K40_CHPump]
+host = "DAQ_LIGIER_IP"
+port = "DAQ_LIGIER_PORT"
+
+
+
+
+[PMTRates]
+lowest_rate = 1000  # [Hz]
+highest_rate = 20000  # [Hz]
+
+[TriggerRate]
+interval = 300  # time inverval to integrate [s]
+with_minor_ticks = true  # minor tickmarks on the plot
+
+[TriggerMap]
+max_events = 5000  # the number of events to log
+
+[ZTPlot]
+min_dus = 1
+ytick_distance = 25  # [m]
+
+[]
+max_events = 20000
