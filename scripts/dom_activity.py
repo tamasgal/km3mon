@@ -7,13 +7,13 @@
 Monitors the DOM activity.
 
 Usage:
-    dom_activity.py [options]
+    dom_activity.py [options] -d DET_ID
     dom_activity.py (-h | --help)
 
 Options:
+    -d DET_ID       Detector ID.
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
-    -d DET_ID       Detector ID [default: 29].
     -o PLOT_DIR     The directory to save the plot [default: plots].
     -h --help       Show this screen.
 
@@ -107,13 +107,13 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_SUM',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
+    pipe.attach(kp.io.ch.CHPump,
+                name="DOMActivityPlotter_CHPump",
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_SUM',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(DOMActivityPlotter, det_id=det_id, plots_path=plots_path)
     pipe.drain()

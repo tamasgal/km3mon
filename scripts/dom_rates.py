@@ -7,13 +7,13 @@
 Monitors DOM rates.
 
 Usage:
-    dom_rates.py [options]
+    dom_rates.py [options] -d DET_ID
     dom_rates.py (-h | --help)
 
 Options:
+    -d DET_ID       Detector ID.
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
-    -d DET_ID       Detector ID [default: 29].
     -o PLOT_DIR     The directory to save the plot [default: plots].
     -h --help       Show this screen.
 
@@ -75,18 +75,18 @@ class DOMRates(kp.Module):
         print(self.__class__.__name__ + ": updating plot.")
 
         filename = os.path.join(self.plots_path, 'dom_rates.png')
-        plot_dom_parameters(
-            self.rates,
-            self.detector,
-            filename,
-            'rate [kHz]',
-            "DOM Rates for DetID-{}".format(self.detector.det_id),
-            vmin=self.lowest_rate,
-            vmax=self.highest_rate,
-            cmap='coolwarm',
-            missing='black',
-            under='darkorchid',
-            over='deeppink')
+        plot_dom_parameters(self.rates,
+                            self.detector,
+                            filename,
+                            'rate [kHz]',
+                            "DOM Rates for DetID-{}".format(
+                                self.detector.det_id),
+                            vmin=self.lowest_rate,
+                            vmax=self.highest_rate,
+                            cmap='coolwarm',
+                            missing='black',
+                            under='darkorchid',
+                            over='deeppink')
         print("done")
 
 
@@ -100,13 +100,13 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_SUM',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
+    pipe.attach(kp.io.ch.CHPump,
+                name="DOMRates_CHPump",
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_SUM',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(DOMRates, det_id=det_id, plots_path=plots_path)
     pipe.drain()

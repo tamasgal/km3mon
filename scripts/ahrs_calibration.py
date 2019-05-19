@@ -5,13 +5,13 @@
 Runs the AHRS calibration online.
 
 Usage:
-    ahrs_calibration.py [options]
+    ahrs_calibration.py [options] -d DET_ID
     ahrs_calibration.py (-h | --help)
 
 Options:
+    -d DET_ID       Detector ID.
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
-    -d DET_ID       Detector ID [default: 29].
     -o PLOT_DIR     The directory to save the plot [default: plots].
     -h --help       Show this screen.
 
@@ -106,19 +106,19 @@ class CalibrateAHRS(kp.Module):
             ax.set_ylabel(ahrs_param)
             with self.lock:
                 for floor in sorted(self.data[ahrs_param].keys()):
-                    ax.plot(
-                        self.times[floor],
-                        self.data[ahrs_param][floor],
-                        marker='.',
-                        linestyle='none',
-                        label="Floor {}".format(floor))
-            lgd = plt.legend(
-                bbox_to_anchor=(1.005, 1), loc=2, borderaxespad=0.)
+                    ax.plot(self.times[floor],
+                            self.data[ahrs_param][floor],
+                            marker='.',
+                            linestyle='none',
+                            label="Floor {}".format(floor))
+            lgd = plt.legend(bbox_to_anchor=(1.005, 1),
+                             loc=2,
+                             borderaxespad=0.)
             fig.tight_layout()
-            plt.savefig(
-                os.path.join(self.plots_path, ahrs_param + '_calib.png'),
-                bbox_extra_artists=(lgd, ),
-                bbox_inches='tight')
+            plt.savefig(os.path.join(self.plots_path,
+                                     ahrs_param + '_calib.png'),
+                        bbox_extra_artists=(lgd, ),
+                        bbox_inches='tight')
             plt.close('all')
 
 
@@ -132,13 +132,13 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_MONIT',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
+    pipe.attach(kp.io.ch.CHPump,
+                name="CalibrateAHRS_CHPump",
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_MONIT',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(CalibrateAHRS, det_id=det_id, plots_path=plots_path)
     pipe.drain()
