@@ -112,7 +112,7 @@ class ZTPlot(kp.Module):
         hits = hits.append_columns('multiplicity', np.ones(len(hits)))
 
         for dom in doms:
-            dom_hits = hits[hits.dom_id == dom]
+            dom_hits = hits[hits.dom_id == dom].sorted(by='time')
             mltps, m_ids = count_multiplicities(dom_hits.time)
             hits['multiplicity'][hits.dom_id == dom] = mltps
 
