@@ -32,7 +32,7 @@ import km3pipe.style
 km3pipe.style.use('km3pipe')
 
 
-class IO_OLINEDistributions(kp.Module):
+class RecoPlotter(kp.Module):
     def configure(self):
         self.fontsize = 16
 
@@ -144,7 +144,7 @@ def main():
                 timeout=60 * 60 * 24 * 7,
                 max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(IO_OLINEDistributions, plots_path=plots_path)
+    pipe.attach(RecoPlotter, plots_path=plots_path)
     pipe.drain()
 
 
