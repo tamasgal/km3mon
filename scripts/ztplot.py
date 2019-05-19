@@ -124,13 +124,12 @@ class ZTPlot(kp.Module):
         n_cols = int(np.ceil(np.sqrt(n_plots)))
         n_rows = int(n_plots / n_cols) + (n_plots % n_cols > 0)
         marker_fig, marker_axes = plt.subplots()  # for the marker size hack...
-        fig, axes = plt.subplots(
-            ncols=n_cols,
-            nrows=n_rows,
-            sharex=True,
-            sharey=True,
-            figsize=(16, 8),
-            constrained_layout=True)
+        fig, axes = plt.subplots(ncols=n_cols,
+                                 nrows=n_rows,
+                                 sharex=True,
+                                 sharey=True,
+                                 figsize=(16, 8),
+                                 constrained_layout=True)
 
         axes = [axes] if n_plots == 1 else axes.flatten()
 
@@ -174,7 +173,7 @@ class ZTPlot(kp.Module):
                       markerscale=1,
                       loc='upper left',
                       frameon=True,
-                      framealpha=0.5)
+                      framealpha=0.7)
 
         for idx, ax in enumerate(axes):
             ax.set_ylim(0, self.max_z)
@@ -204,8 +203,8 @@ class ZTPlot(kp.Module):
                 event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
                 event_info.overlays[0], time_offset,
-                datetime.utcfromtimestamp(
-                    event_info.utc_seconds), trigger_params),
+                datetime.utcfromtimestamp(event_info.utc_seconds),
+                trigger_params),
             fontsize=fontsize,
             y=1.05)
 
@@ -232,13 +231,12 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_EVT, IO_SUM',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
+    pipe.attach(kp.io.ch.CHPump,
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_EVT, IO_SUM',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(ZTPlot, det_id=det_id, plots_path=plots_path)
     pipe.drain()
