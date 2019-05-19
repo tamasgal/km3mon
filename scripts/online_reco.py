@@ -38,17 +38,18 @@ class IO_OLINEDistributions(kp.Module):
 
         self.plots_path = self.require('plots_path')
         self.max_events = self.get('max_events', default=5000)
-        self.zeniths    = deque(maxlen=self.max_events)
-        self.qualities  = deque(maxlen=self.max_events)
-        self.interval   = 60
+        self.zeniths = deque(maxlen=self.max_events)
+        self.qualities = deque(maxlen=self.max_events)
+        self.plot_interval = 60  # [s]
         threading.Thread(target=self.plot).start()
 
     def process(self, blob):
         track = blob['RecoTrack']
 
-        if track.status==1:
+        if track.status == 1:
             zenith = np.cos(
-                kp.math.angle_between([0, 0, -1], [track.dx, track.dy, track.dz]))
+                kp.math.angle_between([0, 0, -1],
+                                      [track.dx, track.dy, track.dz]))
             self.zeniths.append(zenith)
 
             self.qualities.append(track.Q)
@@ -57,23 +58,21 @@ class IO_OLINEDistributions(kp.Module):
 
     def plot(self):
         while True:
-            time.sleep(self.interval)
+            time.sleep(self.plot_interval)
             self.create_zenith_plot()
             self.create_quality_plot()
 
-
     def create_quality_plot(self):
         n = len(self.qualities)
-      
+
         plt.clf()
         fig, ax = plt.subplots(figsize=(16, 8))
-        ax.hist(
-            self.qualities,
-            bins=100,
-            label="JGandalf (last %d events)" % n,
-            histtype="step",
-            normed=True,
-            lw=3)
+        ax.hist(self.qualities,
+                bins=100,
+                label="JGandalf (last %d events)" % n,
+                histtype="step",
+                normed=True,
+                lw=3)
         ax.set_title(
             "Quality distribution of online track reconstructions\n%s UTC" %
             datetime.utcnow().strftime("%c"))
@@ -91,13 +90,12 @@ class IO_OLINEDistributions(kp.Module):
 
         plt.clf()
         fig, ax = plt.subplots(figsize=(16, 8))
-        ax.hist(
-            self.zeniths,
-            bins=180,
-            label="JGandalf (last %d events)" % n,
-            histtype="step",
-            normed=True,
-            lw=3)
+        ax.hist(self.zeniths,
+                bins=180,
+                label="JGandalf (last %d events)" % n,
+                histtype="step",
+                normed=True,
+                lw=3)
         ax.set_title(
             "Zenith distribution of online track reconstructions\n%s UTC" %
             datetime.utcnow().strftime("%c"))
@@ -120,13 +118,12 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_OLINE',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
+    pipe.attach(kp.io.ch.CHPump,
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_OLINE',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(IO_OLINEDistributions, plots_path=plots_path)
     pipe.drain()
