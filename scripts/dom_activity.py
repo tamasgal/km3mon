@@ -36,8 +36,6 @@ from km3modules.plot import plot_dom_parameters
 
 VERSION = "1.0"
 
-km3pipe.style.use('km3pipe')
-
 
 class DOMActivityPlotter(kp.Module):
     "Creates a plot with dots for each DOM, coloured based in their activity"
@@ -99,6 +97,8 @@ class DOMActivityPlotter(kp.Module):
 
 
 def main(chpump_kwargs={}, plotter_kwargs={}):
+    km3pipe.style.use('km3pipe')
+
     pipe = kp.Pipeline()
     pipe.attach(kp.io.ch.CHPump,
                 name="DOMActivityPlotter_CHPump",
@@ -127,9 +127,15 @@ if __name__ == '__main__':
         main(chpump_kwargs, plotter_kwargs)
     else:
         from daemonize import Daemonize
+
+        workdir = os.path.realpath(
+            os.path.join(os.path.dirname(__file__), '..'))
         process_name = os.path.basename(__file__)
         pid_file = os.path.join("pids", process_name + ".pid")
-        print(process_name, pid_file)
-        daemon = Daemonize(app=process_name, pid=pid_file, action=main)
+
+        daemon = Daemonize(app=process_name,
+                           pid=pid_file,
+                           action=main,
+                           chdir=workdir)
         daemon.start()
         print("Process started with PID {}".format(pid_file))
