@@ -98,22 +98,7 @@ class DOMActivityPlotter(kp.Module):
             vmax=15 * 60)
 
 
-def main():
-    from docopt import docopt
-    args = docopt(__doc__, version=VERSION)
-
-    chpump_kwargs = {}
-    plotter_kwargs = {}
-
-    if not args['monitor']:
-        det_id = int(args['-d'])
-        plots_path = args['-o']
-        ligier_ip = args['-l']
-        ligier_port = int(args['-p'])
-
-        chpump_kwargs = {'host': ligier_ip, 'port': ligier_port}
-        plotter_kwargs = {'det_id': det_id, 'plots_path': plots_path}
-
+def main(chpump_kwargs={}, plotter_kwargs={}):
     pipe = kp.Pipeline()
     pipe.attach(kp.io.ch.CHPump,
                 name="DOMActivityPlotter_CHPump",
@@ -127,4 +112,24 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    from docopt import docopt
+    args = docopt(__doc__, version=VERSION)
+
+    if not args['monitor']:
+        det_id = int(args['-d'])
+        plots_path = args['-o']
+        ligier_ip = args['-l']
+        ligier_port = int(args['-p'])
+
+        chpump_kwargs = {'host': ligier_ip, 'port': ligier_port}
+        plotter_kwargs = {'det_id': det_id, 'plots_path': plots_path}
+
+        main(chpump_kwargs, plotter_kwargs)
+    else:
+        from daemonize import Daemonize
+        process_name = os.path.basename(__file__)
+        pid_file = os.path.join("pids", __file__ + ".pid")
+        print(process_name, pid_file)
+        daemon = Daemonize(app=process_name, pid=pid_file, action=main)
+        daemon.start()
+        print("Process started with PID {}".format(pid_file))
