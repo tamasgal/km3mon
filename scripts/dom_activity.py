@@ -48,6 +48,8 @@ class DOMActivityPlotter(kp.Module):
         self.last_activity = defaultdict(partial(deque, maxlen=4000))
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
 
+        print(self.log)
+
         self.log.warning("Starting DOM Activity monitor")
 
     def process(self, blob):
@@ -133,9 +135,19 @@ if __name__ == '__main__':
         process_name = os.path.basename(__file__)
         pid_file = os.path.join("pids", process_name + ".pid")
 
-        daemon = Daemonize(app=process_name,
-                           pid=pid_file,
-                           action=main,
-                           chdir=workdir)
+        logger = kp.logger.get_logger(
+            process_name, filename="logs/{}.log".format(process_name))
+        logger.setLevel("DEBUG")
+
+        daemon = Daemonize(
+            app=process_name,
+            pid=pid_file,
+            action=main,
+            chdir=workdir,
+            foreground=True,
+            logger=logger,
+            verbose=True,
+            auto_close_fds=False
+            )
         daemon.start()
         print("Process started with PID {}".format(pid_file))
