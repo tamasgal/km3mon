@@ -7,6 +7,7 @@
 Monitors the DOM activity.
 
 Usage:
+    dom_activity.py monitor
     dom_activity.py [options] -d DET_ID
     dom_activity.py (-h | --help)
 
@@ -101,21 +102,27 @@ def main():
     from docopt import docopt
     args = docopt(__doc__, version=VERSION)
 
-    det_id = int(args['-d'])
-    plots_path = args['-o']
-    ligier_ip = args['-l']
-    ligier_port = int(args['-p'])
+    chpump_kwargs = {}
+    plotter_kwargs = {}
+
+    if args['monitor']:
+        det_id = int(args['-d'])
+        plots_path = args['-o']
+        ligier_ip = args['-l']
+        ligier_port = int(args['-p'])
+
+        chpump_kwargs = {'host': ligier_ip, 'port': ligier_port}
+        plotter_kwargs = {'det_id': det_id, 'plots_path': plots_path}
 
     pipe = kp.Pipeline()
     pipe.attach(kp.io.ch.CHPump,
                 name="DOMActivityPlotter_CHPump",
-                host=ligier_ip,
-                port=ligier_port,
                 tags='IO_SUM',
                 timeout=60 * 60 * 24 * 7,
-                max_queue=2000)
+                max_queue=2000,
+                **chpump_kwargs)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(DOMActivityPlotter, det_id=det_id, plots_path=plots_path)
+    pipe.attach(DOMActivityPlotter, **plotter_kwargs)
     pipe.drain()
 
 
