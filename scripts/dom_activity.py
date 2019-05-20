@@ -128,7 +128,7 @@ if __name__ == '__main__':
     else:
         from daemonize import Daemonize
         process_name = os.path.basename(__file__)
-        pid_file = os.path.join("pids", __file__ + ".pid")
+        pid_file = os.path.join("pids", process_name + ".pid")
         print(process_name, pid_file)
         daemon = Daemonize(app=process_name, pid=pid_file, action=main)
         daemon.start()
