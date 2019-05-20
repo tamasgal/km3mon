@@ -105,7 +105,7 @@ def main():
     chpump_kwargs = {}
     plotter_kwargs = {}
 
-    if args['monitor']:
+    if not args['monitor']:
         det_id = int(args['-d'])
         plots_path = args['-o']
         ligier_ip = args['-l']
