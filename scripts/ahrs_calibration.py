@@ -66,7 +66,7 @@ class CalibrateAHRS(kp.Module):
         now = datetime.utcnow()
         tmch_data = TMCHData(io.BytesIO(blob['CHData']))
         dom_id = tmch_data.dom_id
-        clb = self.clbmap.dom_id[dom_id]
+        clb = self.clbmap.dom_ids[dom_id]
         if clb.floor == 0:
             self.log.info("Skipping base CLB")
             return blob
