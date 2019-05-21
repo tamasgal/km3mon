@@ -2,3 +2,4 @@ km3pipe
 flask
 frozen-flask
 gunicorn
+supervisor
