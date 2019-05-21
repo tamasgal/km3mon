@@ -1,4 +1,3 @@
-Makefile
 data/
 __pycache__
 *.pyc
