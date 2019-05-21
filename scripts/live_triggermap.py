@@ -120,7 +120,7 @@ class TriggerMap(Module):
         if len(self.hits) > 0:
             self.create_plot(self.hits, "Hits on DOMs", 'hitmap')
         if len(self.triggered_hits) > 0:
-            self.create_plot(self.triggered_hits, "Trigger Map", 'triggermap_')
+            self.create_plot(self.triggered_hits, "Trigger Map", 'triggermap')
 
     def create_plot(self, hits, title, filename):
         fig, ax = plt.subplots(figsize=(16, 8))
