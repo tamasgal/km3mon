@@ -44,7 +44,7 @@ class CalibrateAHRS(kp.Module):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
         self.detector = kp.hardware.Detector(det_id=det_id)
-        self.dus = self.detector.dus
+        self.dus = set()
 
         self.clbmap = kp.db.CLBMap(det_oid=det_id)
 
@@ -82,6 +82,7 @@ class CalibrateAHRS(kp.Module):
             return blob
 
         du = clb.du
+        self.dus.add(du)
         cyaw, cpitch, croll = fit_ahrs(tmch_data.A, tmch_data.H, *calib)
         self.cuckoo_log("DU{}-DOM{} (random pick): calibrated yaw={}".format(
             clb.du, clb.floor, cyaw))
