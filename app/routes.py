@@ -1,4 +1,5 @@
-from os.path import join, exists
+from glob import glob
+from os.path import basename, join, exists
 from functools import wraps
 import toml
 from flask import render_template, send_from_directory, request, Response
@@ -13,7 +14,7 @@ app.config['FREEZER_DESTINATION'] = '../km3web'
 PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates', 'pmt_hrv'],
          ['trigger_rates'], ['ztplot', 'triggermap']]
 
-AHRS_PLOTS = [['yaw_calib'], ['pitch_calib'], ['roll_calib']]
+AHRS_PLOTS = [['yaw_calib_du*'], ['pitch_calib_du*'], ['roll_calib_du*']]
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
@@ -82,7 +83,14 @@ def index():
 @app.route('/ahrs.html')
 @requires_auth
 def ahrs():
-    return render_template('plots.html', plots=AHRS_PLOTS)
+    plots = []
+    for row in AHRS_PLOTS:
+        if not isinstance(row, list) and '*' in row:
+            plots.append(
+                sorted([basename(p) for p in glob(join(PLOTS_PATH, row))]))
+        else:
+            plots.append(row)
+    return render_template('plots.html', plots=plots)
 
 
 @app.route('/reco.html')
@@ -90,10 +98,12 @@ def ahrs():
 def reco():
     return render_template('plots.html', plots=RECO_PLOTS)
 
+
 @app.route('/sn.html')
 @requires_auth
 def supernova():
     return render_template('plots.html', plots=SN_PLOTS)
+
 
 @app.route('/compact.html')
 @requires_auth
