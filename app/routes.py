@@ -35,7 +35,7 @@ if exists(CONFIG_PATH):
 def expand_wildcards(plot_layout):
     """Replace wildcard entries with list of files"""
     plots = []
-    for row in AHRS_PLOTS:
+    for row in plot_layout:
         if not isinstance(row, list) and '*' in row:
             plots.append(
                 sorted([
