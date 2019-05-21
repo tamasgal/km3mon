@@ -7,7 +7,6 @@ build:
 
 start: 
 	@echo Starting supervisord
-	source setenv.sh
 	supervisord -c supervisord.conf
 
 .PHONY: build start stop
