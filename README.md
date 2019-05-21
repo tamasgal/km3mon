@@ -4,13 +4,7 @@ Monitoring facility for the KM3NeT neutrino detector.
 
 ## Requirements
 
-There are two requirements needed:
-
  - Python 3.5+
- - tmux
-
-Both of them should be available ony any DAQ system you encounter. If not,
-contact the administrators.
 
 Every other dependency will be installed or updated during the `make` procedure
 via the Python package manager `pip`.
@@ -21,45 +15,32 @@ First, install (or update) the requirements by typing
 
     make
 
-Next check out the `configure` options with
+Next, modify the ``setenv.sh`` script according to the detector setup.
+Here is an example configuration
 
-    ./configure --help
+```shell
+#!/bin/bash
+export DETECTOR_ID=43
+export DAQ_LIGIER_IP=192.168.0.110
+export DAQ_LIGIER_PORT=5553
+export DETECTOR_MANAGER_IP=192.168.0.120
+export MONITORING_LIGIER_PORT=55530
+export WEBSERVER_PORT=8081
+export LOGGING_PORT=8082
+export LIGIER_CMD="JLigier"
+export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSSN, MSG, IO_MONIT"
+```
     
-which will print the following screen:
 
-```
- _  _  __  __  ___  __  __  _____  _  _
-( )/ )(  \/  )(__ )(  \/  )(  _  )( \( )
- )  (  )    (  (_ \ )    (  )(_)(  )  (
-(_)\_)(_/\/\_)(___/(_/\/\_)(_____)(_)\_)
-
-Usage:  ./configure [options]
-
-  OPTION                    DESCRIPTION                    DEFAULT
-  --detector-id             Detector ID                    29
-  --daq-ligier-ip           DAQ Ligier                     192.168.0.110
-  --daq-ligier-port         Port of the DAQ Ligier         5553
-  --monitoring-ligier-port  Port of the monitoring Ligier  5553
-  --tmux-session-name       TMUX session name              km3mon
-  --webserver-port          Port of the web server         8080
-
-All invalid options are silently ignored.
-```
-
-and configure the ``Makefile`` with
-
-    ./configure --your --options
-
-After that, a `Makefile` is generated and you can start the monitoring facility
-with
+After that, use the following command to start the ``supervisor``:
 
     make start
 
-If you want to stop it:
+To see the status of the processes, use ``supervisorctl status``
 
-    make stop
 
-easy.
+You can stop and start individual services using ``supervisorctl stop
+group:process_name`` and ``supervisorctl start group:process_name``
 
 ## Configuration file
 
@@ -88,7 +69,3 @@ max_events = 5000  # the number of events to log
 min_dus = 1
 ytick_distance = 25  # [m]
 ```
-
-
-After a `make stop` and `make start`, the file is parsed and the default
-values are overwritten by those defined in the configuration file.
