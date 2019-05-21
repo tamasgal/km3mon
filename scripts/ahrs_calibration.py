@@ -50,17 +50,22 @@ class CalibrateAHRS(kp.Module):
 
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
         self.cuckoo_log = kp.time.Cuckoo(10, print)
+
         self.data = {}
-        queue_size = 50000
-        for du in self.dus:
-            self.data[du] = {}
-            for ahrs_param in ('yaw', 'pitch', 'roll'):
-                self.data[du][ahrs_param] = defaultdict(
-                    partial(deque, maxlen=queue_size))
-            self.data[du]['times'] = defaultdict(
-                partial(deque, maxlen=queue_size))
+        self.queue_size = 50000
+
         self.lock = threading.Lock()
         self.index = 0
+
+    def _register_du(self, du):
+        """Create data cache for DU"""
+        self.data[du] = {}
+        for ahrs_param in ('yaw', 'pitch', 'roll'):
+            self.data[du][ahrs_param] = defaultdict(
+                partial(deque, maxlen=self.queue_size))
+        self.data[du]['times'] = defaultdict(
+            partial(deque, maxlen=self.queue_size))
+        self.dus.add(du)
 
     def process(self, blob):
         self.index += 1
@@ -82,7 +87,8 @@ class CalibrateAHRS(kp.Module):
             return blob
 
         du = clb.du
-        self.dus.add(du)
+        if du not in self.dus:
+            self._register_du(du)
         cyaw, cpitch, croll = fit_ahrs(tmch_data.A, tmch_data.H, *calib)
         self.cuckoo_log("DU{}-DOM{} (random pick): calibrated yaw={}".format(
             clb.du, clb.floor, cyaw))
