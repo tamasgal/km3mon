@@ -34,6 +34,7 @@ export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSS
 
 After that, use the following command to start the ``supervisor``:
 
+    source setenv.sh
     make start
 
 To see the status of the processes, use ``supervisorctl status``
