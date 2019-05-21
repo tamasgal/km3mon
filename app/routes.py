@@ -1,5 +1,5 @@
 from glob import glob
-from os.path import basename, join, exists
+from os.path import basename, join, exists, splitext
 from functools import wraps
 import toml
 from flask import render_template, send_from_directory, request, Response
@@ -14,7 +14,7 @@ app.config['FREEZER_DESTINATION'] = '../km3web'
 PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates', 'pmt_hrv'],
          ['trigger_rates'], ['ztplot', 'triggermap']]
 
-AHRS_PLOTS = [['yaw_calib_du*'], ['pitch_calib_du*'], ['roll_calib_du*']]
+AHRS_PLOTS = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
@@ -30,6 +30,21 @@ if exists(CONFIG_PATH):
         print("Reading authentication information from '%s'" % CONFIG_PATH)
         USERNAME = config["WebServer"]["username"]
         PASSWORD = config["WebServer"]["password"]
+
+
+def expand_wildcards(plot_layout):
+    """Replace wildcard entries with list of files"""
+    plots = []
+    for row in AHRS_PLOTS:
+        if not isinstance(row, list) and '*' in row:
+            plots.append(
+                sorted([
+                    splitext(basename(p))[0]
+                    for p in glob(join(app.root_path, PLOTS_PATH, row))
+                ]))
+        else:
+            plots.append(row)
+    return plots
 
 
 def check_auth(username, password):
@@ -77,38 +92,31 @@ def add_header(r):
 @app.route('/index.html')
 @requires_auth
 def index():
-    return render_template('plots.html', plots=PLOTS)
+    return render_template('plots.html', plots=expand_wildcards(PLOTS))
 
 
 @app.route('/ahrs.html')
 @requires_auth
 def ahrs():
-    plots = []
-    for row in AHRS_PLOTS:
-        if not isinstance(row, list) and '*' in row:
-            plots.append(
-                sorted([basename(p) for p in glob(join(PLOTS_PATH, row))]))
-        else:
-            plots.append(row)
-    return render_template('plots.html', plots=plots)
+    return render_template('plots.html', plots=expand_wildcards(AHRS_PLOTS))
 
 
 @app.route('/reco.html')
 @requires_auth
 def reco():
-    return render_template('plots.html', plots=RECO_PLOTS)
+    return render_template('plots.html', plots=expand_wildcards(RECO_PLOTS))
 
 
 @app.route('/sn.html')
 @requires_auth
 def supernova():
-    return render_template('plots.html', plots=SN_PLOTS)
+    return render_template('plots.html', plots=expand_wildcards(SN_PLOTS))
 
 
 @app.route('/compact.html')
 @requires_auth
 def compact():
-    return render_template('plots.html', plots=COMPACT_PLOTS)
+    return render_template('plots.html', plots=expand_wildcards(COMPACT_PLOTS))
 
 
 @app.route('/rttc.html')
@@ -116,7 +124,7 @@ def compact():
 def rttc():
     return render_template(
         'plots.html',
-        plots=RTTC_PLOTS,
+        plots=expand_wildcards(RTTC_PLOTS),
         info=
         "Cable Round Trip Time calculated from realtime data provided by the "
         "Detector Manager. The red lines shows the median and the STD "
@@ -129,7 +137,7 @@ def rttc():
 def k40():
     return render_template(
         'plots.html',
-        plots=K40_PLOTS,
+        plots=expand_wildcards(K40_PLOTS),
         info="The first plot shows the intra-DOM calibration. "
         "y-axis: delta_t [ns], x-axis: cosine of angles. "
         "The second plot the angular distribution of K40 rates. "
@@ -140,7 +148,7 @@ def k40():
 @app.route('/trigger.html')
 @requires_auth
 def trigger():
-    return render_template('plots.html', plots=TRIGGER_PLOTS)
+    return render_template('plots.html', plots=expand_wildcards(TRIGGER_PLOTS))
 
 
 @app.route('/plots/<path:filename>')
