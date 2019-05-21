@@ -61,6 +61,9 @@ class TriggerMap(Module):
         self.max_events = self.get("max_events", default=1000)
         self.det = kp.hardware.Detector(det_id=det_id)
 
+        self.dus = sorted(self.det.dus)
+        self.n_rows = self.det.n_doms
+
         self.run = True
         self.hits = deque(maxlen=self.max_events)
         self.triggered_hits = deque(maxlen=self.max_events)
@@ -91,16 +94,18 @@ class TriggerMap(Module):
 
             self.n_events += 1
 
-            hits = np.zeros(self.det.n_doms)
+            hits = np.zeros(self.n_rows)
             for dom_id in event_hits.dom_id:
                 du, floor, _ = self.det.doms[dom_id]
-                hits[(du - 1) * self.det.n_doms + floor - 1] += 1
+                du_idx = self.dus.index(du)
+                hits[(du_idx - 1) * 18 + floor - 1] += 1
             self.hits.append(hits)
-            triggered_hits = np.zeros(self.det.n_doms)
+            triggered_hits = np.zeros(self.n_rows)
             for dom_id in event_hits.dom_id[event_hits.triggered.astype(
                     'bool')]:
                 du, floor, _ = self.det.doms[dom_id]
-                triggered_hits[(du - 1) * self.det.n_doms + floor - 1] += 1
+                du_idx = self.dus.index(du)
+                triggered_hits[(du_idx - 1) * 18 + floor - 1] += 1
             self.triggered_hits.append(triggered_hits)
 
         return blob
@@ -115,7 +120,7 @@ class TriggerMap(Module):
         if len(self.hits) > 0:
             self.create_plot(self.hits, "Hits on DOMs", 'hitmap')
         if len(self.triggered_hits) > 0:
-            self.create_plot(self.triggered_hits, "Trigger Map", 'triggermap')
+            self.create_plot(self.triggered_hits, "Trigger Map", 'triggermap_')
 
     def create_plot(self, hits, title, filename):
         fig, ax = plt.subplots(figsize=(16, 8))
@@ -131,10 +136,10 @@ class TriggerMap(Module):
             origin='lower',
             zorder=3,
             norm=LogNorm(vmin=1, vmax=np.amax(hit_matrix)))
-        yticks = np.arange(self.det.n_doms)
+        yticks = np.arange(self.n_rows)
         ytick_labels = [
-            "DU{}-DOM{}".format(dom[0], dom[1])
-            for dom in self.det.doms.values()
+            "DU{}-DOM{}".format(du, floor) if floor in [1, 6, 12] else ""
+            for (du, floor, _) in self.det.doms.values()
         ]
         ax.set_yticks(yticks)
         ax.set_yticklabels(ytick_labels)
@@ -157,7 +162,7 @@ class TriggerMap(Module):
                         self.max_events) - n_events_since_runchange
             plt.text(
                 x_pos,
-                self.det.n_doms,
+                self.n_rows,
                 "\nRUN %s  " % run,
                 rotation=60,
                 verticalalignment='top',
