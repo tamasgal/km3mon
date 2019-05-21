@@ -98,14 +98,14 @@ class TriggerMap(Module):
             for dom_id in event_hits.dom_id:
                 du, floor, _ = self.det.doms[dom_id]
                 du_idx = self.dus.index(du)
-                hits[(du_idx - 1) * 18 + floor - 1] += 1
+                hits[du_idx * 18 + floor - 1] += 1
             self.hits.append(hits)
             triggered_hits = np.zeros(self.n_rows)
             for dom_id in event_hits.dom_id[event_hits.triggered.astype(
                     'bool')]:
                 du, floor, _ = self.det.doms[dom_id]
                 du_idx = self.dus.index(du)
-                triggered_hits[(du_idx - 1) * 18 + floor - 1] += 1
+                triggered_hits[du_idx * 18 + floor - 1] += 1
             self.triggered_hits.append(triggered_hits)
 
         return blob
