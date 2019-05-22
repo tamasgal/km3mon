@@ -22,7 +22,7 @@ RECO_PLOTS = [['track_reco', 'ztplot_roy'], ['time_residuals']]
 COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
                  ['trigger_rates', 'trigger_rates_lin'],
                  ['ztplot', 'ztplot_roy', 'triggermap']]
-SN_PLOTS = [['sn_bg_distribution']]
+SN_PLOTS = [['sn_bg_histogram', 'sn_pk_history']]
 
 if exists(CONFIG_PATH):
     config = toml.load(CONFIG_PATH)
