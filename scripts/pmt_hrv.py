@@ -50,7 +50,8 @@ class PMTHRV(kp.Module):
         self.du = self.require("du")
         self.interval = self.get("interval", default=10)
         self.plot_path = self.get("plot_path", default="plots")
-        self.filename = self.get("filename", default="pmt_hrv.png")
+        self.filename = self.get("filename",
+                                 default=f"pmt_hrv_du{self.du}.png")
         self.max_x = 800
         self.index = 0
         self.hrv = defaultdict(list)
@@ -166,19 +167,17 @@ def main():
     detector = kp.hardware.Detector(det_id=det_id)
 
     pipe = kp.Pipeline(timeit=True)
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_MONIT',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
-    pipe.attach(
-        PMTHRV,
-        detector=detector,
-        du=du,
-        interval=interval,
-        plot_path=plot_path)
+    pipe.attach(kp.io.ch.CHPump,
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_MONIT',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
+    pipe.attach(PMTHRV,
+                detector=detector,
+                du=du,
+                interval=interval,
+                plot_path=plot_path)
     pipe.drain()
 
 

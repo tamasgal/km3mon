@@ -51,7 +51,7 @@ class PMTRates(kp.Module):
         self.interval = self.get("interval", default=10)
         self.plot_path = self.get("plot_path", default="plots")
         self.filename = self.get("filename",
-                                 default=f"pmt_rates_{self.du}.png")
+                                 default=f"pmt_rates_du{self.du}.png")
         self.lowest_rate = self.get("lowest_rate", default=5000)
         self.highest_rate = self.get("highest_rate", default=15000)
         self.max_x = 800
