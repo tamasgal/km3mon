@@ -44,7 +44,7 @@ function main()
             fit = KM3NeT.single_du_fit(du_hits)
             push!(Q, fit.Q)
             plot!(du_hits, fit, markercolor=colours[idx], label="DU $(du)", max_z=calib.max_z)
-            write_time_residuals(TIME_RES, event, hits, fit)
+            write_time_residuals(TIME_RES, event, du_hits, fit)
         end
         if sum(Q) < 200 && n_doms > 12 && n_dus > 1
             println("Plotting...")
