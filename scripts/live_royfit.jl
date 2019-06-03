@@ -13,12 +13,13 @@ end
 
 
 const calib = KM3NeT.read_calibration(ARGS[1])
-const TIME_RES = ARGS[2]
+const LIGIER_PORT = parse(Int, ARGS[2])
+const TIME_RES = ARGS[3]
 
 function main()
     println("Starting live ROyFit")
 
-    for message in CHClient(ip"127.0.0.1", 55530, ["IO_EVT"])
+    for message in CHClient(ip"127.0.0.1", LIGIER_PORT, ["IO_EVT"])
         event = KM3NeT.read_io(IOBuffer(message.data), KM3NeT.DAQEvent)
 
         hits = calibrate(event.hits, calib)
