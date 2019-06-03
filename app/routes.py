@@ -11,7 +11,7 @@ USERNAME = None
 PASSWORD = None
 app.config['FREEZER_DESTINATION'] = '../km3web'
 
-PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates', 'pmt_hrv'],
+PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', 'pmt_hrv_du*',
          ['trigger_rates'], ['ztplot', 'triggermap']]
 
 AHRS_PLOTS = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
