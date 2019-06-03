@@ -35,9 +35,7 @@ def main():
     hours = 2
 
     while True:
-        df = pd.read_csv(
-            args['TIME_RESIDUALS_FILE'],
-            names=['run', 'timestamp', 'du', 'floor', 'dom_id', 't_res', 'Q'])
+        df = pd.read_csv(args['TIME_RESIDUALS_FILE'])
         df = df[df.timestamp > time.time() - 60 * 60 * hours]
 
         fig, axes = plt.subplots(nrows=6,
