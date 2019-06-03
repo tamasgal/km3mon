@@ -56,7 +56,7 @@ function main()
 
             plot!(title="$(fit_params)\n$(event_params), $(trigger_params)\n$(time_params)", titlefontsize=8, margin=5mm)
 
-            savefig("plots/ztplot.png")
+            savefig("plots/ztplot_roy.png")
         end
     end
 end
