@@ -168,19 +168,17 @@ def main():
     detector = kp.hardware.Detector(det_id=det_id)
 
     pipe = kp.Pipeline(timeit=True)
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_MONIT',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000)
-    pipe.attach(
-        PMTRates,
-        detector=detector,
-        du=du,
-        interval=interval,
-        plot_path=plot_path)
+    pipe.attach(kp.io.ch.CHPump,
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_MONIT',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
+    pipe.attach(PMTRates,
+                detector=detector,
+                du=du,
+                interval=interval,
+                plot_path=plot_path)
     pipe.drain()
 
 
