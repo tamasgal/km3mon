@@ -15,8 +15,8 @@ First, install (or update) the requirements by typing
 
     make
 
-Next, modify the ``setenv.sh`` script according to the detector setup.
-Here is an example configuration
+Next, create a ``setenv.sh`` script according to the ``setenv_template.sh``
+script and apply the detector settings. Here is an example configuration
 
 ```shell
 #!/bin/bash
