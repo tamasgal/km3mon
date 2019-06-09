@@ -47,8 +47,8 @@ km3pipe.style.use('km3pipe')
 class TriggerRate(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
-        self.interval = self.get(
-            "interval", default=self.trigger_rate_sampling_period())
+        self.interval = self.get("interval",
+                                 default=self.trigger_rate_sampling_period())
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
         print("Update interval: {}s".format(self.interval))
@@ -56,22 +56,12 @@ class TriggerRate(kp.Module):
         self.trigger_rates = OrderedDict()
 
         self.styles = {
-            "xfmt":
-            md.DateFormatter('%Y-%m-%d %H:%M'),
-            "general":
-            dict(markersize=6, linestyle='None'),
-            "Overall":
-            dict(
-                marker='D',
-                markerfacecolor='None',
-                markeredgecolor='tomato',
-                markeredgewidth=1),
-            "3DMuon":
-            dict(marker='X', markerfacecolor='dodgerblue'),
-            "MXShower":
-            dict(marker='v', markerfacecolor='orange'),
-            "3DShower":
-            dict(marker='^', markerfacecolor='olivedrab'),
+            "xfmt": md.DateFormatter('%Y-%m-%d %H:%M'),
+            "general": dict(markersize=6, linestyle=':', linewidth=1),
+            "Overall": dict(marker='D', color='tomato', markeredgewidth=1),
+            "3DMuon": dict(marker='X', color='dodgerblue'),
+            "MXShower": dict(marker='v', color='orange'),
+            "3DShower": dict(marker='^', color='olivedrab'),
         }
 
         queue_len = int(60 * 24 / (self.interval / 60))
@@ -155,12 +145,11 @@ class TriggerRate(kp.Module):
                 self.log.warning("Empty rates, skipping...")
                 continue
             timestamps, trigger_rates = zip(*rates)
-            ax.plot(
-                timestamps,
-                trigger_rates,
-                **self.styles[trigger],
-                **self.styles['general'],
-                label=trigger)
+            ax.plot(timestamps,
+                    trigger_rates,
+                    **self.styles[trigger],
+                    **self.styles['general'],
+                    label=trigger)
 
         run_changes_to_plot = self._get_run_changes_to_plot()
         self.print("Recorded run changes: {}".format(run_changes_to_plot))
@@ -171,15 +160,14 @@ class TriggerRate(kp.Module):
         min_trigger_rate = min(all_rates)
         max_trigger_rate = max(all_rates)
         for run_start, run in run_changes_to_plot:
-            plt.text(
-                run_start, (min_trigger_rate + max_trigger_rate) / 2,
-                "\nRUN %s  " % run,
-                rotation=60,
-                verticalalignment='top',
-                fontsize=8,
-                color='gray')
-            ax.axvline(
-                run_start, color='#ff0f5b', linestyle='--', alpha=0.8)  # added
+            plt.text(run_start, (min_trigger_rate + max_trigger_rate) / 2,
+                     "\nRUN %s  " % run,
+                     rotation=60,
+                     verticalalignment='top',
+                     fontsize=8,
+                     color='gray')
+            ax.axvline(run_start, color='#ff0f5b', linestyle='--',
+                       alpha=0.8)  # added
 
         ax.set_title("Trigger Rates for DetID-{0}\n{1} UTC".format(
             self.det_id,
@@ -234,13 +222,12 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_EVT',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=200000)
+    pipe.attach(kp.io.ch.CHPump,
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_EVT',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=200000)
     pipe.attach(TriggerRate, interval=300, plots_path=plots_path)
     pipe.drain()
 
