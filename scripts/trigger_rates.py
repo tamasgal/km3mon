@@ -89,6 +89,7 @@ class TriggerRate(kp.Module):
             self.trigger_rates_fobj.write(','.join(self._trigger_types) + '\n')
         else:
             self.trigger_rates_fobj = open(filename, "a")
+        self.trigger_rates_fobj.flush()
 
     def process(self, blob):
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
