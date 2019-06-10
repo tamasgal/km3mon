@@ -147,7 +147,11 @@ class TriggerRate(kp.Module):
     def write_trigger_rates(self, timestamp, trigger_rates):
         entry = f"{timestamp}"
         for trigger_type in self._trigger_types:
-            entry += f",{trigger_rates[trigger_type]}"
+            try:
+                trigger_rate = trigger_rates[trigger_type]
+            except KeyError:
+                trigger_rate = 0
+            entry += f",{trigger_rate}"
         entry += '\n'
         self.trigger_rates_fobj.write(entry)
         self.trigger_rates_fobj.flush()
