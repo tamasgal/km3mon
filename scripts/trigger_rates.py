@@ -86,7 +86,8 @@ class TriggerRate(kp.Module):
         filename = join(self.data_path, "trigger_rates.csv")
         if not exists(filename):
             self.trigger_rates_fobj = open(filename, "w")
-            self.trigger_rates_fobj.write(','.join(self._trigger_types) + '\n')
+            self.trigger_rates_fobj.write('timestamp,' +
+                                          ','.join(self._trigger_types) + '\n')
         else:
             self.trigger_rates_fobj = open(filename, "a")
         self.trigger_rates_fobj.flush()
@@ -159,13 +160,11 @@ class TriggerRate(kp.Module):
     def calculate_trigger_rates(self):
         timestamp = datetime.utcnow()
         trigger_rates = {}
-        trigger_rates['Overall'] = 0
         with self.lock:
             for trigger, n_events in self.trigger_counts.items():
                 trigger_rate = n_events / self.interval
                 self.trigger_rates[trigger].append((timestamp, trigger_rate))
                 trigger_rates[trigger] = trigger_rate
-                trigger_rates['Overall'] += trigger_rate
             self.trigger_counts = defaultdict(int)
         return timestamp.timestamp(), trigger_rates
 
