@@ -167,7 +167,7 @@ class TriggerRate(kp.Module):
                 trigger_rates[trigger] = trigger_rate
                 trigger_rates['Overall'] += trigger_rate
             self.trigger_counts = defaultdict(int)
-        return timestamp, trigger_rates
+        return timestamp.timestamp(), trigger_rates
 
     def create_plot(self):
         print('\n' + self.__class__.__name__ + ": updating plot.")
