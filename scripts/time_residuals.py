@@ -44,7 +44,7 @@ def main():
                                  ncols=3,
                                  figsize=(16, 10),
                                  sharex=True,
-                                 sharey=True,
+                                 sharey=False,
                                  constrained_layout=True)
 
         for ax, floor in zip(axes.flatten(), range(1, 19)):
