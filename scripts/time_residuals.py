@@ -51,6 +51,7 @@ def main():
             for du in np.unique(df.du):
                 _df = df[df.du == du]
                 t_res = _df[_df.floor == floor].t_res
+                t_res = t_res[np.abs(t_res) < 500]
                 print(f"   DU {du} floor {floor}: {len(t_res)} entries")
                 ax.hist(-t_res,
                         bins=100,
