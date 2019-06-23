@@ -35,20 +35,24 @@ def main():
     hours = 2
 
     while True:
+        print("Reading data...")
         df = pd.read_csv(args['TIME_RESIDUALS_FILE'])
         df = df[df.timestamp > time.time() - 60 * 60 * hours]
+        print(f" -> number of entries: {len(df)}")
 
         fig, axes = plt.subplots(nrows=6,
                                  ncols=3,
                                  figsize=(16, 10),
                                  sharex=True,
-                                 sharey=True,
+                                 sharey=False,
                                  constrained_layout=True)
 
         for ax, floor in zip(axes.flatten(), range(1, 19)):
             for du in np.unique(df.du):
                 _df = df[df.du == du]
                 t_res = _df[_df.floor == floor].t_res
+                t_res = t_res[np.abs(t_res) < 500]
+                print(f"   DU {du} floor {floor}: {len(t_res)} entries")
                 ax.hist(-t_res,
                         bins=100,
                         histtype='step',

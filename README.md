@@ -72,6 +72,8 @@ a group of processes. Use the ``supervisorctl help`` to find out more and
 ``supervisorctl help COMMAND`` to get a detailed description of the
 corresponding command.
 
+To shut down the monitoring service completely, use ``make stop``.
+
 
 ## Configuration file
 
