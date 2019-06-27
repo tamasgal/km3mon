@@ -9,4 +9,4 @@ export LOGGING_PORT=8082
 export DETX=""
 export ROYFIT_TIMERES="data/time_residuals.csv"
 export LIGIER_CMD="JLigier"
-export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSSN, MSG, IO_MONIT"
+export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSL1, IO_TSSN, MSG, IO_MONIT"
