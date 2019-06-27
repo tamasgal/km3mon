@@ -37,6 +37,9 @@ Notice the `LIGIER_CMD` which in this case uses a Singularity image of Jpp.
 The `DETX` needs to point to a recently calibrated DETX file otherwise the
 live reconstruction will not work correctly.
 
+For the weblog you need to download the latest version of `frontail`:
+https://github.com/mthenw/frontail/releases
+
 After that, use the following command to start the ``supervisor``, which
 you only need to do once:
 
