@@ -91,6 +91,10 @@ different kind of parameters, like plot attributes or ranges.
 Here is an example `pipeline.toml`:
 
 ```
+[WebServer]
+username = "km3net"
+password = "swordfish"
+
 [DOMRates]
 lowest_rate = 150  # [kHz]
 highest_rate = 350  # [kHz]
