@@ -128,7 +128,6 @@ class PMTRates(kp.Module):
         plt.close('all')
 
     def process(self, blob):
-        print("Got data...")
         try:
             tmch_data = TMCHData(io.BytesIO(blob['CHData']))
         except ValueError:
@@ -138,6 +137,7 @@ class PMTRates(kp.Module):
         dom_id = tmch_data.dom_id
 
         if dom_id not in self.detector.doms:
+            self.log.error(f"DOM ID {dom_id} not in detector definition!")
             return blob
 
         du, floor, _ = self.detector.doms[dom_id]
