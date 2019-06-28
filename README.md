@@ -27,10 +27,18 @@ export DETECTOR_MANAGER_IP=192.168.0.120
 export MONITORING_LIGIER_PORT=55530
 export WEBSERVER_PORT=8081
 export LOGGING_PORT=8082
-export LIGIER_CMD="JLigier"
-export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSL, IO_TSL0, IO_TSL1, IO_TSL2, IO_TSSN, MSG, IO_MONIT"
+export DETX="KM3NeT_00000043_03062019_t0set-A02087174.detx"
+export ROYFIT_TIMERES="data/time_residuals.csv"
+export LIGIER_CMD="singularity exec /home/off1user/Software/Jpp_svn2git-rc9.sif JLigier"
+export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSSN, MSG, IO_MONIT"
 ```
     
+Notice the `LIGIER_CMD` which in this case uses a Singularity image of Jpp.
+The `DETX` needs to point to a recently calibrated DETX file otherwise the
+live reconstruction will not work correctly.
+
+For the weblog you need to download the latest version of `frontail`:
+https://github.com/mthenw/frontail/releases
 
 After that, use the following command to start the ``supervisor``, which
 you only need to do once:
@@ -83,6 +91,10 @@ different kind of parameters, like plot attributes or ranges.
 Here is an example `pipeline.toml`:
 
 ```
+[WebServer]
+username = "km3net"
+password = "swordfish"
+
 [DOMRates]
 lowest_rate = 150  # [kHz]
 highest_rate = 350  # [kHz]
