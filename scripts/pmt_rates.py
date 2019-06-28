@@ -128,6 +128,7 @@ class PMTRates(kp.Module):
         plt.close('all')
 
     def process(self, blob):
+        print("Got data...")
         try:
             tmch_data = TMCHData(io.BytesIO(blob['CHData']))
         except ValueError:
