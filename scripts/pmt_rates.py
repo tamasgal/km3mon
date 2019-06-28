@@ -146,6 +146,9 @@ class PMTRates(kp.Module):
 
         y_base = (floor - 1) * 31
 
+        if np.random.rand() > 0.90:
+            print(f"Rates for DOM ID {dom_id} DU {du}: {tmch_data.pmt_rates}")
+
         for channel_id, rate in enumerate(tmch_data.pmt_rates):
             idx = y_base + kp.hardware.ORDERED_PMT_IDS[channel_id]
             with self.lock:
