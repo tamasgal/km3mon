@@ -1,6 +1,8 @@
 # km3mon
 
-Monitoring facility for the KM3NeT neutrino detector.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3268538.svg)](https://doi.org/10.5281/zenodo.3268538)
+
+Online monitoring suite for the KM3NeT neutrino detectors.
 
 ## Requirements
 
