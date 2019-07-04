@@ -61,7 +61,7 @@ function main()
             savefig("plots/ztplot_roy.png")
         end
 
-        if n_triggered_dus > 2
+        if n_triggered_dus > 2 && n_doms > 14
             println("Starting multiline fit with $(n_dus) DUs")
             prefit_track = KM3NeT.prefit(triggered_hits)
             println(prefit_track)
