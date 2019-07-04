@@ -25,7 +25,9 @@ function main()
         hits = calibrate(event.hits, calib)
         triggered_hits = filter(h->h.triggered, hits)
         dus = sort(unique(map(h->h.du, hits)))
+        triggered_dus = sort(unique(map(h->h.du, triggered_hits)))
         n_dus = length(dus)
+        n_triggered_dus = length(triggered_dus)
         n_doms = length(unique(h->h.dom_id, triggered_hits))
 
         if n_doms < 4
@@ -57,6 +59,14 @@ function main()
             plot!(title="$(fit_params)\n$(event_params), $(trigger_params)\n$(time_params)", titlefontsize=8, margin=5mm)
 
             savefig("plots/ztplot_roy.png")
+        end
+
+        if n_triggered_dus > 2
+            println("Starting multiline fit with $(n_dus) DUs")
+            prefit_track = KM3NeT.prefit(triggered_hits)
+            println(prefit_track)
+            plot(triggered_hits, prefit_track)
+            savefig("plots/ztplot_roy_prefit.png")
         end
     end
 end
