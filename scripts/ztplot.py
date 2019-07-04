@@ -47,6 +47,7 @@ class ZTPlot(kp.Module):
         self.plots_path = self.require('plots_path')
         self.ytick_distance = self.get('ytick_distance', default=200)
         self.min_dus = self.get('min_dus', default=1)
+        self.min_doms = self.get('min_doms', default=4)
         self.det_id = self.require('det_id')
         self.t0set = None
         self.calib = None
@@ -82,9 +83,11 @@ class ZTPlot(kp.Module):
         hits = self.calib.apply(hits)
         event_info = blob['EventInfo']
 
-        triggered_dus = np.unique(hits[hits.triggered == True].du)
-        if len(triggered_dus) < self.min_dus:
-            print("Skipping...")
+        n_triggered_dus = len(np.unique(hits[hits.triggered == True].du))
+        n_triggered_doms = len(np.unique(hits[hits.triggered == True].dom_id))
+        if n_triggered_dus < self.min_dus or n_triggered_doms < self.min_doms:
+            print(f"Skipping event with {n_triggered_dus} DUs "
+                  f"and {n_triggered_doms} DOMs.")
             return blob
 
         print("OK")
