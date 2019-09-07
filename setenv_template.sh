@@ -19,7 +19,7 @@ export DETECTOR_MANAGER_IP=192.168.0.120
 
 # The port for the KM3Web monitoring dashboard
 export WEBSERVER_PORT=8081
-# The port for the log viewer
+# The port for the log viewer webserver
 export LOGGING_PORT=8082
 
 # The detector configuration to be used in the online reconstruction
