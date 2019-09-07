@@ -61,8 +61,8 @@ https://github.com/mthenw/frontail/releases
 and place it in e.g. `/usr/local/bin` (or another directory which is in
 `$PATH`).
 
-Before starting off, you also need to create a `supervisorctl.conf`. Usually
-simply copying the `supervisorctl_template.conf` is enough, but make sure
+Before starting off, you also need to create a `supervisord.conf`. Usually
+simply copying the `supervisord_template.conf` is enough, but make sure
 to adjust some of the plots which monitoring only specific DUs.
 
 After that, use the following command to start the ``supervisor``, which
