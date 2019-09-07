@@ -23,24 +23,47 @@ script and apply the detector settings. Here is an example configuration
 ```shell
 #!/bin/bash
 export DETECTOR_ID=43
+
+# The ligier to get events (IO_EVT), timeslices (e.g. IO_TSSN) and
+# summary slices (IO_SUM)
 export DAQ_LIGIER_IP=192.168.0.110
 export DAQ_LIGIER_PORT=5553
-export DETECTOR_MANAGER_IP=192.168.0.120
-export MONITORING_LIGIER_PORT=55530
-export WEBSERVER_PORT=8081
-export LOGGING_PORT=8082
-export DETX="KM3NeT_00000043_03062019_t0set-A02087174.detx"
-export ROYFIT_TIMERES="data/time_residuals.csv"
-export LIGIER_CMD="singularity exec /home/off1user/Software/Jpp_svn2git-rc9.sif JLigier"
 export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSSN, MSG, IO_MONIT"
+
+# The logger ligier (MSG)
+export LOG_LIGIER_IP=192.168.0.119
+export LOG_LIGIER_PORT=5553
+
+# The command to start a ligier on the monitoring machine
+# export LIGIER_CMD="JLigier"
+export LIGIER_CMD="singularity exec /home/off1user/Software/Jpp_svn2git-rc9.sif JLigier"
+export MONITORING_LIGIER_PORT=55530
+
+export DETECTOR_MANAGER_IP=192.168.0.120
+
+# The port for the KM3Web monitoring dashboard
+export WEBSERVER_PORT=8081
+# The port for the log viewer webserver
+export LOGGING_PORT=8082
+
+# The detector configuration to be used in the online reconstruction
+export DETX="KM3NeT_00000043_03062019_t0set-A02087174.detx"
+# Where to save the time residuals
+export ROYFIT_TIMERES="data/time_residuals.csv"
 ```
     
 Notice the `LIGIER_CMD` which in this case uses a Singularity image of Jpp.
 The `DETX` needs to point to a recently calibrated DETX file otherwise the
 live reconstruction will not work correctly.
 
-For the weblog you need to download the latest version of `frontail`:
+For the weblog you need to download the latest version of `frontail`
 https://github.com/mthenw/frontail/releases
+and place it in e.g. `/usr/local/bin` (or another directory which is in
+`$PATH`).
+
+Before starting off, you also need to create a `supervisorctl.conf`. Usually
+simply copying the `supervisorctl_template.conf` is enough, but make sure
+to adjust some of the plots which monitoring only specific DUs.
 
 After that, use the following command to start the ``supervisor``, which
 you only need to do once:
