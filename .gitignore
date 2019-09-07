@@ -1,6 +1,11 @@
 data/
 __pycache__
 *.pyc
+*.pid
+*.detx
 plots/
 logs/
 pids/
+pipeline.toml
+setenv.sh
+supervisord.conf
