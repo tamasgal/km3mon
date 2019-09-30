@@ -28,7 +28,7 @@ from km3pipe.io import CHPump
 
 def current_date_str(fmt="%Y-%m-%d"):
     """Return the current datetime string"""
-    return datetime.datetime.now().strftime(fmt)
+    return datetime.datetime.utcnow().strftime(fmt)
 
 
 class MSGDumper(Module):
