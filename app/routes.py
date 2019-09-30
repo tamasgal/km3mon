@@ -151,6 +151,13 @@ def trigger():
     return render_template('plots.html', plots=expand_wildcards(TRIGGER_PLOTS))
 
 
+@app.route('/logs.html')
+@requires_auth
+def logs():
+    msg_logs = glob("logs/MSG*.log") 
+    return render_template('logs.html', logs=msg_logs)
+
+
 @app.route('/plots/<path:filename>')
 @requires_auth
 def custom_static(filename):

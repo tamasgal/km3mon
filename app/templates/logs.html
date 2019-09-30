@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block logs %}
+
+    <div class="container-fluid" id="logs">
+        {% for filename in logs %}
+        <div class="row">
+            <div class="col-md-12">
+		{{ filename }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
