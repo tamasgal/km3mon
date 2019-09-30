@@ -164,7 +164,6 @@ def logs():
     files = OrderedDict()
     for filename in sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log"))):
         files[basename(filename)] = getsize(filename)
-    print(files)
     return render_template('logs.html', files=files)
 
 
@@ -179,8 +178,8 @@ def custom_static_logfile(filename):
 @app.route('/plots/<path:filename>')
 @requires_auth
 def custom_static(filename):
-    filepath = join(app.root_path, PLOTS_PATH)
-    print("Serving: {}/{}".format(filepath, filename))
+    # filepath = join(app.root_path, PLOTS_PATH)
+    # print("Serving: {}/{}".format(filepath, filename))
     return send_from_directory(join(app.root_path, PLOTS_PATH), filename)
 
 
