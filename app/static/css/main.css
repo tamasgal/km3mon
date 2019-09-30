@@ -29,3 +29,7 @@ img.plot {
 #logs {
     margin-top: 50px;
 }
+
+#logs a {
+    padding: 5px;
+}
