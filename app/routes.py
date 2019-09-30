@@ -1,6 +1,7 @@
 from glob import glob
-from os.path import basename, join, exists, splitext
+from os.path import basename, join, exists, splitext, getsize
 from functools import wraps
+from collections import OrderedDict
 import toml
 from flask import render_template, send_from_directory, request, Response
 from app import app
@@ -160,9 +161,11 @@ def trigger():
 @app.route('/logs.html')
 @requires_auth
 def logs():
-    msg_logs = map(basename,
-                   sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log"))))
-    return render_template('logs.html', filenames=msg_logs)
+    files = OrderedDict()
+    for filename in sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log"))):
+        files[basename(filename)] = getsize(filename)
+    print(files)
+    return render_template('logs.html', files=files)
 
 
 @app.route('/logs/<path:filename>')

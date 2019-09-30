@@ -6,8 +6,8 @@
     <div class="container-fluid" id="logs">
         <div class="row">
             <div class="col-md-12">
-                {% for filename in filenames %}
-                    <a href="/logs/{{ filename }}" class="btn btn-warning" role="button">{{ filename }}</a></button>
+                {% for filename, filesize in files.items() %}
+                <a href="/logs/{{ filename }}" class="btn btn-warning" role="button">{{ filename }} ({{'%0.1f' | format(filesize/1024) }}MB)</a></button>
                 {% endfor %}
             </div>
         </div>
