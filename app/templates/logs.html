@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
-{% block logs %}
+{% block main %}
+
 
     <div class="container-fluid" id="logs">
-        {% for filename in logs %}
         <div class="row">
             <div class="col-md-12">
-		{{ filename }}
+                {% for filename in filenames %}
+                    <a href="/logs/{{ filename }}" class="btn btn-warning" role="button">{{ filename }}</a></button>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
     </div>
 
 {% endblock %}

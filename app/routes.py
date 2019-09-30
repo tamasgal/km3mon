@@ -7,6 +7,7 @@ from app import app
 
 CONFIG_PATH = "pipeline.toml"
 PLOTS_PATH = "../plots"
+LOGS_PATH = "../logs"
 USERNAME = None
 PASSWORD = None
 app.config['FREEZER_DESTINATION'] = '../km3web'
@@ -154,14 +155,22 @@ def trigger():
 @app.route('/logs.html')
 @requires_auth
 def logs():
-    msg_logs = glob("logs/MSG*.log") 
-    return render_template('logs.html', logs=msg_logs)
+    msg_logs = map(basename,
+                   sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log"))))
+    return render_template('logs.html', filenames=msg_logs)
+
+
+@app.route('/logs/<path:filename>')
+@requires_auth
+def custom_static_logfile(filename):
+    filepath = join(app.root_path, LOGS_PATH)
+    print("Serving: {}/{}".format(filepath, filename))
+    return send_from_directory(join(app.root_path, LOGS_PATH), filename)
 
 
 @app.route('/plots/<path:filename>')
 @requires_auth
 def custom_static(filename):
-    print(filename)
     filepath = join(app.root_path, PLOTS_PATH)
-    print(filepath)
+    print("Serving: {}/{}".format(filepath, filename))
     return send_from_directory(join(app.root_path, PLOTS_PATH), filename)

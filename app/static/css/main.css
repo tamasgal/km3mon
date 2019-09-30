@@ -25,3 +25,7 @@ img.plot {
     height:100%;
     display: none;
 }
+
+#logs {
+    margin-top: 50px;
+}
