@@ -162,7 +162,10 @@ def trigger():
 @requires_auth
 def logs():
     files = OrderedDict()
-    for filename in sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log"))):
+    filenames = sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log")),
+                       reverse=True)
+    main_log = filenames.pop(-1)
+    for filename in [main_log] + filenames:
         files[basename(filename)] = getsize(filename)
     return render_template('logs.html', files=files)
 
