@@ -24,6 +24,11 @@ COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
                  ['trigger_rates', 'trigger_rates_lin'],
                  ['ztplot', 'ztplot_roy', 'triggermap']]
 SN_PLOTS = [['sn_bg_histogram', 'sn_pk_history']]
+RASP_PLOTS = [['dom_rates', 'ztplot', 'triggermap'],
+              [
+                  'pmt_rates_du2', 'pmt_rates_du3', 'pmt_rates_du4',
+                  'pmt_rates_du5'
+              ], ['trigger_rates', 'trigger_rates_lin']]
 
 if exists(CONFIG_PATH):
     config = toml.load(CONFIG_PATH)
@@ -133,17 +138,17 @@ def rttc():
         "RTTC = Cable_RTT - (TX_Slave + RX_Slave + TX_Master + RX_Master)")
 
 
-@app.route('/k40.html')
-@requires_auth
-def k40():
-    return render_template(
-        'plots.html',
-        plots=expand_wildcards(K40_PLOTS),
-        info="The first plot shows the intra-DOM calibration. "
-        "y-axis: delta_t [ns], x-axis: cosine of angles. "
-        "The second plot the angular distribution of K40 rates. "
-        "y-axis: rate [Hz], x-axis: cosine of angles. "
-        "blue=before, red=after")
+# @app.route('/k40.html')
+# @requires_auth
+# def k40():
+#     return render_template(
+#         'plots.html',
+#         plots=expand_wildcards(K40_PLOTS),
+#         info="The first plot shows the intra-DOM calibration. "
+#         "y-axis: delta_t [ns], x-axis: cosine of angles. "
+#         "The second plot the angular distribution of K40 rates. "
+#         "y-axis: rate [Hz], x-axis: cosine of angles. "
+#         "blue=before, red=after")
 
 
 @app.route('/trigger.html')
@@ -174,3 +179,9 @@ def custom_static(filename):
     filepath = join(app.root_path, PLOTS_PATH)
     print("Serving: {}/{}".format(filepath, filename))
     return send_from_directory(join(app.root_path, PLOTS_PATH), filename)
+
+
+@app.route('/rasp.html')
+@requires_auth
+def rasp():
+    return render_template('plots.html', plots=expand_wildcards(RASP_PLOTS))
