@@ -45,6 +45,7 @@ km3pipe.style.use('km3pipe')
 
 
 class TriggerRate(kp.Module):
+    """Trigger rate plotter"""
     def configure(self):
         self.plots_path = self.require('plots_path')
         self.data_path = self.get('data_path', default='data')
@@ -83,6 +84,7 @@ class TriggerRate(kp.Module):
         self.det_id = 0
 
     def initialise_data_logging(self):
+        """Set up a CSV to store the trigger rate data"""
         filename = join(self.data_path, "trigger_rates.csv")
         if not exists(filename):
             self.trigger_rates_fobj = open(filename, "w")
@@ -93,6 +95,7 @@ class TriggerRate(kp.Module):
         self.trigger_rates_fobj.flush()
 
     def process(self, blob):
+        """Analyse the trigger flags for an incoming event"""
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
             return blob
         sys.stdout.write('.')
@@ -118,11 +121,13 @@ class TriggerRate(kp.Module):
         return blob
 
     def _log_run_change(self):
+        """Keep track of a run change"""
         self.print("New run: %s" % self.current_run_id)
         now = datetime.utcnow()
         self.run_changes.append((now, self.current_run_id))
 
     def _get_run_changes_to_plot(self):
+        """Retrieve all run numbers to be plotted on the trigger rate plot"""
         self.print("Checking run changes out of range")
         overall_rates = self.trigger_rates['Overall']
         if not overall_rates:
@@ -139,6 +144,7 @@ class TriggerRate(kp.Module):
         return run_changes_to_plot
 
     def plot(self):
+        """The plot loop, calling the plotter every `self.interval` seconds."""
         while self.run:
             time.sleep(self.interval)
             timestamp, trigger_rates = self.calculate_trigger_rates()
@@ -146,6 +152,7 @@ class TriggerRate(kp.Module):
             self.create_plot()
 
     def write_trigger_rates(self, timestamp, trigger_rates):
+        """Write the trigger rate information to the CSV file"""
         entry = f"{timestamp}"
         for trigger_type in self._trigger_types:
             try:
@@ -158,6 +165,7 @@ class TriggerRate(kp.Module):
         self.trigger_rates_fobj.flush()
 
     def calculate_trigger_rates(self):
+        """Calculate the trigger rates from the event trigger parameters"""
         timestamp = datetime.utcnow()
         trigger_rates = {}
         with self.lock:
@@ -169,6 +177,7 @@ class TriggerRate(kp.Module):
         return timestamp.timestamp(), trigger_rates
 
     def create_plot(self):
+        """Create the trigger rate plot"""
         print('\n' + self.__class__.__name__ + ": updating plot.")
 
         fig, ax = plt.subplots(figsize=(16, 4))
@@ -234,6 +243,7 @@ class TriggerRate(kp.Module):
         print("Plot updated at '{}'.".format(filename))
 
     def trigger_rate_sampling_period(self):
+        """This is obsolete and will be removed"""
         try:
             return int(Config().get("Monitoring",
                                     "trigger_rate_sampling_period"))
