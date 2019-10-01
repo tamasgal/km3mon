@@ -43,6 +43,27 @@ import km3pipe.style
 VERSION = "1.0"
 km3pipe.style.use('km3pipe')
 
+## CHANGES for the mail alert ###############################
+import smtplib
+
+try:
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    # ...send emails
+except:
+    print('Something went wrong...')
+
+gmail_user = 'km3shifter@gmail.com'
+gmail_password = #PASSWORD.....
+
+try:
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.ehlo()
+    server.login(gmail_user, gmail_password)
+except:
+    print('Something went wrong...')
+#############################################################
 
 class TriggerRate(kp.Module):
     """Trigger rate plotter"""
@@ -159,6 +180,23 @@ class TriggerRate(kp.Module):
                 trigger_rate = trigger_rates[trigger_type]
             except KeyError:
                 trigger_rate = 0
+                ## CHANGES for the mail alert ###############################
+                sent_from = 'km3shifter@gmail.com'
+                to = ['km3shifter@gmail.com']
+                subject = 'ALERT: trigger rate'
+                email_body = "the trigger is 0"
+                email_text = "Subject:"+subject+"\n"+email_body
+                try:
+                    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                    server.ehlo()
+                    server.login(gmail_user, gmail_password)
+                    server.sendmail(sent_from, to, email_text)
+                    server.close()
+                    print('Email sent!')
+                except:
+                    print('Something went wrong...')
+                ############################################################# 
+
             entry += f",{trigger_rate}"
         entry += '\n'
         self.trigger_rates_fobj.write(entry)
