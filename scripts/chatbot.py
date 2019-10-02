@@ -15,6 +15,7 @@ Options:
 """
 import re
 import toml
+from rocketchat_API.rocketchat import RocketChat
 from RocketChatBot import RocketChatBot
 
 URL = "https://chat.km3net.de"
@@ -24,6 +25,19 @@ with open(CONFIG, 'r') as fobj:
     config = toml.load(fobj)
     BOTNAME = config['Alerts']['botname']
     PASSWORD = config['Alerts']['password']
+    CHANNEL = config['Alerts']['channel']
+
+
+def get_channel_id(channel):
+    rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
+
+    channels = rocket.channels_list().json()['channels']
+    for c in channels:
+        if c['name'] == channel:
+            return c['_id']
+
+
+CHANNEL_ID = get_channel_id(CHANNEL)
 
 
 def run():
@@ -38,12 +52,21 @@ def spawn_bot():
 
 def register_handlers(bot):
     def greet(msg, user, channel_id):
+        if channel_id != CHANNEL_ID:
+            print("skipping")
+            return
         bot.send_message('hello @' + user, channel_id)
 
     def status(msg, user, channel_id):
+        if channel_id != CHANNEL_ID:
+            print("skipping")
+            return
         bot.send_message('erm... smooth datataking... for sure', channel_id)
 
     def shifters(msg, user, channel_id):
+        if channel_id != CHANNEL_ID:
+            print("skipping")
+            return
         try:
             with open(CONFIG, 'r') as fobj:
                 config = toml.load(fobj)
@@ -59,6 +82,9 @@ def register_handlers(bot):
                              channel_id)
 
     def help(msg, user, channel_id):
+        if channel_id != CHANNEL_ID:
+            print("skipping", channel_id)
+            return
         help_str = f"""
         Hi @{user} I was built to take care of the monitoring alerst.
         Here is how you can use me:

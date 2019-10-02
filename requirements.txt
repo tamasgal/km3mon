@@ -3,4 +3,5 @@ flask
 frozen-flask
 gunicorn
 supervisor
+rocketchat_API
 RocketChatAPIBot
