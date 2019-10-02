@@ -70,13 +70,13 @@ def register_handlers(bot):
         try:
             with open(CONFIG, 'r') as fobj:
                 config = toml.load(fobj)
-            shifters = msg.split("shifters are ")[1].strip()
+            shifters = msg[3:].strip()
             config['Alerts']['shifters'] = shifters
             with open(CONFIG, 'w') as fobj:
                 toml.dump(config, fobj)
-            bot.send_message(
-                f'Alright, the new shifters are {shifters}, welcome!',
-                channel_id)
+            msg = f'Alright, the new shifters are {shifters}, welcome!'
+            print(msg)
+            bot.send_message(msg, channel_id)
         except Exception as e:
             bot.send_message(f'something went horribly wrong... {e}',
                              channel_id)
