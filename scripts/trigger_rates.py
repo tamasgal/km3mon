@@ -224,6 +224,7 @@ class TriggerRate(kp.Module):
         ax.set_ylabel("trigger rate [Hz]")
         ax.xaxis.set_major_formatter(self.styles["xfmt"])
         ax.grid(True, which='minor')
+        ax.tick_params(labelright=True)
         if self.with_minor_ticks:
             ax.minorticks_on()
         plt.legend()
