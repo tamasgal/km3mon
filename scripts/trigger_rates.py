@@ -22,6 +22,7 @@ from __future__ import division, print_function
 from datetime import datetime
 from collections import defaultdict, deque, OrderedDict
 from itertools import chain
+from functools import partial
 import sys
 from io import BytesIO
 from os.path import join, exists
@@ -53,6 +54,9 @@ class TriggerRate(kp.Module):
                                  default=self.trigger_rate_sampling_period())
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
+
+        self.sendmail = kp.time.Cuckoo(
+            15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
 
         print("Update interval: {}s".format(self.interval))
         self.trigger_counts = defaultdict(int)
@@ -159,6 +163,8 @@ class TriggerRate(kp.Module):
                 trigger_rate = trigger_rates[trigger_type]
             except KeyError:
                 trigger_rate = 0
+            if trigger_rate == 0:
+                self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
             entry += f",{trigger_rate}"
         entry += '\n'
         self.trigger_rates_fobj.write(entry)
