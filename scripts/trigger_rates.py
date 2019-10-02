@@ -80,8 +80,6 @@ class TriggerRate(kp.Module):
             15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
         self.sendchatalert = kp.time.Cuckoo(30 * 60, sendchatalert)
 
-        self.sendchatalert("Trigger rate bot is now ready to spam.")
-
         print("Update interval: {}s".format(self.interval))
         self.trigger_counts = defaultdict(int)
         self.trigger_rates = OrderedDict()
@@ -258,7 +256,7 @@ class TriggerRate(kp.Module):
 
         filename = join(self.plots_path, self.filename + '_lin.png')
         filename_tmp = join(self.plots_path, self.filename + '_lin_tmp.png')
-        plt.savefig(filename_tmp, dpi=120, bbox_inches="tight")
+        fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
         shutil.move(filename_tmp, filename)
 
         try:
@@ -268,7 +266,7 @@ class TriggerRate(kp.Module):
 
         filename = join(self.plots_path, self.filename + '.png')
         filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
-        plt.savefig(filename_tmp, dpi=120, bbox_inches="tight")
+        fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
         shutil.move(filename_tmp, filename)
 
         plt.close('all')
