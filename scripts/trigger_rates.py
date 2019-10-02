@@ -243,7 +243,6 @@ class TriggerRate(kp.Module):
         ax.set_title("Trigger Rates for DetID-{0}\n{1} UTC".format(
             self.det_id,
             datetime.utcnow().strftime("%c")))
-        ax.set_xlabel("time")
         ax.set_ylabel("trigger rate [Hz]")
         ax.xaxis.set_major_formatter(self.styles["xfmt"])
         ax.grid(True, which='minor')
