@@ -263,6 +263,7 @@ class TriggerRate(kp.Module):
             ax.set_yscale('log')
         except ValueError:
             pass
+        ax.tick_params(labelright=True)
 
         filename = join(self.plots_path, self.filename + '.png')
         filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
