@@ -209,7 +209,7 @@ class TriggerRate(kp.Module):
         """Create the trigger rate plot"""
         print('\n' + self.__class__.__name__ + ": updating plot.")
 
-        fig, ax = plt.subplots(figsize=(16, 4))
+        fig, ax = plt.subplots(figsize=(16, 3))
 
         for trigger, rates in self.trigger_rates.items():
             if not rates:
