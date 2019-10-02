@@ -246,6 +246,10 @@ class TriggerRate(kp.Module):
         ax.set_ylabel("trigger rate [Hz]")
         ax.xaxis.set_major_formatter(self.styles["xfmt"])
         ax.grid(True, which='minor')
+        try:
+            ax.set_yscale('log')
+        except ValueError:
+            pass
         ax.tick_params(labelright=True)
         if self.with_minor_ticks:
             ax.minorticks_on()
@@ -253,18 +257,15 @@ class TriggerRate(kp.Module):
 
         # fig.tight_layout()
 
-        filename = join(self.plots_path, self.filename + '_lin.png')
-        filename_tmp = join(self.plots_path, self.filename + '_lin_tmp.png')
+        filename = join(self.plots_path, self.filename + '.png')
+        filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
         fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
         shutil.move(filename_tmp, filename)
 
-        try:
-            ax.set_yscale('log')
-        except ValueError:
-            pass
+        ax.set_yscale("linear")
 
-        filename = join(self.plots_path, self.filename + '.png')
-        filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
+        filename = join(self.plots_path, self.filename + '_lin.png')
+        filename_tmp = join(self.plots_path, self.filename + '_lin_tmp.png')
         fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
         shutil.move(filename_tmp, filename)
 
