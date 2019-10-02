@@ -35,6 +35,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
+import toml
+
+from rocketchat_API.rocketchat import RocketChat
+
 import km3pipe as kp
 from km3pipe.config import Config
 from km3pipe.io.daq import (DAQPreamble, DAQEvent, is_3dshower, is_3dmuon,
@@ -43,6 +47,23 @@ import km3pipe.style
 
 VERSION = "1.0"
 km3pipe.style.use('km3pipe')
+
+URL = "https://chat.km3net.de"
+CONFIG = "pipeline.toml"
+
+with open(CONFIG, 'r') as fobj:
+    config = toml.load(fobj)
+    BOTNAME = config['Alerts']['botname']
+    PASSWORD = config['Alerts']['password']
+    CHANNEL = config['Alerts']['channel']
+
+rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
+
+
+def sendchatalert(msg):
+    with open(CONFIG, 'r') as fobj:
+        shifters = toml.load(fobj)['Alerts'].get('shifters', "shifters")
+    rocket.chat_post_message(shifters + ": " + msg, channel=CHANNEL)
 
 
 class TriggerRate(kp.Module):
@@ -57,6 +78,9 @@ class TriggerRate(kp.Module):
 
         self.sendmail = kp.time.Cuckoo(
             15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
+        self.sendchatalert = kp.time.Cuckoo(30 * 60, sendchatalert)
+
+        self.sendchatalert("Trigger rate bot is now ready to spam.")
 
         print("Update interval: {}s".format(self.interval))
         self.trigger_counts = defaultdict(int)
@@ -165,6 +189,7 @@ class TriggerRate(kp.Module):
                 trigger_rate = 0
             if trigger_rate == 0:
                 self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
+                self.sendchatalert("Trigger rate is 0Hz!")
             entry += f",{trigger_rate}"
         entry += '\n'
         self.trigger_rates_fobj.write(entry)
