@@ -70,7 +70,7 @@ def register_handlers(bot):
         try:
             with open(CONFIG, 'r') as fobj:
                 config = toml.load(fobj)
-            shifters = msg.split("shifters are now ")[1].strip()
+            shifters = msg.split("shifters are ")[1].strip()
             config['Alerts']['shifters'] = shifters
             with open(CONFIG, 'w') as fobj:
                 toml.dump(config, fobj)
@@ -88,7 +88,7 @@ def register_handlers(bot):
         help_str = f"""
         Hi @{user} I was built to take care of the monitoring alerst.
         Here is how you can use me:
-        - `@{BOTNAME} shifters are now cnorris and bspencer`
+        - `@{BOTNAME} shifters are cnorris and bspencer`
           -> set the new shifters who I may annoy with chat messages and
           emails.
         - `@{BOTNAME} status` -> show some status
