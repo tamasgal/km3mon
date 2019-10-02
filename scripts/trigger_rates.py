@@ -252,7 +252,7 @@ class TriggerRate(kp.Module):
             ax.minorticks_on()
         plt.legend()
 
-        fig.tight_layout()
+        # fig.tight_layout()
 
         filename = join(self.plots_path, self.filename + '_lin.png')
         filename_tmp = join(self.plots_path, self.filename + '_lin_tmp.png')
@@ -263,7 +263,6 @@ class TriggerRate(kp.Module):
             ax.set_yscale('log')
         except ValueError:
             pass
-        ax.tick_params(labelright=True)
 
         filename = join(self.plots_path, self.filename + '.png')
         filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
