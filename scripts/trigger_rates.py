@@ -209,7 +209,7 @@ class TriggerRate(kp.Module):
         """Create the trigger rate plot"""
         print('\n' + self.__class__.__name__ + ": updating plot.")
 
-        fig, ax = plt.subplots(figsize=(16, 3))
+        fig, ax = plt.subplots(figsize=(16, 4))
 
         for trigger, rates in self.trigger_rates.items():
             if not rates:
@@ -246,26 +246,25 @@ class TriggerRate(kp.Module):
         ax.set_ylabel("trigger rate [Hz]")
         ax.xaxis.set_major_formatter(self.styles["xfmt"])
         ax.grid(True, which='minor')
-        try:
-            ax.set_yscale('log')
-        except ValueError:
-            pass
-        ax.tick_params(labelright=True)
+        ax.tick_params(labelright=True, which="both")
         if self.with_minor_ticks:
             ax.minorticks_on()
         plt.legend()
 
-        # fig.tight_layout()
-
-        filename = join(self.plots_path, self.filename + '.png')
-        filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
-        fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
-        shutil.move(filename_tmp, filename)
-
-        ax.set_yscale("linear")
+        fig.tight_layout()
 
         filename = join(self.plots_path, self.filename + '_lin.png')
         filename_tmp = join(self.plots_path, self.filename + '_lin_tmp.png')
+        fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
+        shutil.move(filename_tmp, filename)
+
+        try:
+            ax.set_yscale('log')
+        except ValueError:
+            pass
+
+        filename = join(self.plots_path, self.filename + '.png')
+        filename_tmp = join(self.plots_path, self.filename + '_tmp.png')
         fig.savefig(filename_tmp, dpi=120, bbox_inches="tight")
         shutil.move(filename_tmp, filename)
 
