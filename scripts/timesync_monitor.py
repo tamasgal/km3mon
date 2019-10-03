@@ -35,7 +35,7 @@ class TimeSyncChecker(kp.Module):
         date = datetime.datetime.utcnow().strftime("%c")
         msg = f"ALERT (MONITORING) {date}: {msg}"
         print(msg)
-        self.ch_client.put_message("MSG", "Monitoring Test")
+        self.ch_client.put_message("MSG", msg)
 
     def process(self, blob):
         dom_ids_invalid = []
