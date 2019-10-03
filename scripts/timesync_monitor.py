@@ -38,14 +38,18 @@ class TimeSyncChecker(kp.Module):
         self.ch_client.put_message("MSG", "Monitoring Test")
 
     def process(self, blob):
-        dom_ids = []
+        dom_ids_invalid = []
+        dom_ids_valid = []
         for dom_id, frameinfo in blob['TimesliceFrameInfos'].items():
             valid_time_sync = bool(frameinfo.dom_status[0] & (1 << (32 - 1)))
             if not valid_time_sync:
-                dom_ids.append(dom_id)
-        if dom_ids:
-            self.alert("invalid time sync for DOM ID: {}".format(','.join(
-                map(str, dom_ids))))
+                dom_ids_invalid.append(dom_id)
+            else:
+                dom_ids_valid.append(dom_id)
+        if dom_ids_invalid:
+            self.alert("invalid time sync for DOM ID: {} /// valid: {}".format(
+                ','.join(map(str, dom_ids_invalid)),
+                ','.join(map(str, dom_ids_valid))))
         return blob
 
     def finish(self):
