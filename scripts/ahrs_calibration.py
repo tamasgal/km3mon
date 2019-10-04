@@ -23,6 +23,7 @@ from collections import deque, defaultdict
 from functools import partial
 import io
 import os
+import time
 import threading
 
 import numpy as np
@@ -109,6 +110,9 @@ class CalibrateAHRS(kp.Module):
         print(self.__class__.__name__ + ": updating plot.")
         # xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
         xfmt = md.DateFormatter('%H:%M')
+        xlim = (datetime.utcfromtimestamp(time.time() -
+                                          self.time_range * 60 * 60),
+                datetime.utcnow())
         for du in self.dus:
             data = self.data[du]
             for ahrs_param in data.keys():
@@ -126,6 +130,7 @@ class CalibrateAHRS(kp.Module):
                                 marker='.',
                                 linestyle='none',
                                 label="Floor {}".format(floor))
+                ax.set_xlim(xlim)
                 lgd = plt.legend(bbox_to_anchor=(1.005, 1),
                                  loc=2,
                                  borderaxespad=0.)
