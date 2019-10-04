@@ -90,7 +90,7 @@ class PMTRates(kp.Module):
 
     def add_column(self):
         m_rates = np.roll(self.rates_matrix, -1, 1)
-        m_hrv = np.roll(self.rates_matrix, -1, 1)
+        m_hrv = np.roll(self.hrv_matrix, -1, 1)
         y_range = 18 * 31
         mean_rates = np.full(y_range, np.nan)
         hrv = np.full(y_range, np.nan)
