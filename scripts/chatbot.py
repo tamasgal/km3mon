@@ -14,6 +14,7 @@ Options:
 
 """
 import re
+import subprocess
 import toml
 from rocketchat_API.rocketchat import RocketChat
 from RocketChatBot import RocketChatBot
@@ -61,7 +62,8 @@ def register_handlers(bot):
         if channel_id != CHANNEL_ID:
             print("skipping")
             return
-        bot.send_message('erm... smooth datataking... for sure', channel_id)
+        status = subprocess.check_output(['supervisorctl', 'status'])
+        bot.send_message(status, channel_id)
 
     def shifters(msg, user, channel_id):
         if channel_id != CHANNEL_ID:
