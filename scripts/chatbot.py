@@ -76,7 +76,8 @@ def register_handlers(bot):
             return
         if not is_shifter(user):
             bot.send_message(
-                "Only shifters are allowed to mess with me, sorry...")
+                "Only shifters are allowed to mess with me, sorry...",
+                channel_id)
             return
         status = subprocess.check_output(['supervisorctl', 'status'])
         bot.send_message(status, channel_id)
@@ -86,7 +87,8 @@ def register_handlers(bot):
             print("skipping")
             return
         if not is_operator(user):
-            bot.send_message("Only operators are allowed to set shifters!")
+            bot.send_message("Only operators are allowed to set shifters!",
+                             channel_id)
             return
         try:
             with open(CONFIG, 'r') as fobj:
