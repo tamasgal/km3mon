@@ -55,10 +55,13 @@ class PMTRates(kp.Module):
                                  default=f"pmt_rates_du{self.du}.png")
         self.lowest_rate = self.get("lowest_rate", default=5000)
         self.highest_rate = self.get("highest_rate", default=15000)
+        self.hrv_ratio_threshold = self.get("rv_ratio_threshold", default=0.95)
         self.max_x = 800
         self.index = 0
         self.rates = defaultdict(list)
         self.rates_matrix = np.full((18 * 31, self.max_x), np.nan)
+        self.hrv = defaultdict(list)
+        self.hrv_matrix = np.full((18 * 31, self.max_x), np.nan)
         self.lock = threading.Lock()
         self.thread = threading.Thread(target=self.run, args=())
         self.thread.daemon = True
@@ -73,6 +76,7 @@ class PMTRates(kp.Module):
             self.update_plot()
             with self.lock:
                 self.rates = defaultdict(list)
+                self.hrv = defaultdict(list)
             delta_t = (datetime.now() - now).total_seconds()
             remaining_t = self.interval - delta_t
             log.info("Delta t: {} -> waiting for {}s".format(
@@ -85,16 +89,22 @@ class PMTRates(kp.Module):
                 interval = remaining_t
 
     def add_column(self):
-        m = np.roll(self.rates_matrix, -1, 1)
+        m_rates = np.roll(self.rates_matrix, -1, 1)
+        m_hrv = np.roll(self.rates_matrix, -1, 1)
         y_range = 18 * 31
         mean_rates = np.full(y_range, np.nan)
+        hrv = np.full(y_range, np.nan)
         for i in range(y_range):
-            if i not in self.rates:
-                continue
-            mean_rates[i] = np.mean(self.rates[i])
+            if i in self.rates:
+                mean_rates[i] = np.mean(self.rates[i])
+            if i in self.hrv:
+                if np.mean(self.hrv[i]) > self.hrv_ratio_threshold:
+                    hrv[i] = 1.0
 
-        m[:, self.max_x - 1] = mean_rates
-        self.rates_matrix = m
+        m_rates[:, self.max_x - 1] = mean_rates
+        self.rates_matrix = m_rates
+        m_hrv[:, self.max_x - 1] = mean_rates
+        self.hrv_matrix = m_hrv
 
     def update_plot(self):
         filename = os.path.join(self.plot_path, self.filename)
@@ -106,18 +116,25 @@ class PMTRates(kp.Module):
         def xlabel_func(timestamp):
             return datetime.utcfromtimestamp(timestamp).strftime("%H:%M")
 
-        m = self.rates_matrix
         norm = mcolors.Normalize(vmin=self.lowest_rate,
                                  vmax=self.highest_rate,
                                  clip=True)
         fig, ax = plt.subplots(figsize=(10, 8))
-        ax.imshow(m, origin='lower', interpolation='none', norm=norm)
-        ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
-                     "- colours from {:.1f}kHz to {:.1f}kHz\n"
-                     "PMTs ordered from top to bottom - {}".format(
-                         self.detector.det_id, self.du,
-                         self.lowest_rate / 1000, self.highest_rate / 1000,
-                         datetime.utcnow()))
+        ax.imshow(self.rates_matrix,
+                  origin='lower',
+                  interpolation='none',
+                  norm=norm)
+        ax.imshow(self.hrv_matrix,
+                  origin='lower',
+                  interpolation='none',
+                  cmap="bwr_r")
+        ax.set_title(
+            "Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
+            "- colours from {:.1f}kHz to {:.1f}kHz (HRV ratio threshold {})\n"
+            "PMTs ordered from top to bottom - {}".format(
+                self.detector.det_id, self.du, self.lowest_rate / 1000,
+                self.highest_rate / 1000, self.hrv_ratio_threshold,
+                datetime.utcnow()))
         ax.set_xlabel("UTC time [{}s/px]".format(interval))
         plt.yticks([i * 31 for i in range(18)],
                    ["Floor {}".format(f) for f in range(1, 19)])
