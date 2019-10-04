@@ -3,10 +3,10 @@
         "ALERT": "color: #ed1c66;",
         "ERROR": "color: #CC0C28;",
         "STATUS": "color: #2F76CC;",
-        "DataFilter": "background-color: #138799; color: #ffffff",
-        "AcousticDataFilter": "background-color: #a87332; color: #ffffff",
-        "DataWriter": "background-color: #FFBE05; color: #000000",
-        "DataQueue": "background-color: #674591; color=: #ffffff"
+        "[DataFilter]": "background-color: #138799; color: #ffffff",
+        "[AcousticDataFilter]": "background-color: #a87332; color: #ffffff",
+        "[DataWriter]": "background-color: #FFBE05; color: #000000",
+        "[DataQueue]": "background-color: #674591; color=: #ffffff"
     },
     "lines": {
         "ERROR": "font-weight: bold;"
