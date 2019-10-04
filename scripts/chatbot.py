@@ -126,14 +126,16 @@ def register_handlers(bot):
         - `@{BOTNAME} shifters are cnorris and bspencer`
           -> set the new shifters who I may annoy with chat messages and
           emails.
-        - `@{BOTNAME} status` -> show some status
+        - `@{BOTNAME} status` -> show the status of the monitoring system
+        - `@{BOTNAME} supervisorctl` -> take control over the monitoring system
         - `@{BOTNAME} help` -> show this message
         """
 
         bot.send_message(help_str, channel_id)
 
     handlers = [(['hello', 'hey', 'hi', 'ciao'], greet), (['status'], status),
-                (['help'], help), (['shifters'], shifters)]
+                (['help'], help), (['shifters'], shifters),
+                (['supervisorctl'], supervisorctl)]
     for trigger, handler in handlers:
         bot.add_dm_handler(trigger, handler)
 
