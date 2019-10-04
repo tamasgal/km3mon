@@ -108,6 +108,7 @@ class PMTRates(kp.Module):
         m = self.rates_matrix
         m[m > self.highest_rate] = self.highest_rate
         m[m < self.lowest_rate] = self.lowest_rate
+        m = m / self.highest_rate
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(m, origin='lower', interpolation='none')
         ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
