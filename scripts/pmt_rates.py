@@ -170,10 +170,13 @@ class PMTRates(kp.Module):
         if np.random.rand() > 0.90:
             print(f"Rates for DOM ID {dom_id} DU {du}: {tmch_data.pmt_rates}")
 
-        for channel_id, rate in enumerate(tmch_data.pmt_rates):
+        hrv_flags = reversed("{0:b}".format(tmch_data.hrvbmp).zfill(32))
+        for channel_id, (rate, hrv_flag) in enumerate(
+                zip(tmch_data.pmt_rates, hrv_flags)):
             idx = y_base + kp.hardware.ORDERED_PMT_IDS[channel_id]
             with self.lock:
                 self.rates[idx].append(rate)
+                self.hrv[idx].append(int(hrv_flag))
 
         return blob
 
