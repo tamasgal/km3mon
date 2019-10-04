@@ -32,6 +32,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 import seaborn as sns
 
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
 import km3pipe as kp
 from km3pipe.io.daq import TMCHData
 from km3modules.ahrs import fit_ahrs, get_latest_ahrs_calibration
@@ -43,6 +46,7 @@ class CalibrateAHRS(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
+        self.time_range = self.get('time_range', default=24 * 3)  # hours
         self.detector = kp.hardware.Detector(det_id=det_id)
         self.dus = set()
 
@@ -52,7 +56,7 @@ class CalibrateAHRS(kp.Module):
         self.cuckoo_log = kp.time.Cuckoo(10, print)
 
         self.data = {}
-        self.queue_size = 50000
+        self.queue_size = 100000
 
         self.lock = threading.Lock()
         self.index = 0
