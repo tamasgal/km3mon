@@ -57,7 +57,7 @@ class CalibrateAHRS(kp.Module):
         self.cuckoo_log = kp.time.Cuckoo(10, print)
 
         self.data = {}
-        self.queue_size = 100000
+        self.queue_size = 5000
 
         self.lock = threading.Lock()
         self.index = 0
@@ -108,8 +108,10 @@ class CalibrateAHRS(kp.Module):
 
     def create_plot(self):
         print(self.__class__.__name__ + ": updating plot.")
-        # xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
-        xfmt = md.DateFormatter('%H:%M')
+        if self.time_range > 24:
+            xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
+        else:
+            xfmt = md.DateFormatter('%H:%M')
         xlim = (datetime.utcfromtimestamp(time.time() -
                                           self.time_range * 60 * 60),
                 datetime.utcnow())
