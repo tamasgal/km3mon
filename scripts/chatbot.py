@@ -98,7 +98,8 @@ def register_handlers(bot):
                 stderr=subprocess.STDOUT).decode('ascii')
         except subprocess.CalledProcessError as e:
             output = e.output.decode('ascii')
-        print("supervisorctl output, called by {}:\n{}".format(user, output))
+        print("supervisorctl ({}), called by {}:\n{}".format(
+            msg, user, output))
         bot.send_message(output, channel_id)
 
     def shifters(msg, user, channel_id):
