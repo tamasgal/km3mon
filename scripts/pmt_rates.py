@@ -167,7 +167,7 @@ class PMTRates(kp.Module):
 
         y_base = (floor - 1) * 31
 
-        if np.random.rand() > 0.90:
+        if np.random.rand() > 0.99:
             print(f"Rates for DOM ID {dom_id} DU {du}: {tmch_data.pmt_rates}")
 
         hrv_flags = reversed("{0:b}".format(tmch_data.hrvbmp).zfill(32))
