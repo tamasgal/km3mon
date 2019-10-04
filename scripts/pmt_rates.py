@@ -110,7 +110,7 @@ class PMTRates(kp.Module):
         m[m < self.lowest_rate] = self.lowest_rate
         m = m / self.highest_rate
         fig, ax = plt.subplots(figsize=(10, 8))
-        ax.imshow(m, origin='lower', interpolation='none')
+        ax.imshow(m, origin='lower', interpolation='none', norm=False)
         ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
                      "- colours from {:.1f}kHz to {:.1f}kHz\n"
                      "PMTs ordered from top to bottom - {}".format(
