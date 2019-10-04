@@ -74,10 +74,10 @@ def register_handlers(bot):
         if channel_id != CHANNEL_ID:
             print("skipping")
             return
-        if not is_shifter(user):
+        if not is_shifter(user) and not is_operator():
             bot.send_message(
-                "Only shifters are allowed to mess with me, sorry...",
-                channel_id)
+                "Only operators and shifters are allowed to mess "
+                "with me, sorry...", channel_id)
             return
         status = subprocess.check_output(['supervisorctl', 'status'])
         bot.send_message(status, channel_id)
