@@ -57,7 +57,7 @@ class CalibrateAHRS(kp.Module):
         self.cuckoo_log = kp.time.Cuckoo(10, print)
 
         self.data = {}
-        self.queue_size = 100000
+        self.queue_size = 5000
 
         self.lock = threading.Lock()
         self.index = 0
