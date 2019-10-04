@@ -13,15 +13,15 @@ USERNAME = None
 PASSWORD = None
 app.config['FREEZER_DESTINATION'] = '../km3web'
 
-PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', 'pmt_hrv_du*',
-         ['trigger_rates'], ['ztplot', 'triggermap']]
+PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', ['trigger_rates'],
+         ['ztplot', 'triggermap']]
 
 AHRS_PLOTS = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
 RECO_PLOTS = [['track_reco', 'ztplot_roy'], ['time_residuals']]
-COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates', 'pmt_hrv'],
+COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates'],
                  ['trigger_rates', 'trigger_rates_lin'],
                  ['ztplot', 'ztplot_roy', 'triggermap']]
 SN_PLOTS = [['sn_bg_histogram', 'sn_pk_history']]
