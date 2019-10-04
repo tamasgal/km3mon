@@ -84,6 +84,9 @@ def register_handlers(bot):
         bot.send_message(status, channel_id)
 
     def supervisorctl(msg, user, channel_id):
+        if channel_id != CHANNEL_ID:
+            print("skipping")
+            return
         if not is_shifter(user) and not is_operator(user):
             bot.send_message(
                 "Sorry @{}, only operators and shifters are allowed to mess "
