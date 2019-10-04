@@ -51,6 +51,18 @@ def spawn_bot():
     return RocketChatBot(BOTNAME, PASSWORD, URL)
 
 
+def is_shifter(user):
+    with open(CONFIG, 'r') as fobj:
+        config = toml.load(fobj)
+        return user in config['Alerts']['shifters']
+
+
+def is_operator(user):
+    with open(CONFIG, 'r') as fobj:
+        config = toml.load(fobj)
+        return user in config['Alerts']['operators']
+
+
 def register_handlers(bot):
     def greet(msg, user, channel_id):
         if channel_id != CHANNEL_ID:
@@ -62,12 +74,19 @@ def register_handlers(bot):
         if channel_id != CHANNEL_ID:
             print("skipping")
             return
+        if not is_shifter(user):
+            bot.send_message(
+                "Only shifters are allowed to mess with me, sorry...")
+            return
         status = subprocess.check_output(['supervisorctl', 'status'])
         bot.send_message(status, channel_id)
 
     def shifters(msg, user, channel_id):
         if channel_id != CHANNEL_ID:
             print("skipping")
+            return
+        if not is_operator(user):
+            bot.send_message("Only operators are allowed to set shifters!")
             return
         try:
             with open(CONFIG, 'r') as fobj:
@@ -88,7 +107,7 @@ def register_handlers(bot):
             print("skipping", channel_id)
             return
         help_str = f"""
-        Hi @{user} I was built to take care of the monitoring alerst.
+        Hi @{user} I was built to take care of the monitoring alerts.
         Here is how you can use me:
         - `@{BOTNAME} shifters are cnorris and bspencer`
           -> set the new shifters who I may annoy with chat messages and
