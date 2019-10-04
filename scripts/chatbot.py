@@ -93,8 +93,9 @@ def register_handlers(bot):
                 "with me, sorry...".format(user), channel_id)
             return
         try:
-            output = subprocess.check_output(['supervisorctl'] +
-                                             msg.split()).decode('ascii')
+            output = subprocess.check_output(
+                ['supervisorctl'] + msg.split(),
+                stderr=subprocess.STDOUT).decode('ascii')
         except subprocess.CalledProcessError as e:
             output = e.output.decode('ascii')
         bot.send_message(output, channel_id)
