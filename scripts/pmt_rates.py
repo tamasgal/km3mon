@@ -103,7 +103,7 @@ class PMTRates(kp.Module):
 
         m_rates[:, self.max_x - 1] = mean_rates
         self.rates_matrix = m_rates
-        m_hrv[:, self.max_x - 1] = mean_rates
+        m_hrv[:, self.max_x - 1] = hrv
         self.hrv_matrix = m_hrv
 
     def update_plot(self):
