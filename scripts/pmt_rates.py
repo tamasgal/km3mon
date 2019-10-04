@@ -129,7 +129,7 @@ class PMTRates(kp.Module):
                   interpolation='none',
                   cmap="bwr_r")
         ax.set_title(
-            "Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
+            "Mean PMT Rates for DetID-{} DU-{} "
             "- colours from {:.1f}kHz to {:.1f}kHz (HRV ratio threshold {})\n"
             "PMTs ordered from top to bottom - {}".format(
                 self.detector.det_id, self.du, self.lowest_rate / 1000,
