@@ -108,7 +108,10 @@ class CalibrateAHRS(kp.Module):
 
     def create_plot(self):
         print(self.__class__.__name__ + ": updating plot.")
-        xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
+        if self.time_range > 24:
+            xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
+        else:
+            xfmt = md.DateFormatter('%H:%M')
         xlim = (datetime.utcfromtimestamp(time.time() -
                                           self.time_range * 60 * 60),
                 datetime.utcnow())
