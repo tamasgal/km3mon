@@ -13,10 +13,12 @@
         <div class="row">
             {% for plot in row %}
             <div class="col-md-{{ (12/(row|length))|int }} plot-container">
-                <img id="{{ plot }}"
-                     class="plot img-responsive"
-                     src="plots/{{ plot }}.png"
-                     alt="{{ plot }}"/>
+                <a href="plots/{{ plot }}.png">
+                    <img id="{{ plot }}"
+                         class="plot img-responsive"
+                         src="plots/{{ plot }}.png"
+                         alt="{{ plot }}"/>
+                </a>
             </div>
             {% endfor %}
         </div>
