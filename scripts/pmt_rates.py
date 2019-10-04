@@ -137,7 +137,8 @@ class PMTRates(kp.Module):
         dom_id = tmch_data.dom_id
 
         if dom_id not in self.detector.doms:
-            self.log.error(f"DOM ID {dom_id} not in detector definition!")
+            # it might be the "base CLB"
+            self.log.debug(f"DOM ID {dom_id} not in detector definition!")
             return blob
 
         du, floor, _ = self.detector.doms[dom_id]
