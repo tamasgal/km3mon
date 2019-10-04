@@ -74,7 +74,7 @@ def register_handlers(bot):
         if channel_id != CHANNEL_ID:
             print("skipping")
             return
-        if not is_shifter(user) and not is_operator():
+        if not is_shifter(user) and not is_operator(user):
             bot.send_message(
                 "Only operators and shifters are allowed to mess "
                 "with me, sorry...", channel_id)
