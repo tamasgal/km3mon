@@ -29,6 +29,7 @@ import time
 
 import numpy as np
 import matplotlib
+import matplotlib.colors as mcolors
 matplotlib.use('Agg')
 
 import km3pipe as kp
@@ -106,11 +107,11 @@ class PMTRates(kp.Module):
             return datetime.utcfromtimestamp(timestamp).strftime("%H:%M")
 
         m = self.rates_matrix
-        m[m > self.highest_rate] = self.highest_rate
-        m[m < self.lowest_rate] = self.lowest_rate
-        m = m / self.highest_rate
+        norm = mcolors.Normalize(vmin=self.lowest_rate,
+                                 vmax=self.highest_rate,
+                                 clip=True)
         fig, ax = plt.subplots(figsize=(10, 8))
-        ax.imshow(m, origin='lower', interpolation='none', norm=False)
+        ax.imshow(m, origin='lower', interpolation='none', norm=norm)
         ax.set_title("Mean PMT Rates (Monitoring Channel) for DetID-{} DU-{} "
                      "- colours from {:.1f}kHz to {:.1f}kHz\n"
                      "PMTs ordered from top to bottom - {}".format(
