@@ -13,7 +13,7 @@
         <div class="row">
             {% for plot in row %}
             <div class="col-md-{{ (12/(row|length))|int }} plot-container">
-                <a href="plots/{{ plot }}.png">
+                <a href="plot_{{ plot }}.html">
                     <img id="{{ plot }}"
                          class="plot img-responsive"
                          src="plots/{{ plot }}.png"

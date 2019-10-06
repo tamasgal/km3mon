@@ -102,6 +102,12 @@ def index():
     return render_template('plots.html', plots=expand_wildcards(PLOTS))
 
 
+@app.route('/plot_<plot>.html')
+@requires_auth
+def single_plot(plot):
+    return render_template('plot.html', plot=plot)
+
+
 @app.route('/ahrs.html')
 @requires_auth
 def ahrs():

@@ -33,3 +33,7 @@ img.plot {
 #logs a {
     margin: 5px;
 }
+
+#plot img {
+    margin: 0 auto
+}

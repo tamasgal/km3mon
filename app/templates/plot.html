@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+    <div class="container-fluid" id="plot">
+                <a href="plots/{{ plot }}.png">
+                    <img 
+                         class="img-responsive"
+                         src="plots/{{ plot }}.png"
+                         alt="{{ plot }}"/>
+                </a>
+    </div>
+
+    <script type = "text/javascript">
+        $(document).ready(function(){
+            setInterval(function(){
+                $("#plot").attr("src", "plots/{{ plot }}.png?"+new Date().getTime());
+            }, 45000);
+        });
+    </script>
+
+{% endblock %}
