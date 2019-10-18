@@ -55,7 +55,8 @@ class PMTRates(kp.Module):
                                  default=f"pmt_rates_du{self.du}.png")
         self.lowest_rate = self.get("lowest_rate", default=5000)
         self.highest_rate = self.get("highest_rate", default=15000)
-        self.hrv_ratio_threshold = self.get("rv_ratio_threshold", default=0.95)
+        self.hrv_ratio_threshold = self.get("hrv_ratio_threshold",
+                                            default=0.95)
         self.max_x = 800
         self.index = 0
         self.rates = defaultdict(list)
