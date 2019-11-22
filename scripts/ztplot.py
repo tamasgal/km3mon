@@ -33,6 +33,7 @@ import numpy as np
 
 import km3pipe as kp
 from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
+from km3modules.common import LocalDBService
 from km3modules.hits import count_multiplicities
 from km3modules.plot import ztplot
 import km3pipe.style
@@ -57,6 +58,17 @@ class ZTPlot(kp.Module):
         self.sds = kp.db.StreamDS()
 
         self.index = 0
+
+        if not self.services["LocalDBService"].table_exists("nice_events"):
+            self.services["LocalDBService"].create_table(
+                "nice_events", [
+                    "overlays", "n_hits", "n_triggered_hits", "n_dus",
+                    "filename", "run_id", "det_id", "frame_index",
+                    "trigger_counter", "utc_timestamp"
+                ], [
+                    "INT", "INT", "INT", "INT", "TEXT", "INT", "INT", "INT",
+                    "INT", "INT"
+                ])
 
         self._update_calibration()
 
@@ -87,10 +99,8 @@ class ZTPlot(kp.Module):
         n_triggered_dus = len(np.unique(hits[hits.triggered == True].du))
         n_triggered_doms = len(np.unique(hits[hits.triggered == True].dom_id))
         if n_triggered_dus < self.min_dus or n_triggered_doms < self.min_doms:
-            print(
-                f"Skipping event with {n_triggered_dus} DUs "
-                f"and {n_triggered_doms} DOMs."
-            )
+            print(f"Skipping event with {n_triggered_dus} DUs "
+                  f"and {n_triggered_doms} DOMs.")
             return blob
 
         print("OK")
@@ -120,9 +130,9 @@ class ZTPlot(kp.Module):
             & (self.calib.detector.pmts.channel_id == 0)]
 
         trigger_params = ' '.join([
-            trig for trig, trig_check in (("MX",
-                                           is_mxshower), ("3DM", is_3dmuon),
-                                          ("3DS", is_3dshower))
+            trig
+            for trig, trig_check in (("MX", is_mxshower), ("3DM", is_3dmuon),
+                                     ("3DS", is_3dshower))
             if trig_check(int(event_info.trigger_mask[0]))
         ])
 
@@ -133,17 +143,13 @@ class ZTPlot(kp.Module):
                 event_info.det_id[0], self.t0set, event_info.run_id[0],
                 event_info.frame_index[0], event_info.trigger_counter[0],
                 event_info.overlays[0], trigger_params,
-                datetime.utcfromtimestamp(event_info.utc_seconds)
-            )
-        )[0]
+                datetime.utcfromtimestamp(event_info.utc_seconds)))[0]
 
-        fig = ztplot(
-            hits,
-            title,
-            max_z=self.max_z,
-            ytick_distance=self.ytick_distance,
-            grid_lines=grid_lines
-        )
+        fig = ztplot(hits,
+                     title,
+                     max_z=self.max_z,
+                     ytick_distance=self.ytick_distance,
+                     grid_lines=grid_lines)
 
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')
@@ -168,14 +174,13 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(
-        kp.io.ch.CHPump,
-        host=ligier_ip,
-        port=ligier_port,
-        tags='IO_EVT, IO_SUM',
-        timeout=60 * 60 * 24 * 7,
-        max_queue=2000
-    )
+    pipe.attach(LocalDBService)
+    pipe.attach(kp.io.ch.CHPump,
+                host=ligier_ip,
+                port=ligier_port,
+                tags='IO_EVT, IO_SUM',
+                timeout=60 * 60 * 24 * 7,
+                max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(ZTPlot, det_id=det_id, plots_path=plots_path)
     pipe.drain()
