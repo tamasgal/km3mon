@@ -162,16 +162,19 @@ class ZTPlot(kp.Module):
             ax.set_title('DU{0}'.format(int(du)),
                          fontsize=fontsize,
                          fontweight='bold')
+
             # The only way I could create a legend with matching marker sizes
             max_multiplicity = int(np.max(du_hits.multiplicity))
+            markers = list(
+                range(0, max_multiplicity,
+                      np.ceil(max_multiplicity / 10).astype(int)))
             custom_markers = [
                 marker_axes.scatter(
                     [], [], s=mult * 30, color='#09A9DE', lw=0, alpha=0.5)
-                for mult in range(0, max_multiplicity)
+                for mult in markers
             ] + [marker_axes.scatter([], [], s=30, marker="+", c='#FF6363')]
             ax.legend(custom_markers, ['multiplicity'] +
-                      ["       %d" % m
-                       for m in range(1, max_multiplicity)] + ['triggered'],
+                      ["       %d" % m for m in markers[1:]] + ['triggered'],
                       scatterpoints=1,
                       markerscale=1,
                       loc='upper left',
