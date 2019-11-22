@@ -1,4 +1,4 @@
-km3pipe>=8.23.0
+km3pipe>=8.24.0
 flask
 frozen-flask
 gunicorn
