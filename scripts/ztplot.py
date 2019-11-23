@@ -154,13 +154,12 @@ class ZTPlot(kp.Module):
             if trig_check(int(trigger_mask))
         ])
 
-        title = (
-            "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
-            "TriggerCounter {4}, Overlays {5}, Trigger: {6}"
-            "\n{7} UTC".format(
-                det_id, self.t0set, run_id, frame_index, trigger_counter,
-                overlays, trigger_params,
-                datetime.utcfromtimestamp(event_info.utc_seconds)))[0]
+        title = "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, "  \
+                "FrameIndex {3}, TriggerCounter {4}, Overlays {5}, "  \
+                "Trigger: {6}\n{7} UTC".format(
+                    det_id, self.t0set, run_id, frame_index, trigger_counter,
+                    overlays, trigger_params,
+                    datetime.utcfromtimestamp(event_info.utc_seconds))
 
         fig = ztplot(hits,
                      title,
