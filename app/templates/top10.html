@@ -2,7 +2,7 @@
 
 {% block main %}
 
-    {% for category, plot_filenames in plots %}
+    {% for category, plot_filenames in plots.items() %}
         <h3>{{ category }}</h3>
         <div class="container-fluid">
             <div class="row">
