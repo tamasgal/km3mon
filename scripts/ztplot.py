@@ -179,12 +179,12 @@ class ZTPlot(kp.Module):
         f = os.path.join(self.plots_path, filename + '.png')
         f_tmp = os.path.join(self.plots_path, filename + '_tmp.png')
 
-        ztplot(hits,
-               filename=f_tmp,
-               title=title,
-               max_z=self.max_z,
-               ytick_distance=self.ytick_distance,
-               grid_lines=grid_lines)
+        fig = ztplot(hits,
+                     filename=f_tmp,
+                     title=title,
+                     max_z=self.max_z,
+                     ytick_distance=self.ytick_distance,
+                     grid_lines=grid_lines)
         shutil.move(f_tmp, f)
 
         if overlays > self.records['overlays'] or n_hits > self.records[
@@ -214,6 +214,9 @@ class ZTPlot(kp.Module):
                 run_id, det_id, frame_index, trigger_counter, utc_timestamp
             ])
             shutil.copy(f, plot_filename)
+
+        plt.close(fig)
+        plt.close('all')
 
     def finish(self):
         self.run = False
