@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+    {% for category, plot_filenames in plots %}
+        <h3>{{ category }}</h3>
+        <div class="container-fluid">
+            <div class="row">
+                {% for plot_filename in plot_filenames %}
+                <div class="col-md-12">
+                    <img class="plot img-responsive"
+                         src="{{ plot_filename }}"
+                         alt="{{ plot_filename }}"/>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

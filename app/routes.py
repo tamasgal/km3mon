@@ -6,6 +6,8 @@ import toml
 from flask import render_template, send_from_directory, request, Response
 from app import app
 
+from km3modules.common import LocalDBService
+
 CONFIG_PATH = "pipeline.toml"
 PLOTS_PATH = "../plots"
 LOGS_PATH = "../logs"
@@ -162,6 +164,26 @@ def rttc():
 @requires_auth
 def trigger():
     return render_template('plots.html', plots=expand_wildcards(TRIGGER_PLOTS))
+
+
+@app.route('/top10.html')
+@requires_auth
+def top10():
+    category_names = {
+        'n_hits': 'Number of hits',
+        'overlays': 'Number of overlays'
+    }
+    plots = {}
+    dbs = LocalDBService(filename="data/monitoring.sqlite3")
+    for category in ["overlays", "n_hits"]:
+        filenames = [
+            q[0]
+            for q in dbs.query("SELECT plot_filename FROM event_selection "
+                               "ORDER BY {} DESC LIMIT 10".format(category))
+        ]
+        if len(filenames) > 0:
+            plots[category_names[category]] = filenames
+    return render_template('top10.html', plots=plots)
 
 
 @app.route('/logs.html')
