@@ -54,6 +54,7 @@ class ZTPlot(kp.Module):
         self.calib = None
         self.max_z = None
         self.last_plot_time = 0
+        self.lower_limits = {}
 
         self.sds = kp.db.StreamDS()
 
@@ -69,36 +70,29 @@ class ZTPlot(kp.Module):
                 "INT", "INT", "INT", "INT", "TEXT", "INT", "INT", "INT", "INT",
                 "INT"
             ])
-        self.records = {}
-        max_overlays = self.services["query"](
-            "SELECT max(overlays) FROM {}".format(
-                self.event_selection_table))[0][0]
-        if max_overlays is None:
-            max_overlays = 0
-        max_n_hits = self.services["query"](
-            "SELECT max(n_hits) FROM {}".format(
-                self.event_selection_table))[0][0]
-        if max_n_hits is None:
-            max_n_hits = 0
-        max_n_triggered_hits = self.services["query"](
-            "SELECT max(n_triggered_hits) FROM {}".format(
-                self.event_selection_table))[0][0]
-        if max_n_triggered_hits is None:
-            max_n_triggered_hits = 0
-        self.records = {
-            'overlays': max_overlays,
-            'n_hits': max_n_hits,
-            'n_triggered_hits': max_n_triggered_hits
-        }
-        self.cprint("Current records: {}".format(self.records))
 
         self._update_calibration()
+        self._update_lower_limits()
 
         self.run = True
         self.max_queue = 300
         self.queue = queue.Queue()
         self.thread = threading.Thread(target=self.plot, daemon=True)
         self.thread.start()
+
+    def _update_lower_limits(self):
+        """Update the lower limits for the Top-10 candidate selection"""
+        n_candidates = 10
+        for category in ["overlays", "n_hits", "n_triggered_hits"]:
+            lower_limit = self.services["query"](
+                "SELECT {cat} FROM {tab} ORDER BY {cat} DESC LIMIT {limit}".
+                format(cat=category,
+                       tab=self.event_selection_table,
+                       limit=n_candidates))[-1][0]
+            self.lower_limits[category] = lower_limit
+
+        self.cprint("Current limits for the Top-10: {}".format(
+            self.lower_limits))
 
     def _update_calibration(self):
         self.cprint("Updating calibration")
@@ -155,9 +149,10 @@ class ZTPlot(kp.Module):
         n_triggered_hits = sum(hits.triggered)
 
         # Check for new record
-        is_new_record = overlays > self.records[
-            'overlays'] or n_hits > self.records[
-                'n_hits'] or n_triggered_hits > self.records["n_triggered_hits"]
+        is_new_record = overlays > self.lower_limits[
+            'overlays'] or n_hits > self.lower_limits[
+                'n_hits'] or n_triggered_hits > self.lower_limits[
+                    "n_triggered_hits"]
 
         if (utc_timestamp - self.last_plot_time) < 60 and not is_new_record:
             self.log.debug("Skipping plot...")
@@ -202,12 +197,12 @@ class ZTPlot(kp.Module):
             self.cprint(
                 "New record! Overlays: {}, hits: {}, triggered hits: {}".
                 format(overlays, n_hits, n_triggered_hits))
-            if overlays > self.records['overlays']:
-                self.records['overlays'] = overlays
-            if n_hits > self.records['n_hits']:
-                self.records['n_hits'] = n_hits
-            if n_triggered_hits > self.records['n_triggered_hits']:
-                self.records['n_triggered_hits'] = n_triggered_hits
+            if overlays > self.lower_limits['overlays']:
+                self.lower_limits['overlays'] = overlays
+            if n_hits > self.lower_limits['n_hits']:
+                self.lower_limits['n_hits'] = n_hits
+            if n_triggered_hits > self.lower_limits['n_triggered_hits']:
+                self.lower_limits['n_triggered_hits'] = n_triggered_hits
 
             plot_filename = os.path.join(
                 self.plots_path,
