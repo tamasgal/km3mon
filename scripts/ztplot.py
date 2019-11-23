@@ -208,7 +208,7 @@ def main():
     ligier_port = int(args['-p'])
 
     pipe = kp.Pipeline()
-    pipe.attach(LocalDBService)
+    pipe.attach(LocalDBService, thread_safety=False)
     pipe.attach(kp.io.ch.CHPump,
                 host=ligier_ip,
                 port=ligier_port,
