@@ -120,8 +120,8 @@ class ZTPlot(kp.Module):
         n_triggered_dus = len(np.unique(hits[hits.triggered == True].du))
         n_triggered_doms = len(np.unique(hits[hits.triggered == True].dom_id))
         if n_triggered_dus < self.min_dus or n_triggered_doms < self.min_doms:
-            print(f"Skipping event with {n_triggered_dus} DUs "
-                  f"and {n_triggered_doms} DOMs.")
+            self.log.debug(f"Skipping event with {n_triggered_dus} DUs "
+                           f"and {n_triggered_doms} DOMs.")
             return blob
 
         # print("Event queue size: {0}".format(self.queue.qsize()))
