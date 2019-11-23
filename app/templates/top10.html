@@ -6,9 +6,9 @@
         <h3 style="text-align: center">{{ category }}</h3>
         <div class="container-fluid">
             <div class="row">
-                {% for idx, plot_filename in enumerate(plot_filenames) %}
+                {% for plot_filename in plot_filenames %}
                 <div class="col-md-2">
-                    <h3>#{{ idx + 1 }}</h3>
+                    <h3>#{{ loop.index }}</h3>
                 </div>
                 <div class="col-md-10">
                     <a href="{{ plot_filename }}">
