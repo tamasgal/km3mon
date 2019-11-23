@@ -198,8 +198,7 @@ class ZTPlot(kp.Module):
                 "trigger_counter", "utc_timestamp"
             ], [
                 overlays, n_hits, n_triggered_hits, n_dus, plot_filename,
-                run_id, det_id, run_id, frame_index, trigger_counter,
-                utc_timestamp
+                run_id, det_id, frame_index, trigger_counter, utc_timestamp
             ])
             shutil.copy(f, plot_filename)
 
