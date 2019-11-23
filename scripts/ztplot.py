@@ -159,7 +159,7 @@ class ZTPlot(kp.Module):
             'overlays'] or n_hits > self.records[
                 'n_hits'] or n_triggered_hits > self.records["n_triggered_hits"]
 
-        if not is_new_record or (utc_timestamp - self.last_plot_time) < 60:
+        if (utc_timestamp - self.last_plot_time) < 60 and not is_new_record:
             self.log.debug("Skipping plot...")
             return
 
