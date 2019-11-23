@@ -79,7 +79,16 @@ class ZTPlot(kp.Module):
                 self.event_selection_table))[0][0]
         if max_n_hits is None:
             max_n_hits = 0
-        self.records = {'overlays': max_overlays, 'n_hits': max_n_hits}
+        max_n_triggered_hits = self.services["query"](
+            "SELECT max(n_triggered_hits) FROM {}".format(
+                self.event_selection_table))[0][0]
+        if max_n_triggered_hits is None:
+            max_n_triggered_hits = 0
+        self.records = {
+            'overlays': max_overlays,
+            'n_hits': max_n_hits,
+            'n_triggered_hits': max_n_triggered_hits
+        }
         self.cprint("Current records: {}".format(self.records))
 
         self._update_calibration()
@@ -136,7 +145,6 @@ class ZTPlot(kp.Module):
         print(self.__class__.__name__ + ": updating plot.")
 
         dus = set(hits.du)
-        doms = set(hits.dom_id)
 
         grid_lines = self.calib.detector.pmts.pos_z[
             (self.calib.detector.pmts.du == min(dus))
@@ -180,16 +188,21 @@ class ZTPlot(kp.Module):
         shutil.move(f_tmp, f)
 
         if overlays > self.records['overlays'] or n_hits > self.records[
-                'n_hits']:
-            self.cprint("New record! Overlays: {}, number of hits: {}".format(
-                overlays, n_hits))
+                'n_hits'] or n_triggered_hits > self.records[
+                    "n_triggered_hits"]:
+            self.cprint(
+                "New record! Overlays: {}, hits: {}, triggered hits: {}".
+                format(overlays, n_hits, n_triggered_hits))
             if overlays > self.records['overlays']:
                 self.records['overlays'] = overlays
             if n_hits > self.records['n_hits']:
                 self.records['n_hits'] = n_hits
+            if n_triggered_hits > self.records['n_triggered_hits']:
+                self.records['n_triggered_hits'] = n_triggered_hits
 
             plot_filename = os.path.join(
-                self.plots_path, "ztplot_selection/ztplot_{}_{}_{}_{}".format(
+                self.plots_path,
+                "event_selection/ztplot_{:08d}_{:08d}_FI{}_TC{}".format(
                     det_id, run_id, frame_index, trigger_counter) + ".png")
 
             self.services["insert_row"](self.event_selection_table, [
