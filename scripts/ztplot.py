@@ -145,19 +145,16 @@ class ZTPlot(kp.Module):
                 event_info.overlays[0], trigger_params,
                 datetime.utcfromtimestamp(event_info.utc_seconds)))[0]
 
-        fig = ztplot(hits,
-                     title,
-                     max_z=self.max_z,
-                     ytick_distance=self.ytick_distance,
-                     grid_lines=grid_lines)
-
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')
         f_tmp = os.path.join(self.plots_path, filename + '_tmp.png')
-        fig.savefig(f_tmp, dpi=120, bbox_inches="tight")
-        if len(doms) > 4:
-            plt.savefig(os.path.join(self.plots_path, filename + '_5doms.png'))
-        plt.close('all')
+
+        fig = ztplot(hits,
+                     filename=f_tmp,
+                     title=title,
+                     max_z=self.max_z,
+                     ytick_distance=self.ytick_distance,
+                     grid_lines=grid_lines)
         shutil.move(f_tmp, f)
 
     def finish(self):
