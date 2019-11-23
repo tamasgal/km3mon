@@ -48,6 +48,8 @@ class ZTPlot(kp.Module):
         self.min_dus = self.get('min_dus', default=1)
         self.min_doms = self.get('min_doms', default=4)
         self.det_id = self.require('det_id')
+        self.event_selection_table = self.get('event_selection_table',
+                                              default='event_selection')
         self.t0set = None
         self.calib = None
         self.max_z = None
@@ -57,25 +59,28 @@ class ZTPlot(kp.Module):
         self.index = 0
 
     def prepare(self):
-        if not self.services["table_exists"]("nice_events"):
-            self.services["create_table"]("nice_events", [
-                "overlays", "n_hits", "n_triggered_hits", "n_dus", "filename",
-                "run_id", "det_id", "frame_index", "trigger_counter",
-                "utc_timestamp"
+        if not self.services["table_exists"](self.event_selection_table):
+            self.services["create_table"](self.event_selection_table, [
+                "overlays", "n_hits", "n_triggered_hits", "n_dus",
+                "plot_filename", "run_id", "det_id", "frame_index",
+                "trigger_counter", "utc_timestamp"
             ], [
                 "INT", "INT", "INT", "INT", "TEXT", "INT", "INT", "INT", "INT",
                 "INT"
             ])
         self.records = {}
         max_overlays = self.services["query"](
-            "SELECT max(overlays) FROM nice_events")[0][0]
+            "SELECT max(overlays) FROM {}".format(
+                self.event_selection_table))[0][0]
         if max_overlays is None:
             max_overlays = 0
         max_n_hits = self.services["query"](
-            "SELECT max(n_hits) FROM nice_events")[0][0]
+            "SELECT max(n_hits) FROM {}".format(
+                self.event_selection_table))[0][0]
         if max_n_hits is None:
             max_n_hits = 0
         self.records = {'overlays': max_overlays, 'n_hits': max_n_hits}
+        self.cprint("Current records: {}".format(self.recods))
 
         self._update_calibration()
 
@@ -145,6 +150,7 @@ class ZTPlot(kp.Module):
         utc_timestamp = event_info.utc_seconds[0]
         overlays = event_info.overlays[0]
         n_hits = len(hits)
+        n_triggered_hits = sum(hits.triggered)
         n_dus = len(dus)
 
         trigger_params = ' '.join([
@@ -175,22 +181,25 @@ class ZTPlot(kp.Module):
 
         if overlays > self.records['overlays'] or n_hits > self.records[
                 'n_hits']:
+            self.cprint("New record! Overlays: {}, number of hits: {}".format(
+                overlays, n_hits))
             if overlays > self.records['overlays']:
                 self.records['overlays'] = overlays
             if n_hits > self.records['n_hits']:
                 self.records['n_hits'] = n_hits
 
             plot_filename = os.path.join(
-                self.plots_path, "nice_event_{}_{}_{}_{}".format(
+                self.plots_path, "ztplot_selection/ztplot_{}_{}_{}_{}".format(
                     det_id, run_id, frame_index, trigger_counter) + ".png")
 
-            self.services["insert_row"]("nice_events", [
-                "overlays", "n_hits", "n_dus", "det_id", "run_id",
-                "frame_index", "trigger_counter", "utc_timestamp",
-                "plot_filename"
+            self.services["insert_row"](self.event_selection_table, [
+                "overlays", "n_hits", "n_triggered_hits", "n_dus",
+                "plot_filename", "run_id", "det_id", "frame_index",
+                "trigger_counter", "utc_timestamp"
             ], [
-                overlays, n_hits, n_dus, det_id, run_id, frame_index,
-                trigger_counter, utc_timestamp, plot_filename
+                overlays, n_hits, n_triggered_hits, n_dus, plot_filename,
+                run_id, det_id, run_id, frame_index, trigger_counter,
+                utc_timestamp
             ])
             shutil.copy(f, plot_filename)
 
