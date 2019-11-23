@@ -80,7 +80,7 @@ class ZTPlot(kp.Module):
         if max_n_hits is None:
             max_n_hits = 0
         self.records = {'overlays': max_overlays, 'n_hits': max_n_hits}
-        self.cprint("Current records: {}".format(self.recods))
+        self.cprint("Current records: {}".format(self.records))
 
         self._update_calibration()
 
