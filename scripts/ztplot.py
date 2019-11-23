@@ -53,6 +53,7 @@ class ZTPlot(kp.Module):
         self.t0set = None
         self.calib = None
         self.max_z = None
+        self.last_plot_time = 0
 
         self.sds = kp.db.StreamDS()
 
@@ -144,12 +145,6 @@ class ZTPlot(kp.Module):
     def create_plot(self, event_info, hits):
         print(self.__class__.__name__ + ": updating plot.")
 
-        dus = set(hits.du)
-
-        grid_lines = self.calib.detector.pmts.pos_z[
-            (self.calib.detector.pmts.du == min(dus))
-            & (self.calib.detector.pmts.channel_id == 0)]
-
         trigger_mask = event_info.trigger_mask[0]
         det_id = event_info.det_id[0]
         run_id = event_info.run_id[0]
@@ -159,7 +154,22 @@ class ZTPlot(kp.Module):
         overlays = event_info.overlays[0]
         n_hits = len(hits)
         n_triggered_hits = sum(hits.triggered)
+
+        # Check for new record
+        is_new_record = overlays > self.records[
+            'overlays'] or n_hits > self.records[
+                'n_hits'] or n_triggered_hits > self.records["n_triggered_hits"]
+
+        if not is_new_record or (utc_timestamp - self.last_plot_time) < 60:
+            print("Skipping plot...")
+            return
+
+        dus = set(hits.du)
         n_dus = len(dus)
+
+        grid_lines = self.calib.detector.pmts.pos_z[
+            (self.calib.detector.pmts.du == min(dus))
+            & (self.calib.detector.pmts.channel_id == 0)]
 
         trigger_params = ' '.join([
             trig
@@ -187,9 +197,7 @@ class ZTPlot(kp.Module):
                      grid_lines=grid_lines)
         shutil.move(f_tmp, f)
 
-        if overlays > self.records['overlays'] or n_hits > self.records[
-                'n_hits'] or n_triggered_hits > self.records[
-                    "n_triggered_hits"]:
+        if is_new_record:
             self.cprint(
                 "New record! Overlays: {}, hits: {}, triggered hits: {}".
                 format(overlays, n_hits, n_triggered_hits))
@@ -217,6 +225,7 @@ class ZTPlot(kp.Module):
 
         plt.close(fig)
         plt.close('all')
+        self.last_plot_time = utc_timestamp
 
     def finish(self):
         self.run = False
