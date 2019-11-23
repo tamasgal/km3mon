@@ -149,12 +149,12 @@ class ZTPlot(kp.Module):
         n_triggered_hits = sum(hits.triggered)
 
         # Check for new record
-        is_new_record = overlays > self.lower_limits[
+        is_in_top10 = overlays > self.lower_limits[
             'overlays'] or n_hits > self.lower_limits[
                 'n_hits'] or n_triggered_hits > self.lower_limits[
                     "n_triggered_hits"]
 
-        if (utc_timestamp - self.last_plot_time) < 60 and not is_new_record:
+        if (utc_timestamp - self.last_plot_time) < 60 and not is_in_top10:
             self.log.debug("Skipping plot...")
             return
 
@@ -193,16 +193,10 @@ class ZTPlot(kp.Module):
                      grid_lines=grid_lines)
         shutil.move(f_tmp, f)
 
-        if is_new_record:
+        if is_in_top10:
             self.cprint(
                 "New record! Overlays: {}, hits: {}, triggered hits: {}".
                 format(overlays, n_hits, n_triggered_hits))
-            if overlays > self.lower_limits['overlays']:
-                self.lower_limits['overlays'] = overlays
-            if n_hits > self.lower_limits['n_hits']:
-                self.lower_limits['n_hits'] = n_hits
-            if n_triggered_hits > self.lower_limits['n_triggered_hits']:
-                self.lower_limits['n_triggered_hits'] = n_triggered_hits
 
             plot_filename = os.path.join(
                 self.plots_path,
@@ -218,6 +212,7 @@ class ZTPlot(kp.Module):
                 run_id, det_id, frame_index, trigger_counter, utc_timestamp
             ])
             shutil.copy(f, plot_filename)
+            self._update_lower_limits()
 
         plt.close(fig)
         plt.close('all')
