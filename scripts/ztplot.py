@@ -18,6 +18,14 @@ Options:
 """
 from __future__ import division
 
+import km3pipe.style
+from km3modules.plot import ztplot
+from km3modules.common import LocalDBService
+from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
+import km3pipe as kp
+import numpy as np
+import matplotlib.ticker as ticker
+import matplotlib.pyplot as plt
 from datetime import datetime
 import os
 import queue
@@ -27,19 +35,8 @@ import threading
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import numpy as np
 
-import km3pipe as kp
-from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
-from km3modules.common import LocalDBService
-from km3modules.hits import count_multiplicities
-from km3modules.plot import ztplot
-import km3pipe.style
 km3pipe.style.use('km3pipe')
-
-from km3pipe.logger import logging
 
 lock = threading.Lock()
 
@@ -59,27 +56,37 @@ class ZTPlot(kp.Module):
 
         self.index = 0
 
-        if not self.services["LocalDBService"].table_exists("nice_events"):
-            self.services["LocalDBService"].create_table(
-                "nice_events", [
-                    "overlays", "n_hits", "n_triggered_hits", "n_dus",
-                    "filename", "run_id", "det_id", "frame_index",
-                    "trigger_counter", "utc_timestamp"
-                ], [
-                    "INT", "INT", "INT", "INT", "TEXT", "INT", "INT", "INT",
-                    "INT", "INT"
-                ])
+    def prepare(self):
+        if not self.services["table_exists"]("nice_events"):
+            self.services["create_table"]("nice_events", [
+                "overlays", "n_hits", "n_triggered_hits", "n_dus", "filename",
+                "run_id", "det_id", "frame_index", "trigger_counter",
+                "utc_timestamp"
+            ], [
+                "INT", "INT", "INT", "INT", "TEXT", "INT", "INT", "INT", "INT",
+                "INT"
+            ])
+        self.records = {}
+        max_overlays = self.services["query"](
+            "SELECT max(overlays) FROM nice_events")[0][0]
+        if max_overlays is None:
+            max_overlays = 0
+        max_n_hits = self.services["query"](
+            "SELECT max(n_hits) FROM nice_events")[0][0]
+        if max_n_hits is None:
+            max_n_hits = 0
+        self.records = {'overlays': max_overlays, 'n_hits': max_n_hits}
 
         self._update_calibration()
 
         self.run = True
-        self.max_queue = 3
+        self.max_queue = 300
         self.queue = queue.Queue()
         self.thread = threading.Thread(target=self.plot, daemon=True)
         self.thread.start()
 
     def _update_calibration(self):
-        self.print("Updating calibration")
+        self.cprint("Updating calibration")
         self.t0set = self.sds.t0sets(detid=self.det_id).iloc[-1]['CALIBSETID']
         self.calib = kp.calib.Calibration(det_id=self.det_id, t0set=self.t0set)
         self.max_z = round(np.max(self.calib.detector.pmts.pos_z) + 10, -1)
@@ -103,10 +110,11 @@ class ZTPlot(kp.Module):
                   f"and {n_triggered_doms} DOMs.")
             return blob
 
-        print("OK")
         # print("Event queue size: {0}".format(self.queue.qsize()))
         if self.queue.qsize() < self.max_queue:
             self.queue.put((event_info, hits))
+        else:
+            self.cprint("Skipping, queue is full...")
 
         return blob
 
@@ -129,21 +137,29 @@ class ZTPlot(kp.Module):
             (self.calib.detector.pmts.du == min(dus))
             & (self.calib.detector.pmts.channel_id == 0)]
 
+        trigger_mask = event_info.trigger_mask[0]
+        det_id = event_info.det_id[0]
+        run_id = event_info.run_id[0]
+        frame_index = event_info.frame_index[0]
+        trigger_counter = event_info.trigger_counter[0]
+        utc_timestamp = event_info.utc_seconds[0]
+        overlays = event_info.overlays[0]
+        n_hits = len(hits)
+        n_dus = len(dus)
+
         trigger_params = ' '.join([
             trig
             for trig, trig_check in (("MX", is_mxshower), ("3DM", is_3dmuon),
                                      ("3DS", is_3dshower))
-            if trig_check(int(event_info.trigger_mask[0]))
+            if trig_check(int(trigger_mask))
         ])
 
-        title = (
-            "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, FrameIndex {3}, "
-            "TriggerCounter {4}, Overlays {5}, Trigger: {6}"
-            "\n{7} UTC".format(
-                event_info.det_id[0], self.t0set, event_info.run_id[0],
-                event_info.frame_index[0], event_info.trigger_counter[0],
-                event_info.overlays[0], trigger_params,
-                datetime.utcfromtimestamp(event_info.utc_seconds)))[0]
+        title = "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, "  \
+                "FrameIndex {3}, TriggerCounter {4}, Overlays {5}, "  \
+                "Trigger: {6}\n{7} UTC".format(
+                    det_id, self.t0set, run_id, frame_index, trigger_counter,
+                    overlays, trigger_params,
+                    datetime.utcfromtimestamp(event_info.utc_seconds))
 
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')
@@ -156,6 +172,27 @@ class ZTPlot(kp.Module):
                      ytick_distance=self.ytick_distance,
                      grid_lines=grid_lines)
         shutil.move(f_tmp, f)
+
+        if overlays > self.records['overlays'] or n_hits > self.records[
+                'n_hits']:
+            if overlays > self.records['overlays']:
+                self.records['overlays'] = overlays
+            if n_hits > self.records['n_hits']:
+                self.records['n_hits'] = n_hits
+
+            plot_filename = os.path.join(
+                self.plots_path, "nice_event_{}_{}_{}_{}".format(
+                    det_id, run_id, frame_index, trigger_counter) + ".png")
+
+            self.services["insert_row"]("nice_events", [
+                "overlays", "n_hits", "n_dus", "det_id", "run_id",
+                "frame_index", "trigger_counter", "utc_timestamp",
+                "plot_filename"
+            ], [
+                overlays, n_hits, n_dus, det_id, run_id, frame_index,
+                trigger_counter, utc_timestamp, plot_filename
+            ])
+            shutil.copy(f, plot_filename)
 
     def finish(self):
         self.run = False
