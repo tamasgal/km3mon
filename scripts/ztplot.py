@@ -143,7 +143,6 @@ class ZTPlot(kp.Module):
                 self.create_plot(event_info, hits)
 
     def create_plot(self, event_info, hits):
-        print(self.__class__.__name__ + ": updating plot.")
 
         trigger_mask = event_info.trigger_mask[0]
         det_id = event_info.det_id[0]
@@ -161,8 +160,10 @@ class ZTPlot(kp.Module):
                 'n_hits'] or n_triggered_hits > self.records["n_triggered_hits"]
 
         if not is_new_record or (utc_timestamp - self.last_plot_time) < 60:
-            print("Skipping plot...")
+            self.log.debug("Skipping plot...")
             return
+
+        self.cprint(self.__class__.__name__ + ": updating plot.")
 
         dus = set(hits.du)
         n_dus = len(dus)
