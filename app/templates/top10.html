@@ -8,7 +8,8 @@
             {% for event in events %}
                 <div class="row">
                     <div class="col-md-2" style="vertical-align: middle">
-                        <h3>#{{ loop.index }}</h3>
+                        <h3 class="placement">#{{ loop.index }}</h3>
+                        Highscore: {{ event.meta.highscore }}
                     </div>
                     <div class="col-md-8">
                         <a href="{{ event.plot_filename }}">
