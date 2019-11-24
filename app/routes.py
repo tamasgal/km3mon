@@ -180,10 +180,11 @@ def top10():
             "SELECT plot_filename, {cat} FROM event_selection "
             "ORDER BY {cat} DESC LIMIT 10".format(cat=category))
         if len(raw_data) > 0:
+            print(raw_data)
             top10[category_names[category]] = {
                 "plot_filename": raw_data[0],
                 "meta": {
-                    category: raw_data[1]
+                    "highscore": raw_data[1]
                 },
             }
     return render_template('top10.html', top10=top10)
