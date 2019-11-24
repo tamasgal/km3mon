@@ -4,14 +4,17 @@
 
     {% for category, events in top10.items() %}
         <h3 style="text-align: center">{{ category }}</h3>
-        <div class="container-fluid">
+        <div class="container-fluid" id="top10">
             {% for event in events %}
                 <div class="row">
                     <div class="col-md-2" style="vertical-align: middle">
-                        <h3 class="placement">#{{ loop.index }}</h3>
+                        <h3 class="rank">#{{ loop.index }}</h3>
                         <table class="top10">
                         {% for key, value in event.meta.items() %}
-                            <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+                            <tr>
+                                <td class="meta-key">{{ key }}</td>
+                                <td class="meta-value">{{ value }}</td>
+                            </tr>
                         {% endfor %}
                         </table>
                     </div>
