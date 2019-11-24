@@ -8,6 +8,7 @@ import toml
 from flask import render_template, send_from_directory, request, Response
 from app import app
 
+import km3pipe as kp
 from km3modules.common import LocalDBService
 
 CONFIG_PATH = "pipeline.toml"
@@ -184,20 +185,25 @@ def top10():
             "FROM event_selection ORDER BY {cat} DESC LIMIT 10".format(
                 cat=category))
         if len(raw_data) > 0:
-            print(raw_data)
             top10[category_names[category]] = [{
                 "plot_filename":
                 r[0],
                 "meta": {
-                    "Number of hits (triggered)": "{} ({})".format(r[1], r[2]),
+                    "Hits (triggered)": "{} ({})".format(r[1], r[2]),
                     "Overlays": r[3],
                     "Detector ID": r[4],
                     "Run": r[5],
                     "Frame index": r[6],
                     "Trigger counter": r[7],
-                    "Date": datetime.utcfromtimestamp(r[8]).strftime("%c")
                 },
-                "is_recent": (time.time() - r[8]) < 60 * 60 * 24
+                "is_recent": (time.time() - r[8]) < 60 * 60 * 24,
+                "date":
+                "{} UTC".format(
+                    datetime.utcfromtimestamp(r[8]).strftime("%c")),
+                "irods_path":
+                kp.tools.irods_filepath(r[4], r[5]),
+                "xrootd_path":
+                kp.tools.xrootd_path(r[4], r[5])
             } for r in raw_data]
     return render_template('top10.html', top10=top10)
 

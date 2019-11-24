@@ -14,6 +14,7 @@
                                 <span class="recent">NEW!</span>
                             {% endif %}
                         </h3>
+                        <h4 class="date">{{ event.date }}</h4>
                         <table class="top10">
                         {% for key, value in event.meta.items() %}
                             <tr>
@@ -32,6 +33,12 @@
                     </div>
                     <div class="col-md-2">
                         &nbsp;
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" style="vertical-align: middle">
+                        <p class="filepath"><b>iRODS</b>: {{ event.irods_path }}</p>
+                        <p class="filepath"><b>xrootd</b>: {{ event.xrootd_path }}</p>
                     </div>
                 </div>
             {% endfor %}
