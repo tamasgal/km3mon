@@ -3,6 +3,7 @@ from glob import glob
 from os.path import basename, join, exists, splitext, getsize
 from functools import wraps
 from collections import OrderedDict
+import time
 import toml
 from flask import render_template, send_from_directory, request, Response
 from app import app
@@ -185,7 +186,8 @@ def top10():
         if len(raw_data) > 0:
             print(raw_data)
             top10[category_names[category]] = [{
-                "plot_filename": r[0],
+                "plot_filename":
+                r[0],
                 "meta": {
                     "Number of hits (triggered)": "{} ({})".format(r[1], r[2]),
                     "Overlays": r[3],
@@ -195,7 +197,7 @@ def top10():
                     "Trigger counter": r[7],
                     "Date": datetime.utcfromtimestamp(r[8]).strftime("%c")
                 },
-                "is_recent": True
+                "is_recent": (time.time() - r[8]) < 60 * 60 * 24
             } for r in raw_data]
     return render_template('top10.html', top10=top10)
 
