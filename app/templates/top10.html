@@ -10,9 +10,9 @@
                     <div class="col-md-2" style="vertical-align: middle">
                         <h3 class="rank">
                             #{{ loop.index }}
-                            {{#if event.is_recent}}
+                            {% if event.is_recent %}
                                 <span class="recent">NEW!</span>
-                            {{/if}}
+                            {% endif %}
                         </h3>
                         <table class="top10">
                         {% for key, value in event.meta.items() %}
