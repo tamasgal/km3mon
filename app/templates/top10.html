@@ -8,7 +8,12 @@
             {% for event in events %}
                 <div class="row">
                     <div class="col-md-2" style="vertical-align: middle">
-                        <h3 class="rank">#{{ loop.index }}</h3>
+                        <h3 class="rank">
+                            #{{ loop.index }}
+                            {{#if event.is_recent}}
+                                <span class="recent">NEW!</span>
+                            {{/if}}
+                        </h3>
                         <table class="top10">
                         {% for key, value in event.meta.items() %}
                             <tr>
