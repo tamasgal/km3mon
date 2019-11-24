@@ -1,3 +1,4 @@
+from datetime import datetime
 from glob import glob
 from os.path import basename, join, exists, splitext, getsize
 from functools import wraps
@@ -177,14 +178,22 @@ def top10():
     dbs = LocalDBService(filename="data/monitoring.sqlite3")
     for category in ["overlays", "n_hits"]:
         raw_data = dbs.query(
-            "SELECT plot_filename, {cat} FROM event_selection "
-            "ORDER BY {cat} DESC LIMIT 10".format(cat=category))
+            "SELECT plot_filename, n_hits, n_triggered_hits, overlays, "
+            "det_id, run_id, frame_index, trigger_counter, utc_timestamp "
+            "FROM event_selection ORDER BY {cat} DESC LIMIT 10".format(
+                cat=category))
         if len(raw_data) > 0:
             print(raw_data)
             top10[category_names[category]] = [{
                 "plot_filename": r[0],
                 "meta": {
-                    "highscore": r[1]
+                    "Number of hits (triggered)": "{} ({})".format(r[1], r[2]),
+                    "Overlays": r[3],
+                    "Detector ID": r[4],
+                    "Run": r[5],
+                    "Frame index": r[6],
+                    "Trigger counter": r[7],
+                    "Date": datetime.utc_fromtimestamp(r[8]).strftime("%c")
                 }
             } for r in raw_data]
     return render_template('top10.html', top10=top10)
