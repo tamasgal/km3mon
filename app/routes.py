@@ -193,7 +193,7 @@ def top10():
                     "Run": r[5],
                     "Frame index": r[6],
                     "Trigger counter": r[7],
-                    "Date": datetime.utc_fromtimestamp(r[8]).strftime("%c")
+                    "Date": datetime.utcfromtimestamp(r[8]).strftime("%c")
                 }
             } for r in raw_data]
     return render_template('top10.html', top10=top10)
