@@ -2,19 +2,19 @@
 
 {% block main %}
 
-    {% for category, plot_filenames in plots.items() %}
+    {% for category, events in plots.items() %}
         <h3 style="text-align: center">{{ category }}</h3>
         <div class="container-fluid">
-            {% for plot_filename in plot_filenames %}
+            {% for event in events %}
                 <div class="row">
                     <div class="col-md-2" style="vertical-align: middle">
                         <h3>#{{ loop.index }}</h3>
                     </div>
                     <div class="col-md-8">
-                        <a href="{{ plot_filename }}">
+                        <a href="{{ event.plot_filename }}">
                         <img class="plot img-responsive" style="padding: 20px"
-                             src="{{ plot_filename }}"
-                             alt="{{ plot_filename }}"/>
+                             src="{{ event.plot_filename }}"
+                             alt="{{ event.plot_filename }}"/>
                         </a>
                     </div>
                     <div class="col-md-2">

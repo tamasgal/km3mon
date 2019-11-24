@@ -173,17 +173,20 @@ def top10():
         'n_hits': 'Number of hits',
         'overlays': 'Number of overlays'
     }
-    plots = {}
+    events = {}
     dbs = LocalDBService(filename="data/monitoring.sqlite3")
     for category in ["overlays", "n_hits"]:
-        filenames = [
-            q[0]
-            for q in dbs.query("SELECT plot_filename FROM event_selection "
-                               "ORDER BY {} DESC LIMIT 10".format(category))
-        ]
-        if len(filenames) > 0:
-            plots[category_names[category]] = filenames
-    return render_template('top10.html', plots=plots)
+        raw_data = dbs.query(
+            "SELECT plot_filename, {cat} FROM event_selection "
+            "ORDER BY {cat} DESC LIMIT 10".format(cat=category))
+        if len(raw_data) > 0:
+            events[category_names[category]] = {
+                "plot_filename": raw_data[0],
+                "meta": {
+                    category: raw_data[1]
+                },
+            }
+    return render_template('top10.html', events=events)
 
 
 @app.route('/logs.html')
