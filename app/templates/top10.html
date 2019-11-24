@@ -2,7 +2,7 @@
 
 {% block main %}
 
-    {% for category, events in plots.items() %}
+    {% for category, events in top10.items() %}
         <h3 style="text-align: center">{{ category }}</h3>
         <div class="container-fluid">
             {% for event in events %}
