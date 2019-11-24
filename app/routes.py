@@ -172,13 +172,10 @@ def trigger():
 @app.route('/top10.html')
 @requires_auth
 def top10():
-    category_names = {
-        'n_hits': 'Number of hits',
-        'overlays': 'Number of overlays'
-    }
+    category_names = {'n_hits': 'Number of Hits', 'overlays': 'Overlays'}
     top10 = {}
     dbs = LocalDBService(filename="data/monitoring.sqlite3")
-    for category in ["overlays", "n_hits"]:
+    for category in ["n_hits", "overlays"]:
         raw_data = dbs.query(
             "SELECT plot_filename, n_hits, n_triggered_hits, overlays, "
             "det_id, run_id, frame_index, trigger_counter, utc_timestamp "

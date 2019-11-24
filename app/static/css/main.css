@@ -38,11 +38,17 @@ img.plot {
     margin: 0 auto
 }
 
+.top10-entry {
+    padding-bottom: 70px;
+}
+
+
 #top10 h3 {
-    min-width: 180px;
+    font-size: 50px;
 }
 #top10 h3.rank {
-    font-size: 60px;
+    min-width: 180px;
+    font-size: 50px;
     font-weight: 500;
     color: #438bd9;
     border-bottom: 3px dotted #ddd;

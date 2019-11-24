@@ -2,47 +2,51 @@
 
 {% block main %}
 
+    <div id="top10">
     {% for category, events in top10.items() %}
         <h3 style="text-align: center">{{ category }}</h3>
-        <div class="container-fluid" id="top10">
+        <div class="container-fluid top10-category">
             {% for event in events %}
-                <div class="row">
-                    <div class="col-md-2" style="vertical-align: middle">
-                        <h3 class="rank">
-                            #{{ loop.index }}
-                            {% if event.is_recent %}
-                                <span class="recent">NEW!</span>
-                            {% endif %}
-                        </h3>
-                        <h4 class="date">{{ event.date }}</h4>
-                        <table class="top10">
-                        {% for key, value in event.meta.items() %}
-                            <tr>
-                                <td class="meta-key">{{ key }}</td>
-                                <td class="meta-value">{{ value }}</td>
-                            </tr>
-                        {% endfor %}
-                        </table>
+                <div class="top10-entry">
+                    <div class="row">
+                        <div class="col-md-2" style="vertical-align: middle">
+                            <h3 class="rank">
+                                #{{ loop.index }}
+                                {% if event.is_recent %}
+                                    <span class="recent">NEW!</span>
+                                {% endif %}
+                            </h3>
+                            <h4 class="date">{{ event.date }}</h4>
+                            <table class="top10">
+                            {% for key, value in event.meta.items() %}
+                                <tr>
+                                    <td class="meta-key">{{ key }}</td>
+                                    <td class="meta-value">{{ value }}</td>
+                                </tr>
+                            {% endfor %}
+                            </table>
+                        </div>
+                        <div class="col-md-8">
+                            <a href="{{ event.plot_filename }}">
+                            <img class="plot img-responsive" style="padding: 20px"
+                                 src="{{ event.plot_filename }}"
+                                 alt="{{ event.plot_filename }}"/>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            &nbsp;
+                        </div>
                     </div>
-                    <div class="col-md-8">
-                        <a href="{{ event.plot_filename }}">
-                        <img class="plot img-responsive" style="padding: 20px"
-                             src="{{ event.plot_filename }}"
-                             alt="{{ event.plot_filename }}"/>
-                        </a>
-                    </div>
-                    <div class="col-md-2">
-                        &nbsp;
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12" style="vertical-align: middle">
-                        <p class="filepath"><b>iRODS</b>: {{ event.irods_path }}</p>
-                        <p class="filepath"><b>xrootd</b>: {{ event.xrootd_path }}</p>
+                    <div class="row">
+                        <div class="col-md-12" style="vertical-align: middle">
+                            <p class="filepath"><b>iRODS</b>: {{ event.irods_path }}</p>
+                            <p class="filepath"><b>xrootd</b>: {{ event.xrootd_path }}</p>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% endfor %}
+    </div>
 
 {% endblock %}
