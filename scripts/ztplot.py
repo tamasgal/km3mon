@@ -219,6 +219,7 @@ class ZTPlot(kp.Module):
                 logbook=self.logbook,
                 subject="New massive event!",
                 message="A new event has made it into the top 10!",
+                message_type="Monitoring",
                 author="Gal T",
                 files=[plot_filename])
 
