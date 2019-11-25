@@ -21,6 +21,7 @@ from __future__ import division
 import km3pipe.style
 from km3modules.plot import ztplot
 from km3modules.common import LocalDBService
+from km3modules.communication import ELOGService
 from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
 import km3pipe as kp
 import numpy as np
@@ -50,6 +51,7 @@ class ZTPlot(kp.Module):
         self.det_id = self.require('det_id')
         self.event_selection_table = self.get('event_selection_table',
                                               default='event_selection')
+        self.logbook = self.get('logbook', default="Individual+Logbooks")
         self.t0set = None
         self.calib = None
         self.max_z = None
@@ -213,6 +215,12 @@ class ZTPlot(kp.Module):
             ])
             shutil.copy(f, plot_filename)
             self._update_lower_limits()
+            self['services']['post_elog'](
+                logbook=self.logbook,
+                subject="New massive event!",
+                message="A new event has made it into the top 10!",
+                author="Gal T",
+                files=[plot_filename])
 
         plt.close(fig)
         plt.close('all')
@@ -233,6 +241,7 @@ def main():
 
     pipe = kp.Pipeline()
     pipe.attach(LocalDBService, thread_safety=False)
+    pipe.attach(ELOGService)
     pipe.attach(kp.io.ch.CHPump,
                 host=ligier_ip,
                 port=ligier_port,
