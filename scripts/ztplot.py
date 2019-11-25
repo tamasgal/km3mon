@@ -215,7 +215,7 @@ class ZTPlot(kp.Module):
             ])
             shutil.copy(f, plot_filename)
             self._update_lower_limits()
-            self['services']['post_elog'](
+            self.services['post_elog'](
                 logbook=self.logbook,
                 subject="New massive event!",
                 message="A new event has made it into the top 10!",
