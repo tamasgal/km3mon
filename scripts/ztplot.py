@@ -123,7 +123,8 @@ class ZTPlot(kp.Module):
 
         # print("Event queue size: {0}".format(self.queue.qsize()))
         if self.queue.qsize() < self.max_queue:
-            self.queue.put((event_info, hits))
+            raw_data = blob["CHData"]
+            self.queue.put((event_info, hits, raw_data))
         else:
             self.cprint("Skipping, queue is full...")
 
@@ -132,13 +133,13 @@ class ZTPlot(kp.Module):
     def plot(self):
         while self.run:
             try:
-                event_info, hits = self.queue.get(timeout=50)
+                event_info, hits, raw_data = self.queue.get(timeout=50)
             except queue.Empty:
                 continue
             with lock:
-                self.create_plot(event_info, hits)
+                self.create_plot(event_info, hits, raw_data)
 
-    def create_plot(self, event_info, hits):
+    def create_plot(self, event_info, hits, raw_data):
 
         trigger_mask = event_info.trigger_mask[0]
         det_id = event_info.det_id[0]
@@ -200,10 +201,12 @@ class ZTPlot(kp.Module):
                 "New record! Overlays: {}, hits: {}, triggered hits: {}".
                 format(overlays, n_hits, n_triggered_hits))
 
-            plot_filename = os.path.join(
+            base_filename = os.path.join(
                 self.plots_path,
                 "event_selection/ztplot_{:08d}_{:08d}_FI{}_TC{}".format(
-                    det_id, run_id, frame_index, trigger_counter) + ".png")
+                    det_id, run_id, frame_index, trigger_counter))
+            plot_filename = base_filename + ".png"
+            rawdata_filename = base_filename + ".dat"
 
             self.services["insert_row"](self.event_selection_table, [
                 "overlays", "n_hits", "n_triggered_hits", "n_dus",
@@ -214,6 +217,10 @@ class ZTPlot(kp.Module):
                 run_id, det_id, frame_index, trigger_counter, utc_timestamp
             ])
             shutil.copy(f, plot_filename)
+
+            with open(rawdata_filename, "wb") as fobj:
+                fobj.write(raw_data)
+
             self._update_lower_limits()
             self.services['post_elog'](
                 logbook=self.logbook,
