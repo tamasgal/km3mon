@@ -32,6 +32,7 @@ import os
 import queue
 import shutil
 import threading
+from urllib.error import URLError
 
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
@@ -98,9 +99,17 @@ class ZTPlot(kp.Module):
 
     def _update_calibration(self):
         self.cprint("Updating calibration")
-        self.t0set = self.sds.t0sets(detid=self.det_id).iloc[-1]['CALIBSETID']
-        self.calib = kp.calib.Calibration(det_id=self.det_id, t0set=self.t0set)
-        self.max_z = round(np.max(self.calib.detector.pmts.pos_z) + 10, -1)
+        try:
+            self.t0set = self.sds.t0sets(
+                detid=self.det_id).iloc[-1]['CALIBSETID']
+            self.calib = kp.calib.Calibration(det_id=self.det_id,
+                                              t0set=self.t0set)
+        except URLError as e:
+            self.log.error(
+                "Unable to update calibration, no connection to the DB.\n{}".
+                format(e))
+        else:
+            self.max_z = round(np.max(self.calib.detector.pmts.pos_z) + 10, -1)
 
     def process(self, blob):
         if 'Hits' not in blob:
