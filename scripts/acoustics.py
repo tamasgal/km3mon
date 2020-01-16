@@ -70,7 +70,7 @@ while check:
             for dom in DOMS:
                 try:
                     domID = db.doms.via_omkey((du, dom), detid).dom_id
-                except KeyError:
+                except (KeyError, AttributeError):
                     N_Pulses_Indicator_DU.append(-1.5)
                     continue
 
