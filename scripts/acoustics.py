@@ -70,6 +70,12 @@ while check:
             for dom in DOMS:
                 try:
                     domID = db.doms.via_omkey((du, dom), detid).dom_id
+                except KeyError:
+                    N_Pulses_Indicator_DU.append(-1.5)
+                    continue
+
+                try:
+                    domID = db.doms.via_omkey((du, dom), detid).dom_id
                     toas_all = sds.toashort(detid = detid, minrun = minrun, maxrun = maxrun, domid = domID, emitterid = ab) 
                 
                     QF_abdom = toas_all["QUALITYFACTOR"]
