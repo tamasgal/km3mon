@@ -32,10 +32,9 @@ def diff(first, second):
 
 args = docopt(__doc__)
 
-detid = args['-d']
+detid = int(args['-d'])
 directory = args['-o']
-N_DUS = args['-n']
-N_DUS = int(N_DUS)
+N_DUS = int(args['-n'])
 
 db = kp.db.DBManager()
 sds = kp.db.StreamDS()
