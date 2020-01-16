@@ -49,6 +49,8 @@ DUS = range(1, N_DUS + 1)
 TIT = 600 # Time Interval between Trains of acoustic pulses)
 SSW = 160 # Signal Security Window (Window size with signal)
 
+clbmap = kp.db.CLBMap(detid)
+
 check = True
 while check:
     
@@ -69,8 +71,8 @@ while check:
         for ab in ACOUSTIC_BEACONS:
             for dom in DOMS:
                 try:
-                    domID = db.doms.via_omkey((du, dom), detid).dom_id
-                except (KeyError, AttributeError):
+                    domID = clbmap.omkeys[(du, dom)].dom_id
+                except KeyError:
                     N_Pulses_Indicator_DU.append(-1.5)
                     continue
 
