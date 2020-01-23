@@ -188,7 +188,7 @@ while check:
         duab.append(duabdu)
         DUs.append(np.array(N_Pulses_Indicator[du]))
             
-    ind = np.where(DUs[1] < 1000)
+    ind = np.where(DUs[0] < 1000)
     iAB1 = np.where(ind[0] < L)
     iAB2_up = np.where(ind[0] > (L - 1))
     iAB2_down = np.where(ind[0] < 2*L)
