@@ -32,6 +32,7 @@ import os
 import queue
 import shutil
 import threading
+import time
 from urllib.error import URLError
 
 import matplotlib
@@ -53,6 +54,7 @@ class ZTPlot(kp.Module):
         self.event_selection_table = self.get('event_selection_table',
                                               default='event_selection')
         self.logbook = self.get('logbook', default="Individual+Logbooks")
+        self.run_id = None
         self.t0set = None
         self.calib = None
         self.max_z = None
@@ -74,7 +76,6 @@ class ZTPlot(kp.Module):
                 "INT"
             ])
 
-        self._update_calibration()
         self._update_lower_limits()
 
         self.run = True
@@ -98,16 +99,17 @@ class ZTPlot(kp.Module):
             self.lower_limits))
 
     def _update_calibration(self):
-        self.cprint("Updating calibration")
+        self.cprint("Updating calibration for run {}".format(self.run_id))
         try:
-            self.t0set = self.sds.t0sets(
-                detid=self.det_id).iloc[-1]['CALIBSETID']
             self.calib = kp.calib.Calibration(det_id=self.det_id,
-                                              t0set=self.t0set)
+                                              run=self.run_id)
         except URLError as e:
             self.log.error(
-                "Unable to update calibration, no connection to the DB.\n{}".
+                "Unable to update calibration, no connection to the DB, "
+                "retrying in one minute...\n{}".
                 format(e))
+            time.sleep(60)
+            self._update_calibration()
         else:
             self.max_z = round(np.max(self.calib.detector.pmts.pos_z) + 10, -1)
 
@@ -116,12 +118,15 @@ class ZTPlot(kp.Module):
             return blob
 
         self.index += 1
-        if self.index % 1000 == 0:
-            self._update_calibration()
 
         hits = blob['Hits']
         hits = self.calib.apply(hits)
         event_info = blob['EventInfo']
+
+        run_id = event_info.run_id[0]
+        if run_id != self.run_id:
+            self.run_id = run_id
+            self._update_calibration()
 
         n_triggered_dus = len(np.unique(hits[hits.triggered == True].du))
         n_triggered_doms = len(np.unique(hits[hits.triggered == True].dom_id))
@@ -186,10 +191,10 @@ class ZTPlot(kp.Module):
             if trig_check(int(trigger_mask))
         ])
 
-        title = "z-t-Plot for DetID-{0} (t0set: {1}), Run {2}, "  \
-                "FrameIndex {3}, TriggerCounter {4}, Overlays {5}, "  \
-                "Trigger: {6}\n{7} UTC".format(
-                    det_id, self.t0set, run_id, frame_index, trigger_counter,
+        title = "z-t-Plot for DetID-{0} Run {1}, "  \
+                "FrameIndex {2}, TriggerCounter {3}, Overlays {4}, "  \
+                "Trigger: {5}\n{6} UTC".format(
+                    det_id, run_id, frame_index, trigger_counter,
                     overlays, trigger_params,
                     datetime.utcfromtimestamp(event_info.utc_seconds))
 
