@@ -119,14 +119,14 @@ class ZTPlot(kp.Module):
 
         self.index += 1
 
-        hits = blob['Hits']
-        hits = self.calib.apply(hits)
-        event_info = blob['EventInfo']
-
         run_id = event_info.run_id[0]
         if run_id != self.run_id:
             self.run_id = run_id
             self._update_calibration()
+
+        hits = blob['Hits']
+        hits = self.calib.apply(hits)
+        event_info = blob['EventInfo']
 
         n_triggered_dus = len(np.unique(hits[hits.triggered == True].du))
         n_triggered_doms = len(np.unique(hits[hits.triggered == True].dom_id))
