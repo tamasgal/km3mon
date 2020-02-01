@@ -88,11 +88,14 @@ class ZTPlot(kp.Module):
         """Update the lower limits for the Top-10 candidate selection"""
         n_candidates = 10
         for category in ["overlays", "n_hits", "n_triggered_hits"]:
-            lower_limit = self.services["query"](
-                "SELECT {cat} FROM {tab} ORDER BY {cat} DESC LIMIT {limit}".
-                format(cat=category,
-                       tab=self.event_selection_table,
-                       limit=n_candidates))[-1][0]
+            try:
+                lower_limit = self.services["query"](
+                    "SELECT {cat} FROM {tab} ORDER BY {cat} DESC LIMIT {limit}".
+                    format(cat=category,
+                           tab=self.event_selection_table,
+                           limit=n_candidates))[-1][0]
+            except IndexError:
+                lower_limit = 0
             self.lower_limits[category] = lower_limit
 
         self.cprint("Current limits for the Top-10: {}".format(
