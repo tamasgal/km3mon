@@ -16,6 +16,8 @@ Options:
 from datetime import datetime
 import os
 import time
+import http
+import ssl
 
 import matplotlib
 matplotlib.use("Agg")
@@ -68,7 +70,7 @@ while check:
             mintime = mintime1.values
             maxrun = table["RUN"][len(table["RUN"]) - 1]
             now = time.time()
-            now = now - 600
+            now = now - TIT
             if (now - mintime / 1000) < TIT:
                 minrun = table["RUN"][len(table["RUN"]) - 1] - 1
             print(now)
@@ -280,9 +282,13 @@ while check:
                         N_Pulses_Indicator_DU.append(-1.5)
 
                 except (
-                        TypeError, ValueError
+                        TypeError, ValueError, http.client.RemoteDisconnected, ssl.SSLError
                 ):  # TypeError if no data found for a certain piezo, ValueError if there are zero data for a certain piezo
                     N_Pulses_Indicator_DU.append(-1.5)
+                except (
+                        http.client.RemoteDisconnected, ssl.SSLError
+                ):  # Bad connection to the DB
+                    N_Pulses_Indicator_DU.append(-2.5)                    
 
             # To avoid to take wrong beacon signals
 
@@ -309,8 +315,7 @@ while check:
 
         N_Pulses_Indicator.append(N_Pulses_Indicator_DU)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+    fig, ax = plt.subplots(figsize=(9, 7))
 
     duab = []
     DUs = []
@@ -333,9 +338,9 @@ while check:
         iAB2.append(3 * i + 1)
         iAB3.append(3 * i + 2)
 
-    colorsList = [(0, 0, 0), (1, 0.3, 0), (1, 1, 0), (0.2, 0.9, 0)]
+    colorsList = [(0.6, 0, 1), (0, 0, 0), (1, 0.3, 0), (1, 1, 0), (0.2, 0.9, 0)]
     CustomCmap = matplotlib.colors.ListedColormap(colorsList)
-    bounds = [-2, -1, 0, 1, 2]
+    bounds = [-3, -2, -1, 0, 1, 2]
     norma = colors.BoundaryNorm(bounds, CustomCmap.N)
     for du in DUS:
         color = ax.scatter(duab[du - 1][0],
@@ -363,16 +368,16 @@ while check:
     cbar = plt.colorbar(color)
     cbar.ax.get_yaxis().set_ticks([])
     for j, lab in enumerate(
-        ['$0. pings$', '$1-3 pings$', '$4-7 pings$', '$>7. pings$']):
-        cbar.ax.text(3.5, (2 * j + 1) / 8.0, lab, ha='center', va='center')
+        ['$No DB conn.$','$0. pings$', '$1-3 pings$', '$4-7 pings$', '$>7. pings$']):
+        cbar.ax.text(4, (1.5 * j + 1) / 8.0, lab, ha='center', va='center')
     cbar.ax.get_yaxis().labelpad = 18
 
-    matplotlib.pyplot.xticks(np.arange(1, max(DUS) + 1, step=1))
-    matplotlib.pyplot.yticks(np.arange(0, 19, step=1))
-    matplotlib.pyplot.grid(color='k', linestyle='-', linewidth=0.2)
+    ax.set_xticks(np.arange(1, max(DUS) + 1, step=1))
+    ax.set_yticks(np.arange(0, 19, step=1))
+    ax.grid(color='k', linestyle='-', linewidth=0.2)
     ax.set_xlabel('DUs', fontsize=18)
     ax.set_ylabel('Floors', fontsize=18)
-    ts = now + 3600
+    ts = now
     DATE = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     ax.set_title(
         r' %.16s Detection of the pings emitted by autonomous beacons' % DATE,
@@ -382,12 +387,13 @@ while check:
     my_file = 'Online_Acoustic_Monitoring.png'
 
     fig.savefig(os.path.join(my_path, my_file))
-
+    plt.close('all')
+    
     print(time.time())
 
     check = False
-    check_time = time.time() - now
+    check_time = time.time() - now - TIT
     print(check_time)
 
-    time.sleep(abs(2 * TIT - check_time))
+    time.sleep(abs(TIT - check_time))
     check = True
