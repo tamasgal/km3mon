@@ -71,7 +71,7 @@ def main():
 
         f = open(log_file, 'r')
         for line in f.readlines():
-            msg = message(line)
+            msg = Message(line)
             errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
             warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
 
