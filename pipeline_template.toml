@@ -1,6 +1,31 @@
+[Paths]
+logs = "logs"
+plots = "plots"
+
 [WebServer]
 username = "km3net"
 password = "anothersupersecretpassword"
+
+[PlotLayouts]
+overview = [['dom_activity', 'dom_rates'],
+          'pmt_rates_du*',
+         ['trigger_rates'],
+         ['ztplot', 'triggermap']]
+acoustics = [['Online_Acoustic_Monitoring']]
+ahrs = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
+trigger = [['trigger_rates'], ['trigger_rates_lin']]
+k40 = [['intradom'], ['angular_k40rate_distribution']]
+rttc = [['rttc']]
+reco = [['track_reco', 'ztplot_roy'], ['time_residuals']]
+compact = [['dom_activity', 'dom_rates', 'pmt_rates'],
+                 ['trigger_rates', 'trigger_rates_lin'],
+                 ['ztplot', 'ztplot_roy', 'triggermap']]
+sn = [['sn_bg_histogram', 'sn_pk_history']]
+raspberry = [['dom_rates', 'ztplot', 'triggermap'],
+              [
+                  'pmt_rates_du2', 'pmt_rates_du3', 'pmt_rates_du4',
+                  'pmt_rates_du5'
+              ], ['trigger_rates', 'trigger_rates_lin']]
 
 [DOMRates]
 lowest_rate = 150

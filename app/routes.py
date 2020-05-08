@@ -12,37 +12,19 @@ import km3pipe as kp
 from km3modules.common import LocalDBService
 
 CONFIG_PATH = "pipeline.toml"
-PLOTS_PATH = "../plots"
-LOGS_PATH = "../logs"
-USERNAME = None
-PASSWORD = None
 app.config['FREEZER_DESTINATION'] = '../km3web'
 
-PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', ['trigger_rates'],
-         ['ztplot', 'triggermap']]
 
-ACOUSTICS_PLOTS = [['Online_Acoustic_Monitoring']]
-AHRS_PLOTS = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
-TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
-K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
-RTTC_PLOTS = [['rttc']]
-RECO_PLOTS = [['track_reco', 'ztplot_roy'], ['time_residuals']]
-COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates'],
-                 ['trigger_rates', 'trigger_rates_lin'],
-                 ['ztplot', 'ztplot_roy', 'triggermap']]
-SN_PLOTS = [['sn_bg_histogram', 'sn_pk_history']]
-RASP_PLOTS = [['dom_rates', 'ztplot', 'triggermap'],
-              [
-                  'pmt_rates_du2', 'pmt_rates_du3', 'pmt_rates_du4',
-                  'pmt_rates_du5'
-              ], ['trigger_rates', 'trigger_rates_lin']]
+def get_config():
+    if exists(CONFIG_PATH):
+        CONFIG = toml.load(CONFIG_PATH)
+    else:
+        print("The monitoring configuration could not be found at '{}'.\n"
+            "Please create one based on 'pipeline_template.toml'."
+            .format(CONFIG_PATH))
 
-if exists(CONFIG_PATH):
-    config = toml.load(CONFIG_PATH)
-    if "WebServer" in config:
-        print("Reading authentication information from '%s'" % CONFIG_PATH)
-        USERNAME = config["WebServer"]["username"]
-        PASSWORD = config["WebServer"]["password"]
+    PLOTS_PATH = join("..", CONFIG['Paths']['plots'])
+    LOGS_PATH = join("..", CONFIG['Paths']['logs'])
 
 
 def expand_wildcards(plot_layout):
@@ -64,8 +46,10 @@ def check_auth(username, password):
     """This function is called to check if a username /
     password combination is valid.
     """
-    if USERNAME is not None and PASSWORD is not None:
-        return username == USERNAME and password == PASSWORD
+    ref_username = config["WebServer"]["username"]
+    ref_password = config["WebServer"]["password"]
+    if ref_username is not None and ref_password is not None:
+        return username == ref_username and password == ref_password
     else:
         return True
 
