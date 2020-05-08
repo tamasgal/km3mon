@@ -70,6 +70,10 @@ def main():
         warnings = {}
         errors   = {}
 
+        if not os.path.exists(log_file):
+            time.sleep(60)
+            continue
+
         f = open(log_file, 'r')
         for line in f.readlines():
             msg = Message(line)
