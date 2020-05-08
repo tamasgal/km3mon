@@ -15,11 +15,7 @@ class message:
         self.fields  = re.split(self.regexp,msg)
     
     def is_error(self):
-        if (self.matches!=None and self.fields[6]=='ERROR'):
-            return True
-        else:
-            return False
-    
+        return self.matches!=None and self.fields[6]=='ERROR'
     def is_warning(self):
         if (self.matches!=None and self.fields[6]=='WARNING'):
             return True
