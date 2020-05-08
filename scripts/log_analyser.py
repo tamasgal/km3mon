@@ -1,37 +1,34 @@
-import argparse
 import sys
 import re
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import datetime
+from datetime import datetime as dt
+from datetime import timezone as tz
+import time
 
-class message:
-    
+class message:   
     def __init__(self, msg):
-        self.msg    = msg
-        self.regexp = '(\w+.\w+) \[(\w+)\]: (\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4}) (\d+.\d+.\d+.\d+) (\w+\/*\w+) (\w+) (.*)'
-        self.matches = re.split(self.regexp,msg)
-
-        if (self.matches):
-            self.valid = True
-        else:
-            self.valid = False
-            
+        self.regexp  = '(\w+.\w+)\s+\[(\w+)\]:\s+(\w+\s+\w+\s+\d+\s+\d+:\d+:\d+\s+\d+)\s+(\d+\.\d+\.\d+\.\d+)\s+(\w+\/*\w+)\s+(\w+)\s+(.*)'
+        self.matches = re.match(self.regexp,msg)
+        self.fields  = re.split(self.regexp,msg)
+    
     def is_error(self):
-        if (self.valid and self.matches[6]=='ERROR'):
+        if (self.matches!=None and self.fields[6]=='ERROR'):
             return True
         else:
             return False
     
     def is_warning(self):
-        if (self.valid and self.matches[6]=='WARNING'):
+        if (self.matches!=None and self.fields[6]=='WARNING'):
             return True
         else:
             return False
         
     def get_process(self):
-        if (self.valid):
-            return self.matches[2]
+        if (self.matches!=None):
+            return self.fields[2]
 
 def plot_log_statistics(errors,warnings,title,output):
 
@@ -57,33 +54,35 @@ def plot_log_statistics(errors,warnings,title,output):
     ax.set_xticks(x + 0.5*bar_width)
     ax.set_xticklabels(x_labels)
     ax.legend((err_plt, war_plt), ('errors', 'warnings'))
+    ax.set_ylim(1e-1,1e6)
+    ax.set_yscale('log')
     ax.grid(True)
 
     plt.title(title)
     plt.savefig(output)
     
+def seconds_to_UTC_midnight():    
 
-def main(infile , outfile):
+    tomorrow = dt.now(tz.utc) + datetime.timedelta(days=1)
+    midnight = dt(year=tomorrow.year, month=tomorrow.month, 
+                                 day=tomorrow.day, hour=0, minute=0, second=0, tzinfo=tz.utc)    
+    return (midnight - dt.now(tz.utc)).seconds
+
+
+while True: 
+    log_file = './../logs/MSG_'+(dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")+'.log'
+    out_file = './../logs/MSG_'+(dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")+'.png'
+
     warnings = {}
     errors   = {}
-
-    for line in infile.readlines():
-        msg = message(line)
-        if (msg.valid):
-            errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
-            warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
-        else:
-            sys.exit('ERROR parsing the log file: Line does not match regular expression')
-            
-    title = os.path.basename(infile.name)        
-    plot_log_statistics(errors,warnings,title,outfile)
-
     
-parser = argparse.ArgumentParser(description='Script to inspect log files from the shore station.')
-required = parser.add_argument_group('required arguments')
-required.add_argument('-o' , '--output_file', type=str                    , required=True , help='ouput file')
-required.add_argument('-i' , '--input_file' , type=argparse.FileType('r') , required=True , help='daq .log file.')
-args = parser.parse_args()
-
-if __name__ == "__main__":
-   main(args.input_file , args.output_file)
+    f = open(log_file, 'r')
+    for line in f.readlines():
+        msg = message(line)
+        errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
+        warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
+    
+    title = os.path.basename(f.name)        
+    plot_log_statistics(errors,warnings,title,out_file)
+    
+    time.sleep(seconds_to_UTC_midnight() + 60)
