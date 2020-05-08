@@ -68,21 +68,26 @@ def seconds_to_UTC_midnight():
                                  day=tomorrow.day, hour=0, minute=0, second=0, tzinfo=tz.utc)    
     return (midnight - dt.now(tz.utc)).seconds
 
+def main():
+    
+    while True: 
+        log_file = './../logs/MSG_'+(dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")+'.log'
+        out_file = './../logs/MSG_'+(dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")+'.png'
+        
+        warnings = {}
+        errors   = {}
 
-while True: 
-    log_file = './../logs/MSG_'+(dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")+'.log'
-    out_file = './../logs/MSG_'+(dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")+'.png'
+        f = open(log_file, 'r')
+        for line in f.readlines():
+            msg = message(line)
+            errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
+            warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
 
-    warnings = {}
-    errors   = {}
-    
-    f = open(log_file, 'r')
-    for line in f.readlines():
-        msg = message(line)
-        errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
-        warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
-    
-    title = os.path.basename(f.name)        
-    plot_log_statistics(errors,warnings,title,out_file)
-    
-    time.sleep(seconds_to_UTC_midnight() + 60)
+        title = os.path.basename(f.name)        
+        plot_log_statistics(errors,warnings,title,out_file)
+
+        time.sleep(seconds_to_UTC_midnight() + 60)
+
+        
+if __name__ == '__main__':
+    main()
