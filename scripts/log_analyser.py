@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# coding=utf-8
+# Filename: log_analyser.py
+# Author: Rodrigo Gracia Ruiz <rgracia@km3net.de>
+# vim: ts=4 sw=4 et
 import sys
 import re
 import numpy as np
