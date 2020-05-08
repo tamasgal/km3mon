@@ -17,11 +17,7 @@ class message:
     def is_error(self):
         return self.matches!=None and self.fields[6]=='ERROR'
     def is_warning(self):
-        if (self.matches!=None and self.fields[6]=='WARNING'):
-            return True
-        else:
-            return False
-        
+        return self.matches!=None and self.fields[6]=='WARNING'
     def get_process(self):
         if (self.matches!=None):
             return self.fields[2]
