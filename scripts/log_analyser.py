@@ -63,7 +63,7 @@ def seconds_to_UTC_midnight():
 def main():
     
     while True: 
-        basename = './../logs/MSG_' + (dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+        basename = 'logs/MSG_' + (dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         log_file = basename + '.log'
         out_file = basename + '.png'
         
