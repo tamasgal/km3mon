@@ -8,7 +8,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 import time
 
-class message:   
+class Message:   
     def __init__(self, msg):
         self.regexp  = '(\w+.\w+)\s+\[(\w+)\]:\s+(\w+\s+\w+\s+\d+\s+\d+:\d+:\d+\s+\d+)\s+(\d+\.\d+\.\d+\.\d+)\s+(\w+\/*\w+)\s+(\w+)\s+(.*)'
         self.matches = re.match(self.regexp,msg)
