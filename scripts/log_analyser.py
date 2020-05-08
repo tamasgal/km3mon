@@ -60,6 +60,7 @@ def plot_log_statistics(errors,warnings,title,output):
 
     plt.title(title)
     plt.savefig(output)
+    plt.close('all')
     
 def seconds_to_UTC_midnight():    
 
