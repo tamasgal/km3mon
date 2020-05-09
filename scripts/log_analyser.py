@@ -69,29 +69,37 @@ def seconds_to_UTC_midnight():
                                  day=tomorrow.day, hour=0, minute=0, second=0, tzinfo=tz.utc)    
     return (midnight - dt.now(tz.utc)).seconds
 
+def process_log_file(log_file,out_file):
+
+    warnings = {}
+    errors   = {}
+
+    f = open(log_file, 'r')
+    for line in f.readlines():
+        msg = Message(line)
+        errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
+        warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
+        
+    title = os.path.basename(f.name)        
+    plot_log_statistics(errors,warnings,title,out_file)
+
 def main():
-    
+
+    log_dir = 'logs/'
+    for file in os.listdir(log_dir):
+        if (file.endswith(".log") and file != 'MSG.log' and not os.path.exists(os.path.splitext(file)[0] + '.png')):
+             process_log_file(log_dir + file, log_dir + os.path.splitext(file)[0] + '.png')
+            
     while True: 
-        basename = 'logs/MSG_' + (dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+        basename = log_dir+'MSG_' + (dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         log_file = basename + '.log'
         out_file = basename + '.png'
         
-        warnings = {}
-        errors   = {}
-
         if not os.path.exists(log_file):
             time.sleep(60)
             continue
 
-        f = open(log_file, 'r')
-        for line in f.readlines():
-            msg = Message(line)
-            errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
-            warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
-
-        title = os.path.basename(f.name)        
-        plot_log_statistics(errors,warnings,title,out_file)
-
+        process_log_file(log_file,out_file)
         time.sleep(seconds_to_UTC_midnight() + 60)
 
         
