@@ -31,7 +31,6 @@ class Message:
             return self.fields[2]
 
 def plot_log_statistics(errors,warnings,title,output):
-
     err_keys = [k for k in sorted(errors  .keys() , key=str.casefold)]
     war_keys = [k for k in sorted(warnings.keys() , key=str.casefold)]
 
@@ -77,8 +76,9 @@ def process_log_file(log_file,out_file):
     f = open(log_file, 'r')
     for line in f.readlines():
         msg = Message(line)
-        errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
-        warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
+        if (msg.matches!=None):
+            errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
+            warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
         
     title = os.path.basename(f.name)        
     plot_log_statistics(errors,warnings,title,out_file)
@@ -86,9 +86,12 @@ def process_log_file(log_file,out_file):
 def main():
 
     log_dir = 'logs/'
+    regexp  = '^MSG_(.+)\.log'
+
     for file in os.listdir(log_dir):
-        if (file.endswith(".log") and file != 'MSG.log' and not os.path.exists(os.path.splitext(file)[0] + '.png')):
-             process_log_file(log_dir + file, log_dir + os.path.splitext(file)[0] + '.png')
+        if (re.match(regexp,file) and (not os.path.exists(log_dir + os.path.splitext(file)[0] + '.png'))):
+            print ('processing ', log_dir + file)
+            process_log_file(log_dir + file, log_dir + os.path.splitext(file)[0] + '.png')
             
     while True: 
         basename = log_dir+'MSG_' + (dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
@@ -99,6 +102,7 @@ def main():
             time.sleep(60)
             continue
 
+        print ('processing ', log_file)
         process_log_file(log_file,out_file)
         time.sleep(seconds_to_UTC_midnight() + 60)
 
