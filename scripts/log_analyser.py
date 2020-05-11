@@ -102,6 +102,7 @@ def main():
             time.sleep(60)
             continue
 
+        print ('processing ', log_file)
         process_log_file(log_file,out_file)
         time.sleep(seconds_to_UTC_midnight() + 60)
 
