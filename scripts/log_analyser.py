@@ -85,10 +85,11 @@ def process_log_file(log_file,out_file):
 
 def main():
 
-    log_dir = 'logs/'
+    log_dir = './../logs/'
     for file in os.listdir(log_dir):
         if (file.endswith(".log") and file != 'MSG.log' and not os.path.exists(os.path.splitext(file)[0] + '.png')):
-             process_log_file(log_dir + file, log_dir + os.path.splitext(file)[0] + '.png')
+            print ('processing ', log_dir + file)
+            process_log_file(log_dir + file, log_dir + os.path.splitext(file)[0] + '.png')
             
     while True: 
         basename = log_dir+'MSG_' + (dt.now(tz.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
