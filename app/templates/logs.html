@@ -11,7 +11,7 @@
 
                 {% for filename, filesize in files.items() %}
                 {% if filename != 'MSG.log' %}
-                <div class="log-plot" style="display: inline; width=100px">
+                <div class="log-plot" style="display: inline; width=100px; float: left">
                     <span>{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)<span>
                     <a href="/logs/{{ filename }}">
                         <img src="/logs/{{ filename|replace('.log', '.png') }}"
