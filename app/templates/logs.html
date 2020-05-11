@@ -12,7 +12,9 @@
                 {% for filename, filesize in files.items() %}
                 {% if filename != 'MSG.log' %}
                 <a href="/logs/{{ filename }}">
-                    <img src="/logs/{{ filename|replace('.log', '.png') }}" alt="{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)" />
+                    <img src="/logs/{{ filename|replace('.log', '.png') }}"
+                         width="100"
+                         alt="{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)" />
                 </a>
                 {% endif %}
                 {% endfor %}
