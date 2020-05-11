@@ -7,18 +7,21 @@
 
     <div class="container-fluid" id="logs">
         <div class="row">
-            <div class="col-md-12" style="width: 100%">
+            <div class="col-md-12">
 
                 {% for filename, filesize in files.items() %}
                 {% if filename != 'MSG.log' %}
-                <div class="float-left" style="width=100px">
-                    <span>{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)<span>
+                <div  style="width=100px; float:left; text-align: center; font-size: 10px">
                     <a href="/logs/{{ filename }}">
+                        <span>{{ filename }}</span>
+                    </a><br />
+                    <span>({{'%0.1f' | format(filesize/1024/1024) }}MB)<span><br />
+                    <a href="/logs/{{ filename|replace('.log', '.png') }}">
                         <img src="/logs/{{ filename|replace('.log', '.png') }}"
                             width="100"
                             alt="{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)" />
                     </a>
-                <div>
+                </div>
                 {% endif %}
                 {% endfor %}
             </div>
