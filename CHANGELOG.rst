@@ -4,6 +4,8 @@ Unreleased changes
 * Log analyser added by Rodri <rgracia@km3net.de>
 * Log files are now showing plots indicating the number of errors and warnings
   thanks to Rodri <rgracia@km3net.de>
+* Corrupt event data are now skipped in trigger rate, which previously crashed
+  the thread
 
 Version 1
 ---------
