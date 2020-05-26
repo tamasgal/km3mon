@@ -209,7 +209,7 @@ def main():
         timeout=60 * 60 * 24 * 7,
         max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(TriggerMap, det_id=det_id, plots_path=plots_path)
+    pipe.attach(TriggerMap, det_id=det_id, plots_path=plots_path, only_if="Hits")
     pipe.drain()
 
 
