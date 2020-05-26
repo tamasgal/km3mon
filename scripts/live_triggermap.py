@@ -74,11 +74,6 @@ class TriggerMap(Module):
         self.thread = threading.Thread(target=self.plot).start()
 
     def process(self, blob):
-        tag = str(blob['CHPrefix'].tag)
-
-        if not tag == 'IO_EVT':
-            return blob
-
         event_hits = blob['Hits']
         with lock:
             run_id = blob['EventInfo'].run_id[0]
@@ -88,8 +83,8 @@ class TriggerMap(Module):
                 self.runchanges[_run_id] += 1
                 if _run_id != self.current_run_id and \
                         self.runchanges[_run_id] > self.max_events:
-                    self.print("Removing run {} from the annotation list".
-                               format(_run_id))
+                    self.log.info("Removing run {} from the annotation list".
+                                  format(_run_id))
                     del self.runchanges[_run_id]
 
             self.n_events += 1
@@ -117,6 +112,7 @@ class TriggerMap(Module):
             time.sleep(50)
 
     def create_plots(self):
+        self.cprint("Updating plots")
         if len(self.hits) > 0:
             self.create_plot(self.hits, "Hits on DOMs", 'hitmap')
         if len(self.triggered_hits) > 0:
@@ -156,7 +152,7 @@ class TriggerMap(Module):
         for run, n_events_since_runchange in self.runchanges.items():
             if n_events_since_runchange >= self.max_events:
                 continue
-            self.print("Annotating run {} ({} events passed)".format(
+            self.log.info("Annotating run {} ({} events passed)".format(
                 run, n_events_since_runchange))
             x_pos = min(self.n_events,
                         self.max_events) - n_events_since_runchange
