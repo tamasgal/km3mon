@@ -17,8 +17,6 @@ Options:
     -h --help       Show this screen.
 
 """
-from __future__ import division, print_function
-
 from datetime import datetime
 from collections import defaultdict, deque, OrderedDict
 from itertools import chain
@@ -81,7 +79,7 @@ class TriggerRate(kp.Module):
             15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
         self.sendchatalert = kp.time.Cuckoo(30 * 60, sendchatalert)
 
-        print("Update interval: {}s".format(self.interval))
+        self.cprint("Update interval: {}s".format(self.interval))
         self.trigger_counts = defaultdict(int)
         self.trigger_rates = OrderedDict()
         self._trigger_types = ["Overall", "3DMuon", "MXShower", "3DShower"]
@@ -147,31 +145,31 @@ class TriggerRate(kp.Module):
             self.trigger_counts["MXShower"] += is_mxshower(tm)
             self.trigger_counts["3DMuon"] += is_3dmuon(tm)
 
-        print(self.trigger_counts)
+        self.cprint(self.trigger_counts)
 
         return blob
 
     def _log_run_change(self):
         """Keep track of a run change"""
-        self.print("New run: %s" % self.current_run_id)
+        self.cprint("New run: %s" % self.current_run_id)
         now = datetime.utcnow()
         self.run_changes.append((now, self.current_run_id))
 
     def _get_run_changes_to_plot(self):
         """Retrieve all run numbers to be plotted on the trigger rate plot"""
-        self.print("Checking run changes out of range")
+        self.log.info("Checking run changes out of range")
         overall_rates = self.trigger_rates['Overall']
         if not overall_rates:
-            self.print("No trigger rates logged  yet, nothing to remove.")
+            self.log.info("No trigger rates logged yet, nothing to remove.")
             return
-        self.print("  all:     {}".format(self.run_changes))
+        self.log.info("  all:     {}".format(self.run_changes))
         run_changes_to_plot = []
         min_timestamp = min(overall_rates)[0]
-        self.print("  earliest timestamp to plot: {}".format(min_timestamp))
+        self.log.info("  earliest timestamp to plot: {}".format(min_timestamp))
         for timestamp, run in self.run_changes:
             if timestamp > min_timestamp:
                 run_changes_to_plot.append((timestamp, run))
-        self.print("  to plot: {}".format(run_changes_to_plot))
+        self.log.info("  to plot: {}".format(run_changes_to_plot))
         return run_changes_to_plot
 
     def plot(self):
@@ -212,7 +210,7 @@ class TriggerRate(kp.Module):
 
     def create_plot(self):
         """Create the trigger rate plot"""
-        print('\n' + self.__class__.__name__ + ": updating plot.")
+        self.cprint('\n' + self.__class__.__name__ + ": updating plot.")
 
         fig, ax = plt.subplots(figsize=(16, 4))
 
@@ -228,7 +226,7 @@ class TriggerRate(kp.Module):
                     label=trigger)
 
         run_changes_to_plot = self._get_run_changes_to_plot()
-        self.print("Recorded run changes: {}".format(run_changes_to_plot))
+        self.log.info("Recorded run changes: {}".format(run_changes_to_plot))
         all_rates = [r for d, r in chain(*self.trigger_rates.values())]
         if not all_rates:
             self.log.warning("Empty rates, skipping...")
@@ -274,7 +272,7 @@ class TriggerRate(kp.Module):
         shutil.move(filename_tmp, filename)
 
         plt.close('all')
-        print("Plot updated at '{}'.".format(filename))
+        self.cprint("Plot updated at '{}'.".format(filename))
 
     def trigger_rate_sampling_period(self):
         """This is obsolete and will be removed"""
