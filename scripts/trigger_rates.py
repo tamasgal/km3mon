@@ -27,6 +27,7 @@ import sys
 from io import BytesIO
 from os.path import join, exists
 import shutil
+import struct
 import time
 import threading
 
@@ -129,8 +130,12 @@ class TriggerRate(kp.Module):
 
         data = blob['CHData']
         data_io = BytesIO(data)
-        preamble = DAQPreamble(file_obj=data_io)  # noqa
-        event = DAQEvent(file_obj=data_io)
+        try:
+            preamble = DAQPreamble(file_obj=data_io)  # noqa
+            event = DAQEvent(file_obj=data_io)
+        except struct.error:
+            self.log.error("Corrupt event data recieved, skipping...")
+            return
         self.det_id = event.header.det_id
         if event.header.run > self.current_run_id:
             self.current_run_id = event.header.run
