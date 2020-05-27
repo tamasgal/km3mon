@@ -26,7 +26,7 @@ AHRS_PLOTS = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
 RTTC_PLOTS = [['rttc']]
-RECO_PLOTS = [['track_reco', 'ztplot_roy'], ['time_residuals']]
+RECO_PLOTS = [['time_residuals', 'ztplot_roy']]
 COMPACT_PLOTS = [['dom_activity', 'dom_rates', 'pmt_rates'],
                  ['trigger_rates', 'trigger_rates_lin'],
                  ['ztplot', 'ztplot_roy', 'triggermap']]
