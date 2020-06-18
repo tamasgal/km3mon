@@ -39,11 +39,17 @@ def duplicates(lst, item):
 
 args = docopt(__doc__)
 
-detid = args['-d']
-directory = args['-o']
-
 db = kp.db.DBManager()
 sds = kp.db.StreamDS()
+
+try:
+    detid = int(args['-d'])
+except ValueError:
+    detid = (args['-d'])
+if type(detid)==int:
+    detid = db.get_det_oid(detid)
+
+directory = args['-o']
 
 ACOUSTIC_BEACONS = [12, 14, 16]
 N_DOMS = 18
