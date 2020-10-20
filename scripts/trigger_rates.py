@@ -39,7 +39,6 @@ import toml
 from rocketchat_API.rocketchat import RocketChat
 
 import km3pipe as kp
-from km3pipe.config import Config
 from km3pipe.io.daq import (DAQPreamble, DAQEvent, is_3dshower, is_3dmuon,
                             is_mxshower)
 import km3pipe.style
@@ -70,8 +69,7 @@ class TriggerRate(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         self.data_path = self.get('data_path', default='data')
-        self.interval = self.get("interval",
-                                 default=self.trigger_rate_sampling_period())
+        self.interval = self.get("interval", default=300)
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
 
@@ -273,14 +271,6 @@ class TriggerRate(kp.Module):
 
         plt.close('all')
         self.cprint("Plot updated at '{}'.".format(filename))
-
-    def trigger_rate_sampling_period(self):
-        """This is obsolete and will be removed"""
-        try:
-            return int(Config().get("Monitoring",
-                                    "trigger_rate_sampling_period"))
-        except (TypeError, ValueError):
-            return 180
 
     def finish(self):
         self.trigger_rates_fobj.close()
