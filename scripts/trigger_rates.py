@@ -190,7 +190,7 @@ class TriggerRate(kp.Module):
                 trigger_rate = trigger_rates[trigger_type]
             except KeyError:
                 trigger_rate = 0
-            if trigger_rate == 0 && trigger_type == "Overall":
+            if trigger_rate == 0 and trigger_type == "Overall":
                 self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
                 self.sendchatalert("Trigger rate is 0Hz!")
             entry += f",{trigger_rate}"
