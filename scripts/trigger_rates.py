@@ -24,6 +24,7 @@ from functools import partial
 import sys
 from io import BytesIO
 from os.path import join, exists
+import requests
 import shutil
 import struct
 import time
@@ -55,13 +56,16 @@ with open(CONFIG, 'r') as fobj:
     PASSWORD = config['Alerts']['password']
     CHANNEL = config['Alerts']['channel']
 
+log = kp.logger.get_logger(__name__)
 rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
-
 
 def sendchatalert(msg):
     with open(CONFIG, 'r') as fobj:
         shifters = toml.load(fobj)['Alerts'].get('shifters', "shifters")
-    rocket.chat_post_message(shifters + ": " + msg, channel=CHANNEL)
+    try:
+        rocket.chat_post_message(shifters + ": " + msg, channel=CHANNEL)
+    except requests.exceptions.ConnectionError:
+        log.error("Could not send chat alert!")
 
 
 class TriggerRate(kp.Module):
