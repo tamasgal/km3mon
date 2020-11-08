@@ -41,7 +41,7 @@ args = docopt(__doc__)
 
 db = kp.db.DBManager()
 sds = kp.db.StreamDS()
-
+                    
 try:
     detid = int(args['-d'])
 except ValueError:
@@ -51,7 +51,8 @@ if type(detid)==int:
 
 directory = args['-o']
 
-ACOUSTIC_BEACONS = [12, 14, 16]
+ACOUSTIC_BEACONS = [0, 0, 0]
+
 N_DOMS = 18
 N_ABS = 3
 DOMS = range(N_DOMS + 1)
@@ -82,7 +83,7 @@ while check:
             print(now)
         except:
             pass
-
+        
     N_Pulses_Indicator = [
     ]  # Matrix indicating how many pulses each piezo reveals
     for du in DUS_cycle:
@@ -91,13 +92,30 @@ while check:
         for dom in DOMS:
             UTB_MIN = []
             QF_MAX = []
+
+            n = -1            
             for ab in ACOUSTIC_BEACONS:
+                n = n + 1
                 try:
                     domID = clbmap.omkeys[(du, dom)].dom_id
-                except (KeyError, AttributeError):
+                    
+                    AcBe = sds.toashort(detid=detid,
+                        minrun=minrun,
+                        domid=domID,
+                        maxrun=maxrun)      
+                
+                    ACOUSTIC_BEACONS_TEMP = np.unique(AcBe["EMITTERID"]).tolist()
+                    if np.size(ACOUSTIC_BEACONS_TEMP) < 3:
+                        while np.size(ACOUSTIC_BEACONS_TEMP) < 3:
+                            ACOUSTIC_BEACONS_TEMP.append(0)
+                    ACOUSTIC_BEACONS_TEMP_2 = np.sort(np.abs(ACOUSTIC_BEACONS_TEMP))
+                    m = np.where(np.abs(ACOUSTIC_BEACONS_TEMP) == ACOUSTIC_BEACONS_TEMP_2[n])[0][0]
+                    ab = ACOUSTIC_BEACONS_TEMP[m]
+                    
+                except (KeyError, AttributeError, TypeError):
                     N_Pulses_Indicator_DU.append(-1.5)
                     continue
-
+                
                 try:
                     toas_all = sds.toashort(detid=detid,
                                             minrun=minrun,
