@@ -17,8 +17,6 @@ Options:
     -h --help       Show this screen.
 
 """
-from __future__ import division, print_function
-
 from datetime import datetime
 from collections import defaultdict, deque, OrderedDict
 from itertools import chain
@@ -26,7 +24,9 @@ from functools import partial
 import sys
 from io import BytesIO
 from os.path import join, exists
+import requests
 import shutil
+import struct
 import time
 import threading
 
@@ -40,7 +40,6 @@ import toml
 from rocketchat_API.rocketchat import RocketChat
 
 import km3pipe as kp
-from km3pipe.config import Config
 from km3pipe.io.daq import (DAQPreamble, DAQEvent, is_3dshower, is_3dmuon,
                             is_mxshower)
 import km3pipe.style
@@ -57,13 +56,16 @@ with open(CONFIG, 'r') as fobj:
     PASSWORD = config['Alerts']['password']
     CHANNEL = config['Alerts']['channel']
 
+log = kp.logger.get_logger(__name__)
 rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
-
 
 def sendchatalert(msg):
     with open(CONFIG, 'r') as fobj:
         shifters = toml.load(fobj)['Alerts'].get('shifters', "shifters")
-    rocket.chat_post_message(shifters + ": " + msg, channel=CHANNEL)
+    try:
+        rocket.chat_post_message(shifters + ": " + msg, channel=CHANNEL)
+    except requests.exceptions.ConnectionError:
+        log.error("Could not send chat alert!")
 
 
 class TriggerRate(kp.Module):
@@ -71,8 +73,7 @@ class TriggerRate(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         self.data_path = self.get('data_path', default='data')
-        self.interval = self.get("interval",
-                                 default=self.trigger_rate_sampling_period())
+        self.interval = self.get("interval", default=300)
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
 
@@ -80,7 +81,7 @@ class TriggerRate(kp.Module):
             15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
         self.sendchatalert = kp.time.Cuckoo(30 * 60, sendchatalert)
 
-        print("Update interval: {}s".format(self.interval))
+        self.cprint("Update interval: {}s".format(self.interval))
         self.trigger_counts = defaultdict(int)
         self.trigger_rates = OrderedDict()
         self._trigger_types = ["Overall", "3DMuon", "MXShower", "3DShower"]
@@ -129,8 +130,12 @@ class TriggerRate(kp.Module):
 
         data = blob['CHData']
         data_io = BytesIO(data)
-        preamble = DAQPreamble(file_obj=data_io)  # noqa
-        event = DAQEvent(file_obj=data_io)
+        try:
+            preamble = DAQPreamble(file_obj=data_io)  # noqa
+            event = DAQEvent(file_obj=data_io)
+        except struct.error:
+            self.log.error("Corrupt event data recieved, skipping...")
+            return
         self.det_id = event.header.det_id
         if event.header.run > self.current_run_id:
             self.current_run_id = event.header.run
@@ -142,31 +147,31 @@ class TriggerRate(kp.Module):
             self.trigger_counts["MXShower"] += is_mxshower(tm)
             self.trigger_counts["3DMuon"] += is_3dmuon(tm)
 
-        print(self.trigger_counts)
+        self.cprint(self.trigger_counts)
 
         return blob
 
     def _log_run_change(self):
         """Keep track of a run change"""
-        self.print("New run: %s" % self.current_run_id)
+        self.cprint("New run: %s" % self.current_run_id)
         now = datetime.utcnow()
         self.run_changes.append((now, self.current_run_id))
 
     def _get_run_changes_to_plot(self):
         """Retrieve all run numbers to be plotted on the trigger rate plot"""
-        self.print("Checking run changes out of range")
+        self.log.info("Checking run changes out of range")
         overall_rates = self.trigger_rates['Overall']
         if not overall_rates:
-            self.print("No trigger rates logged  yet, nothing to remove.")
+            self.log.info("No trigger rates logged yet, nothing to remove.")
             return
-        self.print("  all:     {}".format(self.run_changes))
+        self.log.info("  all:     {}".format(self.run_changes))
         run_changes_to_plot = []
         min_timestamp = min(overall_rates)[0]
-        self.print("  earliest timestamp to plot: {}".format(min_timestamp))
+        self.log.info("  earliest timestamp to plot: {}".format(min_timestamp))
         for timestamp, run in self.run_changes:
             if timestamp > min_timestamp:
                 run_changes_to_plot.append((timestamp, run))
-        self.print("  to plot: {}".format(run_changes_to_plot))
+        self.log.info("  to plot: {}".format(run_changes_to_plot))
         return run_changes_to_plot
 
     def plot(self):
@@ -185,7 +190,7 @@ class TriggerRate(kp.Module):
                 trigger_rate = trigger_rates[trigger_type]
             except KeyError:
                 trigger_rate = 0
-            if trigger_rate == 0:
+            if trigger_rate == 0 and trigger_type == "Overall":
                 self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
                 self.sendchatalert("Trigger rate is 0Hz!")
             entry += f",{trigger_rate}"
@@ -207,7 +212,7 @@ class TriggerRate(kp.Module):
 
     def create_plot(self):
         """Create the trigger rate plot"""
-        print('\n' + self.__class__.__name__ + ": updating plot.")
+        self.cprint('\n' + self.__class__.__name__ + ": updating plot.")
 
         fig, ax = plt.subplots(figsize=(16, 4))
 
@@ -223,7 +228,7 @@ class TriggerRate(kp.Module):
                     label=trigger)
 
         run_changes_to_plot = self._get_run_changes_to_plot()
-        self.print("Recorded run changes: {}".format(run_changes_to_plot))
+        self.log.info("Recorded run changes: {}".format(run_changes_to_plot))
         all_rates = [r for d, r in chain(*self.trigger_rates.values())]
         if not all_rates:
             self.log.warning("Empty rates, skipping...")
@@ -269,15 +274,7 @@ class TriggerRate(kp.Module):
         shutil.move(filename_tmp, filename)
 
         plt.close('all')
-        print("Plot updated at '{}'.".format(filename))
-
-    def trigger_rate_sampling_period(self):
-        """This is obsolete and will be removed"""
-        try:
-            return int(Config().get("Monitoring",
-                                    "trigger_rate_sampling_period"))
-        except (TypeError, ValueError):
-            return 180
+        self.cprint("Plot updated at '{}'.".format(filename))
 
     def finish(self):
         self.trigger_rates_fobj.close()

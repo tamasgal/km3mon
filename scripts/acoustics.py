@@ -111,7 +111,6 @@ while check:
                     ACOUSTIC_BEACONS_TEMP_2 = np.sort(np.abs(ACOUSTIC_BEACONS_TEMP))
                     m = np.where(np.abs(ACOUSTIC_BEACONS_TEMP) == ACOUSTIC_BEACONS_TEMP_2[n])[0][0]
                     ab = ACOUSTIC_BEACONS_TEMP[m]
-#                    print(ab)
                     
                 except (KeyError, AttributeError, TypeError):
                     N_Pulses_Indicator_DU.append(-1.5)

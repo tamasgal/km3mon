@@ -2,12 +2,27 @@
 
 {% block main %}
 
+    <div class="alert alert-success alert-dismissible" role="alert">The current log file (write in progress) can be downloaded here: <a href="/logs/MSG.log">MSG.log</a></div>
+
 
     <div class="container-fluid" id="logs">
         <div class="row">
             <div class="col-md-12">
+
                 {% for filename, filesize in files.items() %}
-                <a href="/logs/{{ filename }}" class="btn btn-{{ 'primary' if filename == 'MSG.log' else 'warning' }}" role="button">{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)</a></button>
+                {% if filename != 'MSG.log' %}
+                <div  style="width=100px; float:left; text-align: center; font-size: 10px">
+                    <a href="/logs/{{ filename }}">
+                        <span>{{ filename }}</span>
+                    </a><br />
+                    <span>({{'%0.1f' | format(filesize/1024/1024) }}MB)<span><br />
+                    <a href="/logs/{{ filename|replace('.log', '.png') }}">
+                        <img src="/logs/{{ filename|replace('.log', '.png') }}"
+                            width="100"
+                            alt="{{ filename }} ({{'%0.1f' | format(filesize/1024/1024) }}MB)" />
+                    </a>
+                </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>

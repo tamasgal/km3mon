@@ -139,3 +139,37 @@ max_events = 5000  # the number of events to log
 min_dus = 1
 ytick_distance = 25  # [m]
 ```
+
+
+## Chatbot
+
+The `km3mon` suite comes with a chatbot which can join a channel defined
+in the `pipeline.toml` file under the `[Alerts]` section:
+
+``` toml
+[Alerts]
+botname = "monitoring"
+password = "supersecretpassword"
+channel = "operations_fr"
+operators = [ "a_enzenhoefer", "tamasgal",]
+```
+
+The password is the actual login password of the bot. Once the `chatbot` service
+is running, the bot will notifiy important events like sudden drop of the
+trigger rate and can also be used to retrieve information from the monitoring
+system, set the current shifts and even control the monitoring services through
+the `supervisorctl` interface. Only the operators defined in the configuration
+file are allowed to modify services or change the shifters.
+To see the bot's capabilities, one simply asks them for help via
+`@monitoring help`:
+
+```
+Hi Tamas Gal, I was built to take care of the monitoring alerts.
+Here is how you can use me:
+- @monitoring shifters are cnorris and bspencer
+-> set the new shifters who I may annoy with chat messages and
+emails.
+- @monitoring status -> show the status of the monitoring system
+- @monitoring supervisorctl -> take control over the monitoring system
+- @monitoring help -> show this message
+```
