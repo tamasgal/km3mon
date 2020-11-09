@@ -21,7 +21,7 @@ app.config['FREEZER_DESTINATION'] = '../km3web'
 PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', ['trigger_rates'],
          ['ztplot', 'triggermap']]
 
-ACCOUSTICS_PLOTS = [['Online_Acoustic_Monitoring']]
+ACOUSTICS_PLOTS = [['Online_Acoustic_Monitoring']]
 AHRS_PLOTS = ['yaw_calib_du*', 'pitch_calib_du*', 'roll_calib_du*']
 TRIGGER_PLOTS = [['trigger_rates'], ['trigger_rates_lin']]
 K40_PLOTS = [['intradom'], ['angular_k40rate_distribution']]
