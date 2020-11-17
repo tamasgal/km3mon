@@ -91,6 +91,15 @@ class TriggerMap(Module):
 
             hits = np.zeros(self.n_rows)
             for dom_id in event_hits.dom_id:
+                if dom_id not in self.det.doms:
+                    fname = "IO_EVT_{}.dat".format(round(time.time(), 3))
+                    with open(fname, "bw") as fobj:
+                        fobj.write(blob["CHData"])
+                    self.log.error(
+                        "Invalid DOM ID: %s. Raw event data dump written to %s",
+                        dom_id, fname
+                    )
+                    break
                 du, floor, _ = self.det.doms[dom_id]
                 du_idx = self.dus.index(du)
                 hits[du_idx * 18 + floor - 1] += 1
@@ -98,6 +107,9 @@ class TriggerMap(Module):
             triggered_hits = np.zeros(self.n_rows)
             for dom_id in event_hits.dom_id[event_hits.triggered.astype(
                     'bool')]:
+                if dom_id not in self.det.doms:
+                    # we already check above
+                    break
                 du, floor, _ = self.det.doms[dom_id]
                 du_idx = self.dus.index(du)
                 triggered_hits[du_idx * 18 + floor - 1] += 1
