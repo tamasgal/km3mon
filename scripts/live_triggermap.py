@@ -78,6 +78,7 @@ class TriggerMap(Module):
         with lock:
             run_id = blob['EventInfo'].run_id[0]
             if run_id > self.current_run_id:
+                self.cprint(f"New run: {run_id}")
                 self.current_run_id = run_id
             for _run_id in set(list(self.runchanges.keys()) + [run_id]):
                 self.runchanges[_run_id] += 1
