@@ -72,7 +72,7 @@ class DOMRates(kp.Module):
 
     def create_plot(self):
         """Creates the actual plot"""
-        print(self.__class__.__name__ + ": updating plot.")
+        self.cprint(self.__class__.__name__ + ": updating plot.")
 
         filename = os.path.join(self.plots_path, 'dom_rates.png')
         plot_dom_parameters(
@@ -87,7 +87,7 @@ class DOMRates(kp.Module):
             missing='black',
             under='darkorchid',
             over='deeppink')
-        print("done")
+        self.cprint("plot up to date.")
 
 
 def main():

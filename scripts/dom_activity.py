@@ -69,7 +69,7 @@ class DOMActivityPlotter(kp.Module):
         return blob
 
     def create_plot(self):
-        print(self.__class__.__name__ + ": updating plot.")
+        slef.cprint(self.__class__.__name__ + ": updating plot.")
         filename = os.path.join(self.plots_path, 'dom_activity.png')
         # now = kp.time.tai_timestamp()
         now = time.time()

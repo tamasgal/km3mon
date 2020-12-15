@@ -54,7 +54,7 @@ class CalibrateAHRS(kp.Module):
         self.clbmap = kp.db.CLBMap(det_oid=det_id)
 
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
-        self.cuckoo_log = kp.time.Cuckoo(10, print)
+        self.cuckoo_log = kp.time.Cuckoo(10, self.cprint)
 
         self.data = {}
         self.queue_size = 100000
@@ -107,7 +107,7 @@ class CalibrateAHRS(kp.Module):
         return blob
 
     def create_plot(self):
-        print(self.__class__.__name__ + ": updating plot.")
+        self.cprint(self.__class__.__name__ + ": updating plot.")
         if self.time_range > 24:
             xfmt = md.DateFormatter('%Y-%m-%d %H:%M')
         else:
