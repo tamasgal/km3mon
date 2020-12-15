@@ -242,13 +242,13 @@ class ZTPlot(kp.Module):
                 fobj.write(raw_data)
 
             self._update_lower_limits()
-            self.services['post_elog'](
-                logbook=self.logbook,
-                subject="New massive event!",
-                message="A new event has made it into the top 10!",
-                message_type="Monitoring",
-                author="Gal T",
-                files=[plot_filename])
+            # self.services['post_elog'](
+            #     logbook=self.logbook,
+            #     subject="New massive event!",
+            #     message="A new event has made it into the top 10!",
+            #     message_type="Monitoring",
+            #     author="Gal T",
+            #     files=[plot_filename])
 
         plt.close(fig)
         plt.close('all')
