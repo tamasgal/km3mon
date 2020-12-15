@@ -6,6 +6,9 @@ Unreleased changes
   thanks to Rodri <rgracia@km3net.de>
 * Corrupt event data are now skipped in trigger rate, which previously crashed
   the thread
+* Several catches of errors in online processing to make things run and log
+  instead of crash and annoy
+* Preliminary support for km3pipe v9
 
 Version 1
 ---------
