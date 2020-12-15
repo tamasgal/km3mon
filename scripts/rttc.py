@@ -32,6 +32,7 @@ import numpy as np
 from collections import deque, defaultdict, OrderedDict
 from functools import partial
 
+import km3db
 import km3pipe as kp
 from km3pipe import Pipeline, Module
 import km3pipe.style
@@ -45,11 +46,10 @@ def get_baseline_rttc(det_id, hours=24):
     """Retrieve the median and std RTTC values for a given time interval [h]"""
     print("Retrieving baseline RTTC")
     now = time.time()
-    dm = kp.db.DBManager()
-    det_oid = dm.get_det_oid(det_id)
-    sds = kp.db.StreamDS()
+    det_oid = km3db.todetid(det_id)
+    sds = km3db.StreamDS(container="pd")
     det = kp.hardware.Detector(det_id=det_id)
-    clbmap = kp.db.CLBMap(det_oid=det_oid)
+    clbmap = km3db.CLBMap(det_oid=det_oid)
     runs = sds.runs(detid=det_id)
     latest_run = int(runs.tail(1).RUN)
     run_24h_ago = int(
@@ -91,7 +91,7 @@ def main():
     plots_path = args['-o']
 
     detector = kp.hardware.Detector(det_id=det_id)
-    clbmap = kp.db.CLBMap(det_id)
+    clbmap = km3db.CLBMap(km3io.tools.todetoid(det_id))
     dmm = kp.io.daq.DMMonitor(dm_ip, base='clb/outparams')
 
     params = []

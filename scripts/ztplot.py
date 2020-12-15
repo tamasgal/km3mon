@@ -18,6 +18,7 @@ Options:
 """
 from __future__ import division
 
+import km3db
 import km3pipe.style
 from km3modules.plot import ztplot
 from km3modules.common import LocalDBService
@@ -62,7 +63,7 @@ class ZTPlot(kp.Module):
         self.lower_limits = {}
         self.elog = self.get('elog', default=False)
 
-        self.sds = kp.db.StreamDS()
+        self.sds = km3db.StreamDS(container="pd")
 
         self.index = 0
 

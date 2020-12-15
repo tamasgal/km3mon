@@ -21,6 +21,7 @@ Options:
 # Author: Jonas Reubelt <jreubelt@km3net.de> and Tamas Gal <tgal@km3net.de>
 # License: MIT
 import os
+import km3db
 import km3pipe as kp
 import km3pipe.style
 from km3modules import k40
@@ -39,7 +40,7 @@ def main():
     ligier_ip = args['-l']
     ligier_port = int(args['-p'])
 
-    det_oid = kp.db.DBManager().get_det_oid(det_id)
+    det_oid = km3db.tools.todetoid(det_id)
 
     pipe = kp.Pipeline(timeit=True)
     pipe.attach(
