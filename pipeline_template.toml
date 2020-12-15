@@ -23,6 +23,7 @@ min_dus = 3
 min_doms = 24
 ytick_distance = 25
 logbook = "Operations+FR"
+elog = false
 
 [CalibrateAHRS]
 time_range = 72
