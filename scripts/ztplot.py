@@ -60,6 +60,7 @@ class ZTPlot(kp.Module):
         self.max_z = None
         self.last_plot_time = 0
         self.lower_limits = {}
+        self.elog = self.get('elog', default=False)
 
         self.sds = kp.db.StreamDS()
 
@@ -242,13 +243,14 @@ class ZTPlot(kp.Module):
                 fobj.write(raw_data)
 
             self._update_lower_limits()
-            # self.services['post_elog'](
-            #     logbook=self.logbook,
-            #     subject="New massive event!",
-            #     message="A new event has made it into the top 10!",
-            #     message_type="Monitoring",
-            #     author="Gal T",
-            #     files=[plot_filename])
+            if self.elog:
+                self.services['post_elog'](
+                    logbook=self.logbook,
+                    subject="New massive event!",
+                    message="A new event has made it into the top 10!",
+                    message_type="Monitoring",
+                    author="Gal T",
+                    files=[plot_filename])
 
         plt.close(fig)
         plt.close('all')
@@ -277,7 +279,7 @@ def main():
                 timeout=60 * 60 * 24 * 7,
                 max_queue=2000)
     pipe.attach(kp.io.daq.DAQProcessor)
-    pipe.attach(ZTPlot, det_id=det_id, plots_path=plots_path)
+    pipe.attach(ZTPlot, det_id=det_id, plots_path=plots_path, elog=False)
     pipe.drain()
 
 
