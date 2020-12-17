@@ -127,20 +127,14 @@ class TriggerRate(kp.Module):
             return blob
         sys.stdout.write('.')
         sys.stdout.flush()
+        einfo = blob["EventInfo"]
 
-        data = blob['CHData']
-        data_io = BytesIO(data)
-        try:
-            preamble = DAQPreamble(file_obj=data_io)  # noqa
-            event = DAQEvent(file_obj=data_io)
-        except struct.error:
-            self.log.error("Corrupt event data recieved, skipping...")
-            return
-        self.det_id = event.header.det_id
-        if event.header.run > self.current_run_id:
-            self.current_run_id = event.header.run
+        self.det_id = einfo.det_id[0]
+        run_id = einfo.run_id[0]
+        if run_id > self.current_run_id:
+            self.current_run_id = run_id
             self._log_run_change()
-        tm = event.trigger_mask
+        tm = einfo.trigger_mask[0]
         with self.lock:
             self.trigger_counts["Overall"] += 1
             self.trigger_counts["3DShower"] += is_3dshower(tm)
@@ -296,6 +290,7 @@ def main():
                 tags='IO_EVT',
                 timeout=60 * 60 * 24 * 7,
                 max_queue=200000)
+    pipe.attach(kp.io.daq.DAQProcessor)
     pipe.attach(TriggerRate, interval=300, plots_path=plots_path)
     pipe.drain()
 
