@@ -83,7 +83,7 @@ def register_handlers(bot):
             status = "```\n" + subprocess.check_output(
                 ['supervisorctl', 'status']).decode('ascii') + "\n```"
         except subprocess.CalledProcessError as e:
-            status = e.output.decode('ascii')
+            status = "```\n{}\n```".format(e.output.decode('ascii'))
         bot.send_message(status, channel_id)
 
     def supervisorctl(msg, user, channel_id):
