@@ -134,7 +134,7 @@ class TriggerRate(kp.Module):
         if run_id > self.current_run_id:
             self.current_run_id = run_id
             self._log_run_change()
-        tm = einfo.trigger_mask[0]
+        tm = int(einfo.trigger_mask[0])
         with self.lock:
             self.trigger_counts["Overall"] += 1
             self.trigger_counts["3DShower"] += is_3dshower(tm)
