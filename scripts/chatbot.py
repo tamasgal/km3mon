@@ -79,8 +79,11 @@ def register_handlers(bot):
                 "Sorry @{}, only operators and shifters are allowed to mess "
                 "with me, sorry...".format(user), channel_id)
             return
-        status = "```\n" + subprocess.check_output(
-            ['supervisorctl', 'status']).decode('ascii') + "\n```"
+        try:
+            status = "```\n" + subprocess.check_output(
+                ['supervisorctl', 'status']).decode('ascii') + "\n```"
+        except subprocess.CalledProcessError as e:
+            status = e.output.decode('ascii')
         bot.send_message(status, channel_id)
 
     def supervisorctl(msg, user, channel_id):
