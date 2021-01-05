@@ -14,13 +14,20 @@ Options:
 
 """
 import re
+import requests
 import subprocess
+import time
 import toml
 from rocketchat_API.rocketchat import RocketChat
 from RocketChatBot import RocketChatBot
 
+import km3pipe as kp
+
+log = kp.logger.get_logger("chatbot")
+
 URL = "https://chat.km3net.de"
 CONFIG = "pipeline.toml"
+RECONNECT_INTERVAL = 30
 
 with open(CONFIG, 'r') as fobj:
     config = toml.load(fobj)
@@ -30,7 +37,22 @@ with open(CONFIG, 'r') as fobj:
 
 
 def get_channel_id(channel):
-    rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
+    tries = 0
+    while True:
+        tries += 1
+
+        try:
+            rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
+        except requests.exceptions.ConnectionError as e:
+            log.error("Unable to connect to the RocketChat server: %s", e)
+        except Exception as e:
+            log.error("Unknown error occured: %s", e)
+        else:
+            break
+
+        interval = tries * RECONNECT_INTERVAL
+        print(f"Reconnecting in {interval} seconds...")
+        time.sleep(interval)
 
     channels = rocket.channels_list().json()['channels']
     for c in channels:
