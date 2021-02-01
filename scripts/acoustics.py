@@ -111,7 +111,7 @@ while check:
                     ACOUSTIC_BEACONS_TEMP_2 = np.sort(np.abs(ACOUSTIC_BEACONS_TEMP))
                     m = np.where(np.abs(ACOUSTIC_BEACONS_TEMP) == ACOUSTIC_BEACONS_TEMP_2[n])[0][0]
                     ab = ACOUSTIC_BEACONS_TEMP[m]
-#                    print(ab)
+                    print(ab)
                     
                 except (KeyError, AttributeError, TypeError):
                     N_Pulses_Indicator_DU.append(-1.5)
@@ -185,17 +185,19 @@ while check:
                     SIGNAL = QF_abdom[signal_index]
                     UTB_SIGNAL = UTB_abdom[signal_index]
                     TOA_SIGNAL = TOAS_abdom[signal_index]
-                    NOISE = QF_abdom[noise_index]
-                    NOISElist = NOISE.tolist()
-                    NOISElist.sort(reverse=True)
-                    NOISE = NOISE.tolist()
-                    NOISE.sort(reverse=True)
-                    noise_threshold = max(
-                        NOISE)  # To be sure not to take signal
+                    UNIX_TOA_SIGNAL = UTB_abdom[signal_index] + TOAS_abdom[signal_index]
+                    if len(noise_index) != 0:
+                        NOISE = QF_abdom[noise_index]
+                        NOISElist = NOISE.tolist()
+                        NOISElist.sort(reverse=True)
+                        NOISE = NOISE.tolist()
+                        NOISE.sort(reverse=True)
+                        noise_threshold = max(
+                            NOISE)  # To be sure not to take signal
 
                     # First filter: 22 greatest
 
-                    Security_Number = 22  # To be sure to take all the pulses
+                    Security_Number = len(SIGNAL)  # To be sure to take all the pulses
 
                     SIGNAL = SIGNAL.tolist()
                     SIGNAL_OLD = np.array(SIGNAL)
@@ -229,12 +231,6 @@ while check:
 
                     QF_second.sort(reverse=True)
 
-                    # Old second filter
-
-                    #                    QF_second = np.unique(QF_first)
-                    #                    QF_second = QF_second.tolist()
-                    #                    QF_second.sort(reverse = True)
-
                     # Third filter: If there are more than 11 elements I will eliminate the worst
 
                     if len(QF_second) > 11:
@@ -247,11 +243,13 @@ while check:
                         QF_third = QF_second
 
                     # Fourth filter: I remove the data if it is below the maximum noise
-
-                    QF_fourth = [
-                        k for k in QF_third
-                        if k > (noise_threshold + (10 * np.std(NOISE)))
-                    ]
+                    if len(noise_index) != 0:
+                        QF_fourth = [
+                            k for k in QF_third
+                            if k > (noise_threshold + (10 * np.std(NOISE)))
+                        ]
+                    else:
+                        QF_fourth = QF_third
 
                     # Fifth filter: Check if the clicks are interspersed in the right way
 
@@ -268,17 +266,20 @@ while check:
                                  (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) < 4)
                                 or
                             (np.mod(
-                                (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 5)):
+                                (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 5)
+                            ):
                             D.append(g)
                     for d in sorted(D, reverse=True):
                         del QF_fifth[d]
 
                     # Sixth filter:
-
-                    QF_sixth = [
-                        k for k in QF_fifth
-                        if (abs(k - max(QF_fifth)) < abs(k - noise_threshold))
-                    ]
+                    if len(noise_index) != 0:
+                        QF_sixth = [
+                            k for k in QF_fifth
+                            if (2*abs(k - max(QF_fifth)) < abs(k - noise_threshold))
+                        ]
+                    else:
+                        QF_sixth = QF_fifth
 
                     QF_OK = QF_sixth
 
@@ -321,22 +322,24 @@ while check:
             pulse_inter = 5.04872989654541
 
             for i in range(dim - 1):
-                if (np.mod((UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) == 0
+
+                if (np.mod((UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) < 10**-3
                         or np.mod(
                             (UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) > 5):
-                    if QF_MAX[i] < QF_MAX[i + 1]:
+                    if QF_MAX[i] <= QF_MAX[i + 1]:
                         N_Pulses_Indicator_DU[3 * dom + i] = -1.5
                     else:
                         N_Pulses_Indicator_DU[3 * dom + i + 1] = -1.5
                 if i == 0 and dim == 3:
                     if (np.mod(
                         (UTB_MIN[i] -
-                         UTB_MIN[i + 2]), pulse_inter) == 0 or np.mod(
+                         UTB_MIN[i + 2]), pulse_inter) < 10**-3 or np.mod(
                              (UTB_MIN[i] - UTB_MIN[i + 2]), pulse_inter) > 5):
-                        if QF_MAX[i] < QF_MAX[i + 2]:
+                        if QF_MAX[i] <= QF_MAX[i + 2]:
                             N_Pulses_Indicator_DU[3 * dom + i] = -1.5
                         else:
                             N_Pulses_Indicator_DU[3 * dom + i + 2] = -1.5
+                        
 
         N_Pulses_Indicator.append(N_Pulses_Indicator_DU)
 
