@@ -85,7 +85,7 @@ def process_log_file(log_file,out_file):
 
 def main():
 
-    log_dir = 'logs/'
+    log_dir = '/logs/'
     regexp  = '^MSG_(.+)\.log'
 
     for file in os.listdir(log_dir):
