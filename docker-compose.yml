@@ -12,6 +12,17 @@ services:
             - monitoring.env
         volumes:
             - ./logs:/logs
+            - ./plots:/plots
+            - ./data:/data
+
+    frontend:
+        build: ./frontend
+        env_file:
+            - monitoring.env
+        volumes:
+            - ./logs:/logs
+            - ./plots:/plots
+            - ./data:/data
 
     livelog:
         build: ./livelog

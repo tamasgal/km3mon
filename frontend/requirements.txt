@@ -1,7 +1,2 @@
-km3pipe>=8.25.0
+km3pipe
 flask
-frozen-flask
-gunicorn
-supervisor
-rocketchat_API
-RocketChatAPIBot
