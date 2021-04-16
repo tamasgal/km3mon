@@ -7,4 +7,3 @@ FROM python:3.8.6
  RUN pip install -r requirements.txt
 
  COPY . .
- CMD ["supervisord", "-c", "supervisord.conf"]
