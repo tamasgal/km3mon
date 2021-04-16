@@ -2,6 +2,7 @@ FROM mthenw/frontail
  MAINTAINER Tamas Gal <tgal@km3net.de>
 
  COPY frontail.json frontail.json
+ RUN mkdir -p /logs && touch /logs/MSG.log
 
  EXPOSE 9001
 
