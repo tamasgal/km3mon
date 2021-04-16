@@ -12,11 +12,10 @@ import km3pipe as kp
 from km3modules.common import LocalDBService
 
 CONFIG_PATH = "pipeline.toml"
-PLOTS_PATH = "../plots"
-LOGS_PATH = "../logs"
+PLOTS_PATH = "/plots"
+LOGS_PATH = "/logs"
 USERNAME = None
 PASSWORD = None
-app.config['FREEZER_DESTINATION'] = '../km3web'
 
 PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', ['trigger_rates'],
          ['ztplot', 'triggermap']]
