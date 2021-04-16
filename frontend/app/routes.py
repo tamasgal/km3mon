@@ -179,7 +179,7 @@ def trigger():
 def top10():
     category_names = {'n_hits': 'Number of Hits', 'overlays': 'Overlays'}
     top10 = {}
-    dbs = LocalDBService(filename="data/monitoring.sqlite3")
+    dbs = LocalDBService(filename="/data/monitoring.sqlite3")
     for category in ["n_hits", "overlays"]:
         raw_data = dbs.query(
             "SELECT plot_filename, n_hits, n_triggered_hits, overlays, "
@@ -214,7 +214,7 @@ def top10():
 @requires_auth
 def logs():
     files = OrderedDict()
-    filenames = sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log")),
+    filenames = sorted(glob(join(LOGS_PATH, "MSG*.log")),
                        reverse=True)
     main_log = filenames.pop(-1)
     for filename in [main_log] + filenames:
@@ -225,9 +225,8 @@ def logs():
 @app.route('/logs/<path:filename>')
 @requires_auth
 def custom_static_logfile(filename):
-    filepath = join(app.root_path, LOGS_PATH)
-    print("Serving: {}/{}".format(filepath, filename))
-    return send_from_directory(join(app.root_path, LOGS_PATH), filename)
+    print("Serving: {}/{}".format(LOGS_PATH, filename))
+    return send_from_directory(LOGS_PATH, filename)
 
 
 @app.route('/plots/<path:filename>')
@@ -235,7 +234,7 @@ def custom_static_logfile(filename):
 def custom_static(filename):
     # filepath = join(app.root_path, PLOTS_PATH)
     # print("Serving: {}/{}".format(filepath, filename))
-    return send_from_directory(join(app.root_path, PLOTS_PATH), filename)
+    return send_from_directory(PLOTS_PATH, filename)
 
 
 @app.route('/rasp.html')
