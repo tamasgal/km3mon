@@ -24,6 +24,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
+import km3db
 import km3pipe as kp
 from docopt import docopt
 
@@ -39,15 +40,14 @@ def duplicates(lst, item):
 
 args = docopt(__doc__)
 
-db = kp.db.DBManager()
-sds = kp.db.StreamDS()
+sds = km3db.StreamDS(container="pd")
                     
 try:
     detid = int(args['-d'])
 except ValueError:
     detid = (args['-d'])
 if type(detid)==int:
-    detid = db.get_det_oid(detid)
+    detid = km3db.todetoid(detid)
 
 directory = args['-o']
 
@@ -62,7 +62,7 @@ DUS_cycle = list(np.arange(max(DUS)) + 1)
 TIT = 600  # Time Interval between Trains of acoustic pulses)
 SSW = 160  # Signal Security Window (Window size with signal)
 
-clbmap = kp.db.CLBMap(detid)
+clbmap = km3db.CLBMap(detid)
 
 check = True
 while check:
@@ -70,7 +70,7 @@ while check:
     minrun = None
     while minrun is None:
         try:
-            table = db.run_table(detid)
+            table = sds.runs(det_id=detid)
             minrun = table["RUN"][len(table["RUN"]) - 1]
             ind, = np.where((table["RUN"] == minrun))
             mintime1 = table['UNIXSTARTTIME'][ind]
