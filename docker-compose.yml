@@ -14,8 +14,7 @@ services:
             - ./logs:/logs
         command:
             - supervisord -c supervisord.conf
-        tty:
-            - true
+        tty: true
 
     livelog:
         build: ./livelog
