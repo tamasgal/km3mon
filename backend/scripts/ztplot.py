@@ -203,7 +203,7 @@ class ZTPlot(kp.Module):
                 "Trigger: {5}\n{6} UTC".format(
                     det_id, run_id, frame_index, trigger_counter,
                     overlays, trigger_params,
-                    datetime.utcfromtimestamp(event_info.utc_seconds))
+                    datetime.utcfromtimestamp(utc_timestamp))
 
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')
