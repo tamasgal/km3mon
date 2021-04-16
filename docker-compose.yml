@@ -7,4 +7,14 @@ services:
             - ${MONITORING_LIGIER_PORT}:5553
 
     backend:
-        command: supervisord -c supervisord.conf
+        build: ./backend
+        volumes:
+            - ./logs:/logs
+
+    livelog:
+        build: ./livelog
+        ports:
+            - ${LOGGING_PORT}:9001
+        volumes:
+            - ./logs:/logs
+
