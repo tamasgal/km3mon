@@ -12,9 +12,6 @@ services:
             - monitoring.env
         volumes:
             - ./logs:/logs
-        command:
-            - supervisord -c supervisord.conf
-        tty: true
 
     livelog:
         build: ./livelog
