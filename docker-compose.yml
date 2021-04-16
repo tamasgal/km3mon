@@ -1,7 +1,10 @@
 version: "3"
 services:
     ligier:
-        image: "docker.km3net.de/jpp:14.0.1"
+        image: "docker.km3net.de/jpp:v14.1.0"
         command: JLigier -d2
         ports:
-            - 5553:5553
+            - ${MONITORING_PORT}:5553
+
+    backend:
+        command: supervisord -c supervisord.conf
