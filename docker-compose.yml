@@ -1,0 +1,7 @@
+version: "3"
+services:
+    ligier:
+        image: "docker.km3net.de/jpp:14.0.1"
+        command: JLigier -d2
+        ports:
+            - 5553:5553
