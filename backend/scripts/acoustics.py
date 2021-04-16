@@ -9,7 +9,7 @@ Usage:
 
 Options:
     -d DET_ID       Detector ID.
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """

@@ -13,7 +13,7 @@ Usage:
 Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """
@@ -72,7 +72,7 @@ class TriggerRate(kp.Module):
     """Trigger rate plotter"""
     def configure(self):
         self.plots_path = self.require('plots_path')
-        self.data_path = self.get('data_path', default='data')
+        self.data_path = self.get('data_path', default='/data')
         self.interval = self.get("interval", default=300)
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
