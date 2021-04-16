@@ -1,4 +1,4 @@
-FROM python:3.9.2
+FROM python:3.8.6
  MAINTAINER Tamas Gal <tgal@km3net.de>
 
  WORKDIR /monitoring
