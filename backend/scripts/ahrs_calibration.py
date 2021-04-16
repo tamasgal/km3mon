@@ -36,6 +36,7 @@ import seaborn as sns
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+import km3db
 import km3pipe as kp
 from km3pipe.io.daq import TMCHData
 from km3modules.ahrs import fit_ahrs, get_latest_ahrs_calibration
@@ -51,7 +52,7 @@ class CalibrateAHRS(kp.Module):
         self.detector = kp.hardware.Detector(det_id=det_id)
         self.dus = set()
 
-        self.clbmap = kp.db.CLBMap(det_oid=det_id)
+        self.clbmap = km3db.CLBMap(det_oid=det_id)
 
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
         self.cuckoo_log = kp.time.Cuckoo(10, self.cprint)

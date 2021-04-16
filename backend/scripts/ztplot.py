@@ -23,6 +23,7 @@ from km3modules.plot import ztplot
 from km3modules.common import LocalDBService
 from km3modules.communication import ELOGService
 from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
+import km3db
 import km3pipe as kp
 import numpy as np
 import matplotlib.ticker as ticker
@@ -62,7 +63,7 @@ class ZTPlot(kp.Module):
         self.lower_limits = {}
         self.elog = self.get('elog', default=False)
 
-        self.sds = kp.db.StreamDS()
+        self.sds = km3db.StreamDS()
 
         self.index = 0
 
