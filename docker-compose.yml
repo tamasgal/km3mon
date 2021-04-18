@@ -14,6 +14,8 @@ services:
             - ./logs:/logs
             - ./plots:/plots
             - ./data:/data
+        depends_on:
+            - "ligier"
 
     frontend:
         build: ./frontend
