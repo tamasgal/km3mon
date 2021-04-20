@@ -6,6 +6,14 @@ services:
         ports:
             - ${MONITORING_LIGIER_PORT}:5553
 
+    ligiermirror:
+        build: ./ligiermirror
+        env_file:
+            - .env
+        command: JLigierMirror -H ${DAQ_LIGIER_IP}:${DAQ_LIGIER_PORT} -X monitoring_ligier_1:5553 -t "${TAGS_TO_MIRROR}"
+        depends_on:
+            - "ligier"
+
     backend:
         build: ./backend
         env_file:
