@@ -47,7 +47,7 @@ def get_baseline_rttc(det_id, hours=24):
     print("Retrieving baseline RTTC")
     now = time.time()
     det_oid = km3db.tools.todetoid(det_id)
-    sds = km3db.StreamDS()
+    sds = km3db.StreamDS(container="pd")
     det = kp.hardware.Detector(det_id=det_id)
     clbmap = km3db.CLBMap(det_oid=det_oid)
     runs = sds.runs(detid=det_id)
