@@ -47,7 +47,7 @@ try:
 except ValueError:
     detid = (args['-d'])
 if type(detid)==int:
-    detid = km3db.todetoid(detid)
+    detid = km3db.tools.todetoid(detid)
 
 directory = args['-o']
 
