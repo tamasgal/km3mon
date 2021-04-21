@@ -17,7 +17,7 @@ LOGS_PATH = "/logs"
 USERNAME = None
 PASSWORD = None
 
-PLOTS = [['dom_activity', 'dom_rates'], ['pmt_rates_du*'], ['trigger_rates'],
+PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', ['trigger_rates'],
          ['ztplot', 'triggermap']]
 
 ACOUSTICS_PLOTS = [['Online_Acoustic_Monitoring']]
