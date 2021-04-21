@@ -79,6 +79,7 @@ class TriggerRate(kp.Module):
 
         self.sendmail = kp.time.Cuckoo(
             15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
+        self.print_stats = kp.time.Cuckoo(60, self.cprint)
         self.sendchatalert = kp.time.Cuckoo(30 * 60, sendchatalert)
 
         self.cprint("Update interval: {}s".format(self.interval))
@@ -125,8 +126,7 @@ class TriggerRate(kp.Module):
         """Analyse the trigger flags for an incoming event"""
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
             return blob
-        sys.stdout.write('.')
-        sys.stdout.flush()
+
         einfo = blob["EventInfo"]
 
         self.det_id = einfo.det_id[0]
@@ -141,7 +141,7 @@ class TriggerRate(kp.Module):
             self.trigger_counts["MXShower"] += is_mxshower(tm)
             self.trigger_counts["3DMuon"] += is_3dmuon(tm)
 
-        self.cprint(self.trigger_counts)
+        self.print_stats(self.trigger_counts)
 
         return blob
 
