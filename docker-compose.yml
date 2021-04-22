@@ -31,6 +31,18 @@ services:
         depends_on:
             - "ligier"
 
+    reco:
+        build: ./reco
+        env_file:
+            - .env
+        volumes:
+            - ./reco:/reco
+            - ./logs:/logs
+            - ./plots:/plots
+            - ./data:/data
+        depends_on:
+            - "ligier"
+
     frontend:
         build: ./frontend
         env_file:
