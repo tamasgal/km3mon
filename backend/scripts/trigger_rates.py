@@ -179,18 +179,25 @@ class TriggerRate(kp.Module):
     def write_trigger_rates(self, timestamp, trigger_rates):
         """Write the trigger rate information to the CSV file"""
         entry = f"{timestamp}"
+        sendalert = False
         for trigger_type in self._trigger_types:
             try:
                 trigger_rate = trigger_rates[trigger_type]
             except KeyError:
                 trigger_rate = 0
             if trigger_rate == 0 and trigger_type == "Overall":
-                self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
-                self.sendchatalert("Trigger rate is 0Hz!")
+                sendalert = True
             entry += f",{trigger_rate}"
         entry += '\n'
         self.trigger_rates_fobj.write(entry)
         self.trigger_rates_fobj.flush()
+
+        if sendalert:
+            try:
+                self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
+            except ConnectionRefusedError as e:
+                self.log.error(f"Could not send alert mail: {e}")
+            self.sendchatalert("Trigger rate is 0Hz!")
 
     def calculate_trigger_rates(self):
         """Calculate the trigger rates from the event trigger parameters"""
