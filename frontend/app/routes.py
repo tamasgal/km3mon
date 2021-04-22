@@ -203,7 +203,7 @@ def top10():
                 "{} UTC".format(
                     datetime.utcfromtimestamp(r[8]).strftime("%c")),
                 "irods_path":
-                kp.tools.irods_filepath(r[4], r[5]),
+                kp.tools.irods_path(r[4], r[5]),
                 "xrootd_path":
                 kp.tools.xrootd_path(r[4], r[5])
             } for r in raw_data]
