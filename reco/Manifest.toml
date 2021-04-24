@@ -607,8 +607,10 @@ uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 version = "0.3.5"
 
 [[NeRCA]]
-deps = ["DocStringExtensions", "HDF5", "IntervalArithmetic", "Ipopt", "JuMP", "LinearAlgebra", "PGFPlotsX", "Parameters", "Printf", "ProgressMeter", "RecipesBase", "Sockets", "StaticArrays", "Statistics", "Test", "UnROOT"]
-git-tree-sha1 = "015caa0f1fc9bf84a3c517ca785dac347704b1df"
+deps = ["Colors", "DocStringExtensions", "HDF5", "IntervalArithmetic", "Ipopt", "JuMP", "LinearAlgebra", "PGFPlotsX", "Parameters", "Printf", "ProgressMeter", "RecipesBase", "Sockets", "StaticArrays", "Statistics", "Test", "UnROOT"]
+git-tree-sha1 = "c3e7001662fbc8acbcf6961f63873d7aaf3a98c3"
+repo-rev = "master"
+repo-url = "https://github.com/tamasgal/NeRCA.jl.git"
 uuid = "89b7c20c-a96a-11e9-35df-35fba0891eb2"
 version = "0.6.3"
 
