@@ -35,6 +35,7 @@ services:
         build: ./reco
         env_file:
             - .env
+        command: monitoring_ligier_1 ${MONITORING_LIGIER_PORT}
         volumes:
             - ./reco:/reco
             - ./logs:/logs
