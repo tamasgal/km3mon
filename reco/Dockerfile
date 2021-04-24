@@ -5,6 +5,6 @@ MAINTAINER Tamas Gal <tgal@km3net.de>
  RUN apt-get -y update && apt-get -y install build-essential && apt-get clean
 
  COPY . .
- RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.build("NeRCA"); Pkg.test("NeRCA"; coverage = true)'
+ RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.add("NeRCA#master"); Pkg.build("NeRCA"); Pkg.test("NeRCA"; coverage = true)'
 
  ENTRYPOINT ["julia", "--project=.", "royfit.jl"]
