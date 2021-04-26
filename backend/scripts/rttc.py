@@ -91,7 +91,7 @@ def main():
     plots_path = args['-o']
 
     detector = kp.hardware.Detector(det_id=det_id)
-    clbmap = km3db.CLBMap(det_id)
+    clbmap = km3db.CLBMap(det_oid=km3db.tools.todetoid(det_id))
     dmm = kp.io.daq.DMMonitor(dm_ip, base='clb/outparams')
 
     params = []
