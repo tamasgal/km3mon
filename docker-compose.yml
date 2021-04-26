@@ -24,7 +24,7 @@ services:
         env_file:
             - .env
         volumes:
-            - ./backend:/backend
+            - ./backend:/monitoring
             - ./logs:/logs
             - ./plots:/plots
             - ./data:/data
