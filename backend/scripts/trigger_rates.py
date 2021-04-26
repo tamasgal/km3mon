@@ -127,7 +127,11 @@ class TriggerRate(kp.Module):
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
             return blob
 
-        einfo = blob["EventInfo"]
+        try:
+            einfo = blob["EventInfo"]
+        except KeyError:
+            self.log.error("No EventInfo found in the blob!")
+            return blob
 
         self.det_id = einfo.det_id[0]
         run_id = einfo.run_id[0]
