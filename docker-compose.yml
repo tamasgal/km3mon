@@ -2,7 +2,7 @@ version: "3"
 services:
     ligier:
         image: "docker.km3net.de/jpp:v14.1.0"
-        command: JLigier -d2 #-- 2>> /logs/ligier.err.log 1>> /logs/ligier.out.log
+        command: JLigier -d2
         volumes:
             - ./logs:/logs
         ports:
@@ -12,7 +12,18 @@ services:
         build: ./ligiermirror
         env_file:
             - .env
-        command: JLigierMirror -H ${DAQ_LIGIER_IP}:${DAQ_LIGIER_PORT} -X monitoring_ligier_1:5553 -t ${TAGS_TO_MIRROR} #-- 2>> /logs/ligiermirror.err.log 1>> /logs/ligiermirror.out.log
+        command: JLigierMirror -H ${DAQ_LIGIER_IP}:${DAQ_LIGIER_PORT} -X monitoring_ligier_1:5553 -t ${TAGS_TO_MIRROR}
+        volumes:
+            - ./logs:/logs
+        depends_on:
+            - "ligier"
+        restart: unless-stopped
+
+    ligierlogmirror:
+        build: ./ligiermirror
+        env_file:
+            - .env
+        command: JLigierMirror -H ${LOG_LIGIER_IP}:${LOG_LIGIER_PORT} -X monitoring_ligier_1:5553 -t MSG
         volumes:
             - ./logs:/logs
         depends_on:
