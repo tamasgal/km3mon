@@ -24,12 +24,13 @@ function main()
 
     sparams = NeRCA.SingleDURecoParams()
 
-    for message in CHClient(LIGIER_HOST, LIGIER_PORT, ["IO_EVT"])
+    for (idx, message) in enumerate(CHClient(LIGIER_HOST, LIGIER_PORT, ["IO_EVT"]))
+
+	idx % 80 == 0 && println()
+
         if rand() > DOWNSAMPLE
-            print("x")
+            print(".")
             continue
-        else
-            print("Random pick... ")
         end
         event = NeRCA.read(IOBuffer(message.data), NeRCA.DAQEvent)
 
@@ -42,10 +43,10 @@ function main()
         n_doms = length(unique(h->h.dom_id, triggered_hits))
 
         if n_doms < 4
-            println("Not enough DOMs!")
+            print("s")
             continue
         end
-        println("Reconstructing!")
+        print("R")
 
         colours = palette(:default)
         plot()
@@ -60,8 +61,7 @@ function main()
             plot!(du_hits, fit, markercolor=colours[idx], label="DU $(du)", max_z=calib.max_z)
             write_time_residuals("/data/reco_timeres.csv", event, fit.selected_hits, fit)
         end
-        if sum(Q) < 200 && n_doms > 12 && n_dus > 1
-            println("\nPlotting...")
+        if sum(Q) < 200 && n_doms > 9 && n_dus > 1
             fit_params = "ROy live reconstruction (combined single line): Q=$([round(_Q,digits=2) for _Q in Q])"
             event_params = "Det ID $(event.det_id), Run $(event.run_id), FrameIndex $(event.timeslice_id), TriggerCounter $(event.trigger_counter), Overlays $(event.overlays)"
             time_params = "$(unix2datetime(event.timestamp)) UTC"
@@ -71,6 +71,8 @@ function main()
             plot!(title="$(fit_params)\n$(event_params), $(trigger_params)\n$(time_params)", titlefontsize=8, margin=5mm)
 
             savefig("/plots/ztplot_roy.png")
+
+            print("+")
         end
 
         #= if n_triggered_dus > 2 && n_doms > 14 =#
