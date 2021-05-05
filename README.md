@@ -40,9 +40,10 @@ To stop it it
 
 Log files are kept in `logs/`, data dumps in `data/` and plots in `plots/`.
 
-To check the logs or follow them in real-time
+To check the logs or follow them in real-time (`-f`) and limit the rewind
+to a number of lines `--tail=N`, e.g.
 
-    docker-compose logs -f SERVICE_NAME
+    docker-compose logs -f --tail=10 SERVICE_NAME
 
 The `SERVICE_NAME` can be any of `backend`, `frontend`, `ligier`, `ligiermirror`,
 `ligierlogmirror`, `reco` or `livelog`.
