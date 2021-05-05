@@ -1,6 +1,13 @@
 Unreleased changes
 ------------------
 
+Version 1
+---------
+
+2.0.0 / 2021-05-05
+~~~~~~~~~~~~~~~~~~
+
+* Fully dockerised monitoring system
 * Log analyser added by Rodri <rgracia@km3net.de>
 * Log files are now showing plots indicating the number of errors and warnings
   thanks to Rodri <rgracia@km3net.de>
@@ -10,8 +17,6 @@ Unreleased changes
   instead of crash and annoy
 * Preliminary support for km3pipe v9
 
-Version 1
----------
 
 1.2.0 / 2019-11-25
 ~~~~~~~~~~~~~~~~~~
