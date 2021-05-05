@@ -94,7 +94,8 @@ class DOMActivityPlotter(kp.Module):
             "DOM Activity for DetID-{} - via Summary Slices".format(
                 self.detector.det_id),
             vmin=0.0,
-            vmax=15 * 60)
+            vmax=15 * 60,
+            cmap="cividis")
 
 
 def main():
