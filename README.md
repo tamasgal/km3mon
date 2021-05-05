@@ -32,10 +32,20 @@ The monitoring system can be started using
 This will download and build all the required images and launch the containers
 for each service. It will also create an overlay network.
 
+To stop it it
+
+    docker-compose down
 
 ## Monitoring the monitoring
 
 Log files are kept in `logs/`, data dumps in `data/` and plots in `plots/`.
+
+To check the logs or follow them in real-time
+
+    docker-compose logs -f SERVICE_NAME
+
+The `SERVICE_NAME` can be any of `backend`, `frontend`, `ligier`, `ligiermirror`,
+`ligierlogmirror`, `reco` or `livelog`.
 
 The monitoring back-end is running inside a Docker container and controlled
 by `supervisord`. You can enter the `backend` with
