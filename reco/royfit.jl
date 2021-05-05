@@ -1,5 +1,6 @@
 #!/usr/bin/env julia
-println("Initialising libraries...")
+println("Initialising libraries, this may take a minute...")
+using Sockets
 using NeRCA
 using Plots
 using PlotThemes
@@ -8,27 +9,27 @@ using Measures
 GR.inline("png")
 
 if length(ARGS) < 2
-    println("Usage: ./live_royfit.jl LIGIER_PORT TIME_RES_FILE")
+    println("Usage: ./live_royfit.jl LIGIER_HOST LIGIER_PORT")
     exit(1)
 end
 
 
 const calib = NeRCA.read_calibration("/data/latest.detx")
-const LIGIER_PORT = parse(Int, ARGS[1])
-const TIME_RES = ARGS[2]
-const DOWNSAMPLE = 0.1  # fraction to keep
+const LIGIER_HOST = getalladdrinfo(ARGS[1])[1]
+const LIGIER_PORT = parse(Int, ARGS[2])
+const DOWNSAMPLE = 0.5  # fraction to keep
 
 function main()
     println("Starting live ROyFit")
 
     sparams = NeRCA.SingleDURecoParams()
 
-    for message in CHClient(ip"127.0.0.1", LIGIER_PORT, ["IO_EVT"])
+    for message in CHClient(LIGIER_HOST, LIGIER_PORT, ["IO_EVT"])
         if rand() > DOWNSAMPLE
             print("x")
             continue
         else
-            print(".")
+            print("Random pick... ")
         end
         event = NeRCA.read(IOBuffer(message.data), NeRCA.DAQEvent)
 
@@ -41,8 +42,10 @@ function main()
         n_doms = length(unique(h->h.dom_id, triggered_hits))
 
         if n_doms < 4
+            println("Not enough DOMs!")
             continue
         end
+        println("Reconstructing!")
 
         colours = palette(:default)
         plot()
@@ -55,7 +58,7 @@ function main()
             fit = NeRCA.single_du_fit(du_hits, sparams)
             push!(Q, fit.Q)
             plot!(du_hits, fit, markercolor=colours[idx], label="DU $(du)", max_z=calib.max_z)
-            write_time_residuals(TIME_RES, event, fit.selected_hits, fit)
+            write_time_residuals("/data/reco_timeres.csv", event, fit.selected_hits, fit)
         end
         if sum(Q) < 200 && n_doms > 12 && n_dus > 1
             println("\nPlotting...")
