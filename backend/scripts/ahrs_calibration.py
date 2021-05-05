@@ -12,7 +12,7 @@ Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
     -d DET_ID       Detector ID [default: 29].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """
@@ -36,6 +36,7 @@ import seaborn as sns
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+import km3db
 import km3pipe as kp
 from km3pipe.io.daq import TMCHData
 from km3modules.ahrs import fit_ahrs, get_latest_ahrs_calibration
@@ -47,11 +48,12 @@ class CalibrateAHRS(kp.Module):
     def configure(self):
         self.plots_path = self.require('plots_path')
         det_id = self.require('det_id')
+        det_oid = km3db.tools.todetoid(det_id)
         self.time_range = self.get('time_range', default=24 * 3)  # hours
         self.detector = kp.hardware.Detector(det_id=det_id)
         self.dus = set()
 
-        self.clbmap = kp.db.CLBMap(det_oid=det_id)
+        self.clbmap = km3db.CLBMap(det_oid=det_oid)
 
         self.cuckoo = kp.time.Cuckoo(60, self.create_plot)
         self.cuckoo_log = kp.time.Cuckoo(10, self.cprint)

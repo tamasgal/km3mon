@@ -16,7 +16,7 @@ Options:
     -u DU           The DU to monitor [default: 1].
     -d DET_ID       Detector ID [default: 29].
     -i INTERVAL     Time interval for one pixel [default: 10].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """

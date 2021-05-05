@@ -12,11 +12,10 @@ import km3pipe as kp
 from km3modules.common import LocalDBService
 
 CONFIG_PATH = "pipeline.toml"
-PLOTS_PATH = "../plots"
-LOGS_PATH = "../logs"
+PLOTS_PATH = "/plots"
+LOGS_PATH = "/logs"
 USERNAME = None
 PASSWORD = None
-app.config['FREEZER_DESTINATION'] = '../km3web'
 
 PLOTS = [['dom_activity', 'dom_rates'], 'pmt_rates_du*', ['trigger_rates'],
          ['ztplot', 'triggermap']]
@@ -180,7 +179,7 @@ def trigger():
 def top10():
     category_names = {'n_hits': 'Number of Hits', 'overlays': 'Overlays'}
     top10 = {}
-    dbs = LocalDBService(filename="data/monitoring.sqlite3")
+    dbs = LocalDBService(filename="/data/monitoring.sqlite3")
     for category in ["n_hits", "overlays"]:
         raw_data = dbs.query(
             "SELECT plot_filename, n_hits, n_triggered_hits, overlays, "
@@ -204,7 +203,7 @@ def top10():
                 "{} UTC".format(
                     datetime.utcfromtimestamp(r[8]).strftime("%c")),
                 "irods_path":
-                kp.tools.irods_filepath(r[4], r[5]),
+                kp.tools.irods_path(r[4], r[5]),
                 "xrootd_path":
                 kp.tools.xrootd_path(r[4], r[5])
             } for r in raw_data]
@@ -215,7 +214,7 @@ def top10():
 @requires_auth
 def logs():
     files = OrderedDict()
-    filenames = sorted(glob(join(app.root_path, LOGS_PATH, "MSG*.log")),
+    filenames = sorted(glob(join(LOGS_PATH, "MSG*.log")),
                        reverse=True)
     main_log = filenames.pop(-1)
     for filename in [main_log] + filenames:
@@ -226,9 +225,8 @@ def logs():
 @app.route('/logs/<path:filename>')
 @requires_auth
 def custom_static_logfile(filename):
-    filepath = join(app.root_path, LOGS_PATH)
-    print("Serving: {}/{}".format(filepath, filename))
-    return send_from_directory(join(app.root_path, LOGS_PATH), filename)
+    print("Serving: {}/{}".format(LOGS_PATH, filename))
+    return send_from_directory(LOGS_PATH, filename)
 
 
 @app.route('/plots/<path:filename>')
@@ -236,7 +234,7 @@ def custom_static_logfile(filename):
 def custom_static(filename):
     # filepath = join(app.root_path, PLOTS_PATH)
     # print("Serving: {}/{}".format(filepath, filename))
-    return send_from_directory(join(app.root_path, PLOTS_PATH), filename)
+    return send_from_directory(PLOTS_PATH, filename)
 
 
 @app.route('/rasp.html')

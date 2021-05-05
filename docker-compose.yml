@@ -1,0 +1,76 @@
+version: "3"
+services:
+    ligier:
+        image: "docker.km3net.de/jpp:v14.1.0"
+        command: JLigier -d2
+        volumes:
+            - ./logs:/logs
+        ports:
+            - ${MONITORING_LIGIER_PORT}:5553
+
+    ligiermirror:
+        build: ./ligiermirror
+        env_file:
+            - .env
+        command: JLigierMirror -H ${DAQ_LIGIER_IP}:${DAQ_LIGIER_PORT} -X monitoring_ligier_1:5553 -t ${TAGS_TO_MIRROR}
+        volumes:
+            - ./logs:/logs
+        depends_on:
+            - "ligier"
+        restart: unless-stopped
+
+    ligierlogmirror:
+        build: ./ligiermirror
+        env_file:
+            - .env
+        command: JLigierMirror -H ${LOG_LIGIER_IP}:${LOG_LIGIER_PORT} -X monitoring_ligier_1:5553 -t MSG
+        volumes:
+            - ./logs:/logs
+        depends_on:
+            - "ligier"
+        restart: unless-stopped
+
+    backend:
+        build: ./backend
+        env_file:
+            - .env
+        volumes:
+            - ./backend:/monitoring
+            - ./logs:/logs
+            - ./plots:/plots
+            - ./data:/data
+        depends_on:
+            - "ligier"
+
+    reco:
+        build: ./reco
+        env_file:
+            - .env
+        command: monitoring_ligier_1 ${MONITORING_LIGIER_PORT}
+        volumes:
+            - ./reco:/reco
+            - ./logs:/logs
+            - ./plots:/plots
+            - ./data:/data
+        depends_on:
+            - "ligier"
+
+    frontend:
+        build: ./frontend
+        env_file:
+            - .env
+        ports:
+            - ${WEBSERVER_PORT}:5000
+        volumes:
+            - ./frontend:/frontend
+            - ./logs:/logs
+            - ./plots:/plots
+            - ./data:/data
+
+    livelog:
+        build: ./livelog
+        ports:
+            - ${LOGGING_PORT}:9001
+        volumes:
+            - ./logs:/logs
+        restart: unless-stopped

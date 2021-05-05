@@ -13,7 +13,7 @@ Usage:
 Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """
@@ -72,13 +72,14 @@ class TriggerRate(kp.Module):
     """Trigger rate plotter"""
     def configure(self):
         self.plots_path = self.require('plots_path')
-        self.data_path = self.get('data_path', default='data')
+        self.data_path = self.get('data_path', default='/data')
         self.interval = self.get("interval", default=300)
         self.filename = self.get("filename", default="trigger_rates")
         self.with_minor_ticks = self.get("with_minor_ticks", default=False)
 
         self.sendmail = kp.time.Cuckoo(
             15 * 60, partial(kp.tools.sendmail, "orca.alerts@km3net.de"))
+        self.print_stats = kp.time.Cuckoo(60, self.cprint)
         self.sendchatalert = kp.time.Cuckoo(30 * 60, sendchatalert)
 
         self.cprint("Update interval: {}s".format(self.interval))
@@ -125,9 +126,12 @@ class TriggerRate(kp.Module):
         """Analyse the trigger flags for an incoming event"""
         if not str(blob['CHPrefix'].tag) == 'IO_EVT':
             return blob
-        sys.stdout.write('.')
-        sys.stdout.flush()
-        einfo = blob["EventInfo"]
+
+        try:
+            einfo = blob["EventInfo"]
+        except KeyError:
+            self.log.error("No EventInfo found in the blob!")
+            return blob
 
         self.det_id = einfo.det_id[0]
         run_id = einfo.run_id[0]
@@ -141,7 +145,7 @@ class TriggerRate(kp.Module):
             self.trigger_counts["MXShower"] += is_mxshower(tm)
             self.trigger_counts["3DMuon"] += is_3dmuon(tm)
 
-        self.cprint(self.trigger_counts)
+        self.print_stats(self.trigger_counts)
 
         return blob
 
@@ -179,18 +183,25 @@ class TriggerRate(kp.Module):
     def write_trigger_rates(self, timestamp, trigger_rates):
         """Write the trigger rate information to the CSV file"""
         entry = f"{timestamp}"
+        sendalert = False
         for trigger_type in self._trigger_types:
             try:
                 trigger_rate = trigger_rates[trigger_type]
             except KeyError:
                 trigger_rate = 0
             if trigger_rate == 0 and trigger_type == "Overall":
-                self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
-                self.sendchatalert("Trigger rate is 0Hz!")
+                sendalert = True
             entry += f",{trigger_rate}"
         entry += '\n'
         self.trigger_rates_fobj.write(entry)
         self.trigger_rates_fobj.flush()
+
+        if sendalert:
+            try:
+                self.sendmail("Subject: Trigger rate is 0Hz!\n\n")
+            except ConnectionRefusedError as e:
+                self.log.error(f"Could not send alert mail: {e}")
+            self.sendchatalert("Trigger rate is 0Hz!")
 
     def calculate_trigger_rates(self):
         """Calculate the trigger rates from the event trigger parameters"""

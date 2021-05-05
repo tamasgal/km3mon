@@ -12,7 +12,7 @@ Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
     -d DET_ID       Detector ID [default: 29].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """
@@ -23,6 +23,7 @@ from km3modules.plot import ztplot
 from km3modules.common import LocalDBService
 from km3modules.communication import ELOGService
 from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
+import km3db
 import km3pipe as kp
 import numpy as np
 import matplotlib.ticker as ticker
@@ -62,7 +63,7 @@ class ZTPlot(kp.Module):
         self.lower_limits = {}
         self.elog = self.get('elog', default=False)
 
-        self.sds = kp.db.StreamDS()
+        self.sds = km3db.StreamDS()
 
         self.index = 0
 
@@ -202,7 +203,7 @@ class ZTPlot(kp.Module):
                 "Trigger: {5}\n{6} UTC".format(
                     det_id, run_id, frame_index, trigger_counter,
                     overlays, trigger_params,
-                    datetime.utcfromtimestamp(event_info.utc_seconds))
+                    datetime.utcfromtimestamp(utc_timestamp))
 
         filename = 'ztplot'
         f = os.path.join(self.plots_path, filename + '.png')

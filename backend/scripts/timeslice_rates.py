@@ -13,7 +13,7 @@ Usage:
 Options:
     -l LIGIER_IP    The IP of the ligier [default: 127.0.0.1].
     -p LIGIER_PORT  The port of the ligier [default: 5553].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """

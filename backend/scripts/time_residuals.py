@@ -9,7 +9,7 @@ Usage:
     time_residuals.py (-h | --help)
 
 Options:
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """

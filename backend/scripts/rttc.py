@@ -11,7 +11,7 @@ Usage:
 Options:
     -d DET_ID       Detector ID.
     -l DM_IP        The IP of the DetectorManager [default: 127.0.0.1].
-    -o PLOT_DIR     The directory to save the plot [default: plots].
+    -o PLOT_DIR     The directory to save the plot [default: /plots].
     -h --help       Show this screen.
 
 """
@@ -32,6 +32,7 @@ import numpy as np
 from collections import deque, defaultdict, OrderedDict
 from functools import partial
 
+import km3db
 import km3pipe as kp
 from km3pipe import Pipeline, Module
 import km3pipe.style
@@ -45,11 +46,10 @@ def get_baseline_rttc(det_id, hours=24):
     """Retrieve the median and std RTTC values for a given time interval [h]"""
     print("Retrieving baseline RTTC")
     now = time.time()
-    dm = kp.db.DBManager()
-    det_oid = dm.get_det_oid(det_id)
-    sds = kp.db.StreamDS()
+    det_oid = km3db.tools.todetoid(det_id)
+    sds = km3db.StreamDS(container="pd")
     det = kp.hardware.Detector(det_id=det_id)
-    clbmap = kp.db.CLBMap(det_oid=det_oid)
+    clbmap = km3db.CLBMap(det_oid=det_oid)
     runs = sds.runs(detid=det_id)
     latest_run = int(runs.tail(1).RUN)
     run_24h_ago = int(
@@ -91,7 +91,7 @@ def main():
     plots_path = args['-o']
 
     detector = kp.hardware.Detector(det_id=det_id)
-    clbmap = kp.db.CLBMap(det_id)
+    clbmap = km3db.CLBMap(det_oid=km3db.tools.todetoid(det_id))
     dmm = kp.io.daq.DMMonitor(dm_ip, base='clb/outparams')
 
     params = []

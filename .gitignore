@@ -6,6 +6,7 @@ __pycache__
 plots/
 logs/
 pids/
-pipeline.toml
+backend/pipeline.toml
 setenv.sh
 supervisord.conf
+.env
