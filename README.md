@@ -6,96 +6,72 @@ Online monitoring suite for the KM3NeT neutrino detectors.
 
 ## Requirements
 
- - Python 3.5+
+ - Docker and Docker Compose
 
-Every other dependency will be installed or updated during the `make` procedure
-via the Python package manager `pip`.
+Everything is containerised, so no need to install other software.
 
-## Usage
+## Setup
 
-First, install (or update) the requirements by typing
+1. Create a `.env` file using the `example.env` template and adjust the detector
+   ID and the IP/port of the servers.
 
-    make
+2. Next, create a `backend/supervisord.conf` from the template file
+   `backend/supervisord.conf.example` and adjust if needed.
 
-Next, create a ``setenv.sh`` script according to the ``setenv_template.sh``
-script and apply the detector settings. Here is an example configuration
+3. Create a `backend/pipeline.toml` from the `backend/pipeline.toml.example`
+   and adapt the settings if needed. Don't forget to add operators and shifters.
 
-```shell
-#!/bin/bash
-export DETECTOR_ID=43
+4. Optionally, adapt the layout of the plots in `frontend/routes.py`.
 
-# The ligier to get events (IO_EVT), timeslices (e.g. IO_TSSN) and
-# summary slices (IO_SUM)
-export DAQ_LIGIER_IP=192.168.0.110
-export DAQ_LIGIER_PORT=5553
-export TAGS_TO_MIRROR="IO_EVT, IO_SUM, IO_TSSN, MSG, IO_MONIT"
+## Start and stop
 
-# The logger ligier (MSG)
-export LOG_LIGIER_IP=192.168.0.119
-export LOG_LIGIER_PORT=5553
+The monitoring system can be started using
 
-# The command to start a ligier on the monitoring machine
-# export LIGIER_CMD="JLigier"
-export LIGIER_CMD="singularity exec /home/off1user/Software/Jpp_svn2git-rc9.sif JLigier"
-export MONITORING_LIGIER_PORT=55530
+    docker-compose up -d
 
-export DETECTOR_MANAGER_IP=192.168.0.120
+This will download and build all the required images and launch the containers
+for each service. It will also create an overlay network.
 
-# The port for the KM3Web monitoring dashboard
-export WEBSERVER_PORT=8081
-# The port for the log viewer webserver
-export LOGGING_PORT=8082
 
-# The detector configuration to be used in the online reconstruction
-export DETX="KM3NeT_00000043_03062019_t0set-A02087174.detx"
-# Where to save the time residuals
-export ROYFIT_TIMERES="data/time_residuals.csv"
-```
-    
-Notice the `LIGIER_CMD` which in this case uses a Singularity image of Jpp.
-The `DETX` needs to point to a recently calibrated DETX file otherwise the
-live reconstruction will not work correctly.
+## Monitoring the monitoring
 
-For the weblog you need to download the latest version of `frontail`
-https://github.com/mthenw/frontail/releases
-and place it in e.g. `/usr/local/bin` (or another directory which is in
-`$PATH`).
+Log files are kept in `logs/`, data dumps in `data/` and plots in `plots/`.
 
-Before starting off, you also need to create a `supervisord.conf`. Usually
-simply copying the `supervisord_template.conf` is enough, but make sure
-to adjust some of the plots which monitoring only specific DUs.
+The monitoring back-end is running inside a Docker container and controlled
+by `supervisord`. You can enter the `backend` with
 
-After that, use the following command to start the ``supervisor``, which
-you only need to do once:
+    docker exec -it monitoring_backend_1 bash
 
-    source setenv.sh
-    make start
-
-From now on ``supervisorctl`` is the tool to communicate with the monitoring
-system. To see the status of the processes, use ``supervisorctl status``,
-which will show each process one by one (make sure you call it in the
+The ``supervisorctl`` is the tool to communicate with the monitoring
+back-end system. To see the status of the processes, use `supervisorctl status`,
+it will show each process one by one (make sure you call it in the
 folder where you launched it):
 
 ```
 $ supervisorctl status
-ligiers:ligiermirror                  RUNNING   pid 611, uptime 1 day, 7:55:09
-ligiers:monitoring_ligier             RUNNING   pid 610, uptime 1 day, 7:55:09
-logging:msg_dumper                    RUNNING   pid 7466, uptime 1 day, 7:28:00
-logging:weblog                        RUNNING   pid 7465, uptime 1 day, 7:28:00
-monitoring_process:ahrs_calibration   RUNNING   pid 19612, uptime 1 day, 1:20:32
-monitoring_process:dom_activity       RUNNING   pid 626, uptime 1 day, 7:55:09
-monitoring_process:dom_rates          RUNNING   pid 631, uptime 1 day, 7:55:09
-monitoring_process:pmt_hrv            RUNNING   pid 633, uptime 1 day, 7:55:09
-monitoring_process:pmt_rates          RUNNING   pid 632, uptime 1 day, 7:55:09
-monitoring_process:rttc               RUNNING   pid 9717, uptime 10:55:53
-monitoring_process:trigger_rates      RUNNING   pid 637, uptime 1 day, 7:55:09
-monitoring_process:triggermap         RUNNING   pid 638, uptime 1 day, 7:55:09
-monitoring_process:ztplot             RUNNING   pid 7802, uptime 1 day, 7:26:13
-webserver                             RUNNING   pid 29494, uptime 1 day, 0:34:23
+alerts:timesync_monitor               RUNNING   pid 26, uptime 1 day, 5:21:06
+logging:chatbot                       RUNNING   pid 11, uptime 1 day, 5:21:06
+logging:log_analyser                  RUNNING   pid 10, uptime 1 day, 5:21:06
+logging:msg_dumper                    RUNNING   pid 9, uptime 1 day, 5:21:06
+monitoring_process:acoustics          RUNNING   pid 1567, uptime 1 day, 5:20:59
+monitoring_process:ahrs_calibration   RUNNING   pid 91859, uptime 1:09:14
+monitoring_process:dom_activity       RUNNING   pid 1375, uptime 1 day, 5:21:00
+monitoring_process:dom_rates          RUNNING   pid 1378, uptime 1 day, 5:21:00
+monitoring_process:pmt_rates_10       RUNNING   pid 1376, uptime 1 day, 5:21:00
+monitoring_process:pmt_rates_11       RUNNING   pid 1379, uptime 1 day, 5:21:00
+monitoring_process:pmt_rates_13       RUNNING   pid 1377, uptime 1 day, 5:21:00
+monitoring_process:pmt_rates_14       RUNNING   pid 1568, uptime 1 day, 5:20:59
+monitoring_process:pmt_rates_18       RUNNING   pid 21, uptime 1 day, 5:21:06
+monitoring_process:pmt_rates_9        RUNNING   pid 1566, uptime 1 day, 5:20:59
+monitoring_process:rttc               RUNNING   pid 118444, uptime 0:17:20
+monitoring_process:trigger_rates      RUNNING   pid 22, uptime 1 day, 5:21:06
+monitoring_process:triggermap         RUNNING   pid 1796, uptime 1 day, 5:20:58
+monitoring_process:ztplot             RUNNING   pid 24, uptime 1 day, 5:21:06
+reconstruction:time_residuals         RUNNING   pid 27, uptime 1 day, 5:21:06
 ```
 
-The processes are grouped accordingly (ligier, monitoring_process etc.) and
-automaticallly started in the right order.
+The processes are grouped accordingly (logging, monitoring_process etc.) and
+automatically started in the right order.
 
 You can stop and start individual services using ``supervisorctl stop
 group:process_name`` and ``supervisorctl start group:process_name``
@@ -105,41 +81,10 @@ a group of processes. Use the ``supervisorctl help`` to find out more and
 ``supervisorctl help COMMAND`` to get a detailed description of the
 corresponding command.
 
-To shut down the monitoring service completely, use ``make stop``.
+## Back-end configuration file
 
-
-## Configuration file
-
-A file called `pipeline.toml` can be placed into the root folder of the
-monitoring software (usually `~/monitoring`) which can be used to set
-different kind of parameters, like plot attributes or ranges.
-Here is an example `pipeline.toml`:
-
-```
-[WebServer]
-username = "km3net"
-password = "swordfish"
-
-[DOMRates]
-lowest_rate = 150  # [kHz]
-highest_rate = 350  # [kHz]
-
-[PMTRates]
-lowest_rate = 1000  # [Hz]
-highest_rate = 20000  # [Hz]
-
-[TriggerRate]
-interval = 300  # time inverval to integrate [s]
-with_minor_ticks = true  # minor tickmarks on the plot
-
-[TriggerMap]
-max_events = 5000  # the number of events to log
-
-[ZTPlot]
-min_dus = 1
-ytick_distance = 25  # [m]
-```
-
+The file `backend/pipeline.toml` is the heart of all monitoring processes and
+can be used to set different kind of parameters, like plot attributes or ranges.
 
 ## Chatbot
 
