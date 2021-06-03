@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
 import km3pipe as kp
+import km3db
 from docopt import docopt
 
 
@@ -39,15 +40,15 @@ def duplicates(lst, item):
 
 args = docopt(__doc__)
 
-db = kp.db.DBManager()
-sds = kp.db.StreamDS()
-                    
+db = km3db.DBManager()
+sds = km3db.StreamDS(container="pd")
+
 try:
     detid = int(args['-d'])
 except ValueError:
     detid = (args['-d'])
 if type(detid)==int:
-    detid = db.get_det_oid(detid)
+    detid = km3db.tools.todetoid(detid)
 
 directory = args['-o']
 
@@ -62,7 +63,7 @@ DUS_cycle = list(np.arange(max(DUS)) + 1)
 TIT = 600  # Time Interval between Trains of acoustic pulses)
 SSW = 160  # Signal Security Window (Window size with signal)
 
-clbmap = kp.db.CLBMap(detid)
+clbmap = km3db.CLBMap(detid)
 
 check = True
 while check:
@@ -70,7 +71,7 @@ while check:
     minrun = None
     while minrun is None:
         try:
-            table = db.run_table(detid)
+            table = sds.runs(detid=detid)
             minrun = table["RUN"][len(table["RUN"]) - 1]
             ind, = np.where((table["RUN"] == minrun))
             mintime1 = table['UNIXSTARTTIME'][ind]
@@ -83,7 +84,7 @@ while check:
             print(now)
         except:
             pass
-        
+
     N_Pulses_Indicator = [
     ]  # Matrix indicating how many pulses each piezo reveals
     for du in DUS_cycle:
@@ -92,8 +93,7 @@ while check:
         for dom in DOMS:
             UTB_MIN = []
             QF_MAX = []
-
-            n = -1            
+            n = -1
             for ab in ACOUSTIC_BEACONS:
                 n = n + 1
                 try:
@@ -113,10 +113,11 @@ while check:
                     ab = ACOUSTIC_BEACONS_TEMP[m]
                     print(ab)
                     
-                except (KeyError, AttributeError, TypeError):
+                    
+                except (TypeError, KeyError, AttributeError):
                     N_Pulses_Indicator_DU.append(-1.5)
                     continue
-                
+
                 try:
                     toas_all = sds.toashort(detid=detid,
                                             minrun=minrun,
@@ -197,7 +198,7 @@ while check:
 
                     # First filter: 22 greatest
 
-                    Security_Number = len(SIGNAL)  # To be sure to take all the pulses
+                    Security_Number = 22  # To be sure to take all the pulses
 
                     SIGNAL = SIGNAL.tolist()
                     SIGNAL_OLD = np.array(SIGNAL)
@@ -254,25 +255,26 @@ while check:
                     # Fifth filter: Check if the clicks are interspersed in the right way
 
                     QF_fifth = QF_fourth
-                    Q = []
-                    for q in np.arange(len(QF_fifth)):
-                        Q.append(np.where(SIGNAL_OLD == QF_fifth[q])[0][0])
-                    UTB_fourth = np.array(UTB_SIGNAL.tolist())[Q]
-                    UTB_fourth_l = UTB_fourth.tolist()
-                    D = []
-                    for g in np.arange(len(UTB_fourth_l)):
-                        if ((np.mod((UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 2
-                             and np.mod(
-                                 (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) < 4)
-                                or
-                            (np.mod(
-                                (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 5)
-                            ):
-                            D.append(g)
-                    for d in sorted(D, reverse=True):
-                        del QF_fifth[d]
+                    if detid == 49 or detid == "D_ORCA006":
+                        Q = []
+                        for q in np.arange(len(QF_fifth)):
+                            Q.append(np.where(SIGNAL_OLD == QF_fifth[q])[0][0])
+                        UTB_fourth = np.array(UTB_SIGNAL.tolist())[Q]
+                        UTB_fourth_l = UTB_fourth.tolist()
+                        D = []
+                        for g in np.arange(len(UTB_fourth_l)):
+                            if ((np.mod((UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 2
+                                 and np.mod(
+                                     (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) < 4)
+                                    or
+                                (np.mod(
+                                    (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 5)):
+                                D.append(g)
+                        for d in sorted(D, reverse=True):
+                            del QF_fifth[d]
 
                     # Sixth filter:
+
                     if len(noise_index) != 0:
                         QF_sixth = [
                             k for k in QF_fifth
@@ -322,7 +324,7 @@ while check:
             pulse_inter = 5.04872989654541
 
             for i in range(dim - 1):
-
+                
                 if (np.mod((UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) < 10**-3
                         or np.mod(
                             (UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) > 5):
@@ -339,7 +341,7 @@ while check:
                             N_Pulses_Indicator_DU[3 * dom + i] = -1.5
                         else:
                             N_Pulses_Indicator_DU[3 * dom + i + 2] = -1.5
-                        
+
 
         N_Pulses_Indicator.append(N_Pulses_Indicator_DU)
 
@@ -400,7 +402,7 @@ while check:
         cbar.ax.text(4, (1.5 * j + 1) / 8.0, lab, ha='center', va='center')
     cbar.ax.get_yaxis().labelpad = 18
 
-    ax.set_xticks(np.arange(1, max(DUS) + 1, step=1))
+    ax.set_xticks(np.arange(min(DUS), max(DUS) + 1, step=1))
     ax.set_yticks(np.arange(0, 19, step=1))
     ax.grid(color='k', linestyle='-', linewidth=0.2)
     ax.set_xlabel('DUs', fontsize=18)
