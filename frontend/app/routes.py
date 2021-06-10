@@ -115,7 +115,7 @@ def single_plot(plot):
 @app.route('/acoustics.html')
 @requires_auth
 def acoustics():
-    return render_template('acoustics.html', plots=expand_wildcards(ACOUSTICS_PLOTS))
+    return render_template('plots.html', plots=expand_wildcards(ACOUSTICS_PLOTS))
 
 
 @app.route('/ahrs.html')
