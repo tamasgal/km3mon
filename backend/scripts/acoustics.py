@@ -70,7 +70,7 @@ while check:
     minrun = None
     while minrun is None:
         try:
-            table = sds.runs(det_id=detid)
+            table = sds.runs(detid=detid)
             minrun = table["RUN"][len(table["RUN"]) - 1]
             ind, = np.where((table["RUN"] == minrun))
             mintime1 = table['UNIXSTARTTIME'][ind]
