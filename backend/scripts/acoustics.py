@@ -40,8 +40,6 @@ def duplicates(lst, item):
 
 args = docopt(__doc__)
 
-detid = args['-d']
-db = km3db.DBManager()
 sds = km3db.StreamDS(container="pd")
 
 try:
@@ -53,11 +51,8 @@ if type(detid)==int:
 
 directory = args['-o']
 
-db = kp.db.DBManager()
-sds = kp.db.StreamDS()
 ACOUSTIC_BEACONS = [0, 0, 0]
 
-ACOUSTIC_BEACONS = [12, 14, 16]
 N_DOMS = 18
 N_ABS = 3
 DOMS = range(N_DOMS + 1)
@@ -67,7 +62,6 @@ DUS_cycle = list(np.arange(max(DUS)) + 1)
 TIT = 600  # Time Interval between Trains of acoustic pulses)
 SSW = 160  # Signal Security Window (Window size with signal)
 
-clbmap = kp.db.CLBMap(detid)
 clbmap = km3db.CLBMap(detid)
 
 check = True
@@ -76,7 +70,6 @@ while check:
     minrun = None
     while minrun is None:
         try:
-            table = db.run_table(detid)
             table = sds.runs(detid=detid)
             minrun = table["RUN"][len(table["RUN"]) - 1]
             ind, = np.where((table["RUN"] == minrun))
@@ -84,7 +77,6 @@ while check:
             mintime = mintime1.values
             maxrun = table["RUN"][len(table["RUN"]) - 1]
             now = time.time()
-            now = now - 600
             now = now - TIT
             if (now - mintime / 1000) < TIT:
                 minrun = table["RUN"][len(table["RUN"]) - 1] - 1
@@ -105,7 +97,6 @@ while check:
                 n = n + 1
                 try:
                     domID = clbmap.omkeys[(du, dom)].dom_id
-                except (KeyError, AttributeError):
                     
                     AcBe = sds.toashort(detid=detid,
                         minrun=minrun,
@@ -194,13 +185,6 @@ while check:
                     SIGNAL = QF_abdom[signal_index]
                     UTB_SIGNAL = UTB_abdom[signal_index]
                     TOA_SIGNAL = TOAS_abdom[signal_index]
-                    NOISE = QF_abdom[noise_index]
-                    NOISElist = NOISE.tolist()
-                    NOISElist.sort(reverse=True)
-                    NOISE = NOISE.tolist()
-                    NOISE.sort(reverse=True)
-                    noise_threshold = max(
-                        NOISE)  # To be sure not to take signal
                     UNIX_TOA_SIGNAL = UTB_abdom[signal_index] + TOAS_abdom[signal_index]
                     if len(noise_index) != 0:
                         NOISE = QF_abdom[noise_index]
@@ -247,12 +231,6 @@ while check:
 
                     QF_second.sort(reverse=True)
 
-                    # Old second filter
-
-                    #                    QF_second = np.unique(QF_first)
-                    #                    QF_second = QF_second.tolist()
-                    #                    QF_second.sort(reverse = True)
-
                     # Third filter: If there are more than 11 elements I will eliminate the worst
 
                     if len(QF_second) > 11:
@@ -265,11 +243,6 @@ while check:
                         QF_third = QF_second
 
                     # Fourth filter: I remove the data if it is below the maximum noise
-
-                    QF_fourth = [
-                        k for k in QF_third
-                        if k > (noise_threshold + (10 * np.std(NOISE)))
-                    ]
                     if len(noise_index) != 0:
                         QF_fourth = [
                             k for k in QF_third
@@ -281,22 +254,6 @@ while check:
                     # Fifth filter: Check if the clicks are interspersed in the right way
 
                     QF_fifth = QF_fourth
-                    Q = []
-                    for q in np.arange(len(QF_fifth)):
-                        Q.append(np.where(SIGNAL_OLD == QF_fifth[q])[0][0])
-                    UTB_fourth = np.array(UTB_SIGNAL.tolist())[Q]
-                    UTB_fourth_l = UTB_fourth.tolist()
-                    D = []
-                    for g in np.arange(len(UTB_fourth_l)):
-                        if ((np.mod((UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 2
-                             and np.mod(
-                                 (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) < 4)
-                                or
-                            (np.mod(
-                                (UTB_fourth_l[g] - UTB_fourth_l[0]), 5) > 5)):
-                            D.append(g)
-                    for d in sorted(D, reverse=True):
-                        del QF_fifth[d]
                     if detid == 49 or detid == "D_ORCA006":
                         Q = []
                         for q in np.arange(len(QF_fifth)):
@@ -317,10 +274,6 @@ while check:
 
                     # Sixth filter:
 
-                    QF_sixth = [
-                        k for k in QF_fifth
-                        if (abs(k - max(QF_fifth)) < abs(k - noise_threshold))
-                    ]
                     if len(noise_index) != 0:
                         QF_sixth = [
                             k for k in QF_fifth
@@ -356,7 +309,6 @@ while check:
                         N_Pulses_Indicator_DU.append(-1.5)
 
                 except (
-                        TypeError, ValueError
                         TypeError, ValueError, http.client.RemoteDisconnected, ssl.SSLError
                 ):  # TypeError if no data found for a certain piezo, ValueError if there are zero data for a certain piezo
                     N_Pulses_Indicator_DU.append(-1.5)
@@ -371,12 +323,10 @@ while check:
             pulse_inter = 5.04872989654541
 
             for i in range(dim - 1):
-                if (np.mod((UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) == 0
                 
                 if (np.mod((UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) < 10**-3
                         or np.mod(
                             (UTB_MIN[i] - UTB_MIN[i + 1]), pulse_inter) > 5):
-                    if QF_MAX[i] < QF_MAX[i + 1]:
                     if QF_MAX[i] <= QF_MAX[i + 1]:
                         N_Pulses_Indicator_DU[3 * dom + i] = -1.5
                     else:
@@ -384,10 +334,8 @@ while check:
                 if i == 0 and dim == 3:
                     if (np.mod(
                         (UTB_MIN[i] -
-                         UTB_MIN[i + 2]), pulse_inter) == 0 or np.mod(
                          UTB_MIN[i + 2]), pulse_inter) < 10**-3 or np.mod(
                              (UTB_MIN[i] - UTB_MIN[i + 2]), pulse_inter) > 5):
-                        if QF_MAX[i] < QF_MAX[i + 2]:
                         if QF_MAX[i] <= QF_MAX[i + 2]:
                             N_Pulses_Indicator_DU[3 * dom + i] = -1.5
                         else:
@@ -396,8 +344,6 @@ while check:
 
         N_Pulses_Indicator.append(N_Pulses_Indicator_DU)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
     fig, ax = plt.subplots(figsize=(9, 7))
 
     duab = []
@@ -421,10 +367,8 @@ while check:
         iAB2.append(3 * i + 1)
         iAB3.append(3 * i + 2)
 
-    colorsList = [(0, 0, 0), (1, 0.3, 0), (1, 1, 0), (0.2, 0.9, 0)]
     colorsList = [(0.6, 0, 1), (0, 0, 0), (1, 0.3, 0), (1, 1, 0), (0.2, 0.9, 0)]
     CustomCmap = matplotlib.colors.ListedColormap(colorsList)
-    bounds = [-2, -1, 0, 1, 2]
     bounds = [-3, -2, -1, 0, 1, 2]
     norma = colors.BoundaryNorm(bounds, CustomCmap.N)
     for du in DUS:
@@ -453,21 +397,15 @@ while check:
     cbar = plt.colorbar(color)
     cbar.ax.get_yaxis().set_ticks([])
     for j, lab in enumerate(
-        ['$0. pings$', '$1-3 pings$', '$4-7 pings$', '$>7. pings$']):
-        cbar.ax.text(3.5, (2 * j + 1) / 8.0, lab, ha='center', va='center')
         ['$No DB conn.$','$0. pings$', '$1-3 pings$', '$4-7 pings$', '$>7. pings$']):
         cbar.ax.text(4, (1.5 * j + 1) / 8.0, lab, ha='center', va='center')
     cbar.ax.get_yaxis().labelpad = 18
 
-    matplotlib.pyplot.xticks(np.arange(1, max(DUS) + 1, step=1))
-    matplotlib.pyplot.yticks(np.arange(0, 19, step=1))
-    matplotlib.pyplot.grid(color='k', linestyle='-', linewidth=0.2)
     ax.set_xticks(np.arange(min(DUS), max(DUS) + 1, step=1))
     ax.set_yticks(np.arange(0, 19, step=1))
     ax.grid(color='k', linestyle='-', linewidth=0.2)
     ax.set_xlabel('DUs', fontsize=18)
     ax.set_ylabel('Floors', fontsize=18)
-    ts = now + 3600
     ts = now
     DATE = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     ax.set_title(
@@ -478,16 +416,13 @@ while check:
     my_file = 'Online_Acoustic_Monitoring.png'
 
     fig.savefig(os.path.join(my_path, my_file))
-
     plt.close('all')
     
     print(time.time())
 
     check = False
-    check_time = time.time() - now
     check_time = time.time() - now - TIT
     print(check_time)
 
-    time.sleep(abs(2 * TIT - check_time))
     time.sleep(abs(TIT - check_time))
     check = True
