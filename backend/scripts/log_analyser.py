@@ -17,10 +17,11 @@ from datetime import timezone as tz
 import time
 
 class Message:   
+    regexp = re.compile('(\w+.\w+)\s+\[(\w+)\]:\s+(.*)\s+(\d+\.\d+\.\d+\.\d+)\s+(\w+\/*\w+)\s+(\w+)\s+(.*)')
+
     def __init__(self, msg):
-        self.regexp  = '(\w+.\w+)\s+\[(\w+)\]:\s+(\w+\s+\w+\s+\d+\s+\d+:\d+:\d+\s+\d+)\s+(\d+\.\d+\.\d+\.\d+)\s+(\w+\/*\w+)\s+(\w+)\s+(.*)'
-        self.matches = re.match(self.regexp,msg)
-        self.fields  = re.split(self.regexp,msg)
+        self.matches = self.regexp.match(msg)
+        self.fields  = self.regexp.split(msg)
     
     def is_error(self):
         return self.matches!=None and self.fields[6]=='ERROR'
@@ -79,6 +80,9 @@ def process_log_file(log_file,out_file):
         if (msg.matches!=None):
             errors  [msg.get_process()] = errors  .get(msg.get_process(), 0) + 1 if msg.is_error()   else  errors  .get(msg.get_process(), 0)
             warnings[msg.get_process()] = warnings.get(msg.get_process(), 0) + 1 if msg.is_warning() else  warnings.get(msg.get_process(), 0)
+
+    print(f"Warnings: {warnings}")
+    print(f"Errors: {errors}")
         
     title = os.path.basename(f.name)        
     plot_log_statistics(errors,warnings,title,out_file)
