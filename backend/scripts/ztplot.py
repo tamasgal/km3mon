@@ -109,6 +109,11 @@ class ZTPlot(kp.Module):
         try:
             self.calib = kp.calib.Calibration(det_id=self.det_id,
                                               run=self.run_id)
+        except IndexError:
+            self.log.error("Unusable (probably empty) DETX received from the database, "
+                           "falling back to the base DETX without any calibration and "
+                           "retrying at run change.")
+            self.calib = kp.calib.Calibration(det_id=self.det_id)
         except URLError as e:
             self.log.error(
                 "Unable to update calibration, no connection to the DB, "
