@@ -61,9 +61,9 @@ function main()
             plot!(du_hits, fit, markercolor=colours[idx], label="DU $(du)", max_z=calib.max_z)
             write_time_residuals("/data/reco_timeres.csv", event, fit.selected_hits, fit)
         end
-        if sum(Q) < 200 && n_doms > 9 && n_dus > 1
+        if sum(Q) < 200 && n_doms > 6 && n_dus > 1
             fit_params = "ROy live reconstruction (combined single line): Q=$([round(_Q,digits=2) for _Q in Q])"
-            event_params = "Det ID $(event.det_id), Run $(event.run_id), FrameIndex $(event.timeslice_id), TriggerCounter $(event.trigger_counter), Overlays $(event.overlays)"
+            event_params = "Det ID $(event.det_id), Run:$(event.run_id) FI:$(event.timeslice_id) TC:$(event.trigger_counter), Overlays $(event.overlays)"
             time_params = "$(unix2datetime(event.timestamp)) UTC"
             trigger_params = "Trigger: $(is_mxshower(event) ? "MX " : "")$(is_3dmuon(event) ? "3DM " : "")$(is_3dshower(event) ? "3DS " : "")"
             time_params = "$(unix2datetime(event.timestamp)) UTC"
