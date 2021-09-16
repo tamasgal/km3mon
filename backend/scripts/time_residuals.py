@@ -42,7 +42,7 @@ def main():
 
         fig, axes = plt.subplots(nrows=6,
                                  ncols=3,
-                                 figsize=(16, 10),
+                                 figsize=(16, 22),
                                  sharex=True,
                                  sharey=False,
                                  constrained_layout=True)
