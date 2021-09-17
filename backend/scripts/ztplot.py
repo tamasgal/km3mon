@@ -220,7 +220,8 @@ class ZTPlot(kp.Module):
                      max_z=self.max_z,
                      ytick_distance=self.ytick_distance,
                      grid_lines=grid_lines,
-                     n_dus=n_dus)
+                     n_dus=n_dus,
+                     figsize=(16, 16))
         shutil.move(f_tmp, f)
 
         if is_in_top10:
