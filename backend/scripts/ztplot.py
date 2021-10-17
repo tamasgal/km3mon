@@ -22,7 +22,7 @@ import km3pipe.style
 from km3modules.plot import ztplot
 from km3modules.common import LocalDBService
 from km3modules.communication import ELOGService
-from km3pipe.io.daq import is_3dmuon, is_3dshower, is_mxshower
+from km3io.tools import is_3dmuon, is_3dshower, is_mxshower
 import km3db
 import km3pipe as kp
 import numpy as np
