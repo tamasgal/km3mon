@@ -40,8 +40,8 @@ import toml
 from rocketchat_API.rocketchat import RocketChat
 
 import km3pipe as kp
-from km3pipe.io.daq import (DAQPreamble, DAQEvent, is_3dshower, is_3dmuon,
-                            is_mxshower)
+from km3pipe.io.daq import DAQPreamble, DAQEvent
+from km3io.tools import is_3dshower, is_3dmuon is_mxshower
 import km3pipe.style
 
 VERSION = "1.0"
