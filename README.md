@@ -12,7 +12,7 @@ Everything is containerised, so no need to install other software.
 
 ## Setup
 
-1. Create a `.env` file using the `example.env` template and adjust the detector
+1. Create a file called `.env` from the `example.env` template and adjust the detector
    ID and the IP/port of the servers.
 
 2. Next, create a `backend/supervisord.conf` from the template file
