@@ -29,7 +29,7 @@ elog = false
 time_range = 72
 
 [LocalDBService]
-filename = "data/monitoring.sqlite3"
+filename = "/data/monitoring.sqlite3"
 
 [ELOGService]
 password = "swordfish"
