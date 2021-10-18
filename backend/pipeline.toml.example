@@ -35,6 +35,7 @@ filename = "/data/monitoring.sqlite3"
 password = "swordfish"
 
 [Alerts]
+enabled = false
 botname = "monitoring"
 password = "supersecretpassword"
 channel = "operations_fr"

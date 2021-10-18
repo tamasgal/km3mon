@@ -50,16 +50,22 @@ km3pipe.style.use('km3pipe')
 URL = "https://chat.km3net.de"
 CONFIG = "pipeline.toml"
 
+rocket = None
+
 with open(CONFIG, 'r') as fobj:
     config = toml.load(fobj)
     BOTNAME = config['Alerts']['botname']
     PASSWORD = config['Alerts']['password']
     CHANNEL = config['Alerts']['channel']
+    if config['Alerts']['enabled']:
+        rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
 
 log = kp.logger.get_logger(__name__)
-rocket = RocketChat(BOTNAME, PASSWORD, server_url=URL)
 
 def sendchatalert(msg):
+    if rocket is None:
+        log.warning(msg)
+        return
     with open(CONFIG, 'r') as fobj:
         shifters = toml.load(fobj)['Alerts'].get('shifters', "shifters")
     try:
